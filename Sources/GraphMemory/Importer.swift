@@ -8,9 +8,19 @@
 // FIXME: Consolidate error reporting mechanism
 // FIXME: There are mutliple error reporting mechanisms: exception, issue list
 
+import Foundation
 import Records
 
-enum ImporterError: Error {
+/// Errors raised by the Importer
+///
+public enum ImporterError: Error {
+    /// The validation of records that were attempted to be imported failed.
+    /// The associated list contains list of issues identified.
+    case validationError(IssueList)
+    /// Loading of a resource failed.
+    case resourceLoadError(URL)
+    /// Creating an instance from record failed
+    case instantionFailed(Record)
     case missingID
     case typeError
     case duplicateID
@@ -35,7 +45,7 @@ public struct ImporterNaming {
     }
 }
 
-/// Importer loads records from external source into the graph space.
+/// Importer loads records from external source into the graph.
 ///
 public class Importer {
     typealias NodeNamespace = Namespace<String,Node>
@@ -82,11 +92,11 @@ public class Importer {
     ///
     public func validateNodeRecords(_ records: RecordSet, type: RecordRepresentable.Type) -> IssueList {
         guard records.schema.hasField(naming.nodeKeyField) else {
-            let issue = Issue(.error, "No field for node key `\(naming.nodeKeyField)`.")
+            let issue = Issue(.error, "Missing field with node key `\(naming.nodeKeyField)`.")
             return [issue]
         }
 
-        var issues = IssueList()
+        let issues = IssueList()
         
         // Validate value completeness
         //
@@ -189,35 +199,87 @@ public class Importer {
         return issues
     }
 
-    /// Import nodes from a record set. Fails to import nodes if there are
-    /// duplicates.
+    /// Imports nodes from a CSV file located at given URL.
     ///
-    public func importNodes(_ recordSet: RecordSet, namespace: String="default", type: RecordRepresentable.Type) -> IssueList {
-        // FIXME: Should return list of imported nodes or a dictionary.
+    /// - Parameters:
+    ///     - url: URL of the CSV file
+    ///     - type: Subclass of Node that will be used to instantiate records
+    ///     - fieldMap: a dictionary to map CSV field names into record
+    ///       field names. Keys are CSV field names, values are record field
+    ///       names
+    ///
+    @discardableResult
+    public func importNodesFromCSV(_ url: URL, namespace: String = "default",
+                            type: RecordRepresentable.Type,
+                            fieldMap: [String:String]=[:]) throws -> [String] {
+        guard let records = try RecordSet(contentsOfCSVFile: url) else {
+            throw ImporterError.resourceLoadError(url)
+        }
+               
+        if fieldMap.count > 0 {
+            records.schema = records.schema.renamed(fieldMap)
+        }
         
-        var issues = IssueList()
-        
-        // Check for duplicates
-        //
-        // 1. Validate record set
-        issues += validateNodeRecords(recordSet, type: type)
+        let issues = validateNodeRecords(records, type: type)
 
-        for record in recordSet {
-            do {
-                // FIXME: Type mismatch, we need to make Node RecordRepresentable
-                // TODO: Collect the nodes and return them
-                try importNode(record, namespace: namespace, type: type)
-            }
-            catch {
-                issues.error("Unable to create node from record: \(error) (\(record))")
-                continue
-            }
+        guard !issues.hasErrors else {
+            throw ImporterError.validationError(issues)
+        }
+        
+        let names: [String]
+        names = try importNodes(records, namespace: namespace, type: type)
+        return names
+    }
+
+    /// Import nodes from a record set. The `records` are expeced to be
+    /// validated by ``validateNodeRecords(_:type:)``
+    ///
+    /// - Parameters:
+    ///
+    ///     - records: a `RecordSet` of records that represent nodes to be
+    ///       imported
+    ///     - namespace: a namespace into which the keys of imported records
+    ///       are going to be registered.
+    ///     - type: subclass of Node that will be used to instantiate the
+    ///       records
+    ///
+    /// - Returns: List of node names registered in the namespace.
+    /// - Throws: ``ImporterError``
+    ///
+    @discardableResult
+    public func importNodes(_ records: RecordSet, namespace: String="default",
+                            type: RecordRepresentable.Type) throws -> [String] {
+        // FIXME: Should return list of imported nodes or a dictionary.
+        var names: [String] = []
+        
+        for record in records {
+            // FIXME: Type mismatch, we need to make Node RecordRepresentable
+            // TODO: Collect the nodes and return them
+            let name = try importNode(record, namespace: namespace, type: type)
+            names.append(name)
         }
      
-        return issues
+        return names
     }
     
-    func importNode(_ record: Record, namespace: String="default", type: RecordRepresentable.Type) throws -> Node {
+    /// Imports a record as a node. An instance of Node or Node's subclass is
+    /// created from the record's fields and is associated with the graph.
+    ///
+    /// - Parameters:
+    ///
+    ///     - records: a `RecordSet` of records that represent nodes to be
+    ///       imported
+    ///     - namespace: a namespace into which the imported node will be
+    ///       registered.
+    ///     - type: subclass of Node that will be used to instantiate the
+    ///       records
+    ///
+    /// - Returns: name of the imported note that was registered in the
+    ///   namespace
+    /// - Throws: ``ImporterError``
+    ///
+    @discardableResult
+    func importNode(_ record: Record, namespace: String="default", type: RecordRepresentable.Type) throws -> String {
         guard let keyValue = record[naming.nodeKeyField] else {
             throw ImporterError.missingID
         }
@@ -236,6 +298,6 @@ public class Importer {
             setNodeName(nodeKey, node:node, namespace:namespace)
         }
 
-        return node
+        return nodeKey
     }
 }

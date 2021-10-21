@@ -1,0 +1,27 @@
+
+# Inspired by:
+# https://developer.apple.com/documentation/cloudkit/integrating_a_text-based_schema_into_your_workflow?changes=la
+
+DEFINE SCHEMA
+    
+NODE TRAIT Card (
+    name STRING "Name",
+    level NUMBER "Level",
+)
+LINKS (
+    amplifies,
+    amplified_by INCOMING NAME amplifies,
+    suffer_missing NAMED "suffer-missing"
+)
+
+LINK TRAIT amplifies
+
+NODE TRAIT Note (
+    text STRING
+)
+LINKS (
+    comment OUTGOING,
+    previus OUTGOING,
+    next OUTGOING,
+    referenced_by INCOMING see_also
+)

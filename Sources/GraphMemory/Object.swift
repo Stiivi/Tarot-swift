@@ -5,8 +5,6 @@
 //  Created by Stefan Urbanek on 2021/10/10.
 //
 
-import Foundation
-
 public typealias OID = Int
 public typealias PropertyKey = String
 public typealias PropertyValue = String

@@ -35,7 +35,8 @@ final class ImporterTests: XCTestCase {
         let importer = Importer(space: space)
         
         let record = Record(schema: schema, ["id": "1", "name": "one"])
-        let node = try importer.importNode(record, type: TestNode.self)
+        let name = try importer.importNode(record, type: TestNode.self)
+        let node = importer.namedNode(name)!
         
         let gnode = space.nodes.first!
         
@@ -47,15 +48,14 @@ final class ImporterTests: XCTestCase {
         let space = GraphMemory()
         let importer = Importer(space: space)
 
-        let records: [Record] = [
+        let records = RecordSet(schema: schema, [
             Record(schema: schema, ["id":"1", "name": "one"]),
             Record(schema: schema, ["id":"2", "name": "two"]),
             Record(schema: schema, ["id":"3", "name": "three"]),
-        ]
+        ])
         
-        for record in records {
-            let node = try TestNode(record: record)
-            try importer.importNode(record, type: TestNode.self)
-        }
+        let names = try importer.importNodes(records, type: TestNode.self)
+        
+        XCTAssertEqual(Set(names), ["1", "2", "3"])
     }
 }

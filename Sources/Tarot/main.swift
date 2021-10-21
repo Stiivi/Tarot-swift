@@ -6,7 +6,6 @@
 //
 import GraphMemory
 
-
 // Main
 
 let DATA_PATH = "/Users/stefan/Documents/Data Cards/Cards of Data Governance 2021"
@@ -20,14 +19,11 @@ let FILE_MAP = [
 
 func main() throws {
     // try loadModel(DATA_PATH, fileMap: FILE_MAP)
-    var issues = IssueList()
-    
     print("Loading model...")
-    issues += try loadModelUsingImporter(DATA_PATH, fileMap: FILE_MAP)
-    print("Model loaded.")
-    
-    if issues.count > 0 {
-        print("ISSUES:")
+    do {
+        try loadModel(DATA_PATH, fileMap: FILE_MAP)
+    }
+    catch ImporterError.validationError(let issues) {
         for issue in issues {
             print(issue)
         }

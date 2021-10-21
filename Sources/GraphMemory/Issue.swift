@@ -5,8 +5,6 @@
 //  Created by Stefan Urbanek on 2021/10/20.
 //
 
-import Foundation
-
 public struct Issue: CustomStringConvertible {
     public enum Severity: String, Equatable {
         case info

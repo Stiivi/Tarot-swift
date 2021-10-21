@@ -132,3 +132,62 @@ class Card: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStrin
 
     
 }
+
+var IndicatorTrait = Trait(
+    name: "Card",
+    links: [
+        LinkDescription("card", "card"),
+        LinkDescription("represented_stat", "card", isReverse: true),
+    ],
+    properties: [
+        PropertyDescription("name"),
+        PropertyDescription("label"),
+        PropertyDescription("shortName"),
+        PropertyDescription("imageName"),
+        PropertyDescription("description"),
+        PropertyDescription("orientation"),
+    ]
+)
+
+
+class Indicator: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStringConvertible {
+    static var recordSchema: Schema {
+        Schema([
+            Field("name", isUnique: true),
+            // Field("label", isRequired: false),
+            Field("short"),
+            Field("image"),
+            Field("description"),
+            Field("orientation"),
+        ])
+    }
+
+    var name: String
+    var label: String
+    var shortName: String
+    var imageName: String
+    // #FIXME: What should be the proper name of this if we want to be custom string convertible?
+    var _description: String?
+    var orientation: String
+
+    required init(record: Record) throws {
+        let name = try record.stringValue(of: "name")!
+        
+        // Make compiler happy (for the ?? name)
+        self.name = name
+        // label = try record.stringValue(of: "label") ?? name
+        label = name
+        shortName = try record.stringValue(of: "short") ?? name
+        imageName = try record.stringValue(of: "image") ?? name
+        _description = try record.stringValue(of: "description")
+        orientation = try record.stringValue(of: "orientation") ?? "positive"
+    }
+    func recordRepresentation() -> Record {
+        fatalError("recordRepresentation not implemented")
+    }
+
+    public var description: String { name }
+    public var debugDescription: String {
+        "Indicator(\(name))"
+    }
+}

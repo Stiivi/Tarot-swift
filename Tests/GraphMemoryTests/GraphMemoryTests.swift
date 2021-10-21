@@ -113,7 +113,7 @@ final class GraphMemoryTests: XCTestCase {
     func testTrait() throws {
         let graph = GraphMemory()
 
-        let ld = LinkTrait("cards", "card")
+        let ld = LinkDescription("cards", "card")
         let trait = Trait(name: "Stack", links: [ld])
 
         let c1 = Thing("Card 1")
@@ -140,7 +140,7 @@ final class GraphMemoryTests: XCTestCase {
     func testReverseTrait() throws {
         let graph = GraphMemory()
 
-        let ld = LinkTrait("colors", "component", isReverse:true)
+        let ld = LinkDescription("colors", "component", isReverse:true)
         let trait = Trait(name: "Thing", links: [ld])
 
         let red = Thing("red")
