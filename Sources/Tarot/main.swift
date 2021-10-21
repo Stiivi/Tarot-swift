@@ -23,7 +23,7 @@ func main() throws {
     do {
         try loadModel(DATA_PATH, fileMap: FILE_MAP)
     }
-    catch ImporterError.validationError(let issues) {
+    catch ImportError.validationError(let issues) {
         for issue in issues {
             print(issue)
         }

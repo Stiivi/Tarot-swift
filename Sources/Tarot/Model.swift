@@ -134,7 +134,7 @@ class Card: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStrin
 }
 
 var IndicatorTrait = Trait(
-    name: "Card",
+    name: "Indicator",
     links: [
         LinkDescription("card", "card"),
         LinkDescription("represented_stat", "card", isReverse: true),
@@ -191,3 +191,22 @@ class Indicator: Node, RecordRepresentable, CustomStringConvertible, CustomDebug
         "Indicator(\(name))"
     }
 }
+
+var TarotTrait = Trait(
+    name: "Tarot",
+    links: [
+        LinkDescription("cards", "card"),
+    ],
+    properties: [
+    ]
+)
+
+
+/// Collection of cards
+///
+// class Tarot: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStringConvertible {
+//    public var description: String { name }
+//    public var debugDescription: String {
+//        "Tarot(\(name))"
+//    }
+//}

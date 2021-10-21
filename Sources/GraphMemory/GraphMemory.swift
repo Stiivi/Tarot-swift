@@ -8,6 +8,10 @@
 /// Graph Memory is a mutable graph container. It contains nodes and links and
 /// provides functionality for modifying the graph.
 ///
+/// - Remark: For engineers out there: This is a "domain specific problem environment object", or a
+/// "simulation environment". It is not made a generic as it is not intended
+/// for general purpose use. It does not mean it might not change in the future.
+///
 public class GraphMemory {
     private var nodeIndex: [OID:Node] = [:]
     private var linkIndex: [OID:Link] = [:]

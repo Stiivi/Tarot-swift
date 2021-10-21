@@ -9,8 +9,7 @@ import Foundation
 import Records
 import GraphMemory
 
-func loadModel(_ dataPath: String, fileMap: [String:String]) throws -> IssueList {
-    var issues = IssueList()
+func loadModel(_ dataPath: String, fileMap: [String:String]) throws {
     let dataURL = URL(fileURLWithPath: dataPath, isDirectory: true)
     let space = GraphMemory()
     var naming = ImporterNaming()
@@ -43,13 +42,7 @@ func loadModel(_ dataPath: String, fileMap: [String:String]) throws -> IssueList
     // 2. read and validate Card relationships
     // ---------------------------------------------------------------
 
-    print("Reading card relationships...")
-    guard let linkRecords = try RecordSet(contentsOfCSVFile: dataURL.appendingPathComponent(fileMap["links"]!)) else {
-        fatalError("Can not load link records")
-    }
-
-    print("Validating card relationships...")
-    issues += importer.validateLinkRecords(linkRecords, namespace: "cards")
-
-    return issues
+    print("Loading card relationships...")
+    let linksURL = dataURL.appendingPathComponent(fileMap["links"]!)
+    try importer.importLinksFromCSV(linksURL, namespace:"cards")
 }

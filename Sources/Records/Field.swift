@@ -20,9 +20,9 @@ public final class Field: Equatable {
     public var isUnique: Bool = false
     
     /// Flag whether the values are optional . If values are optional
-    /// they can be `nil`. Default is `false`.
+    /// they can be `nil`. Default is `true`.
     ///
-    public var isRequired: Bool = false
+    public var isRequired: Bool = true
 
     /// Flag whether the values can be empty. See `Value.isEmpty` for more
     /// information how emptiness is being checked. Default is `false`
