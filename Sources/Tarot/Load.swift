@@ -9,7 +9,7 @@ import Foundation
 import Records
 import GraphMemory
 
-func loadModel(_ space: GraphMemory, _ dataPath: String, fileMap: [String:String]) throws {
+func loadData(_ space: GraphMemory, _ dataPath: String, fileMap: [String:String]) throws {
     let dataURL = URL(fileURLWithPath: dataPath, isDirectory: true)
     var naming = ImporterNaming()
     

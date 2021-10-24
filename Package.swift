@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "GraphMemory",
+    name: "Tarot",
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -30,7 +30,10 @@ let package = Package(
             dependencies: ["Records", "DotWriter"]),
         .executableTarget(
             name: "Tarot",
-            dependencies: ["GraphMemory"]),
+            dependencies: ["GraphMemory"],
+            resources: [
+                .copy("model.json")]
+        ),
         .testTarget(
             name: "GraphMemoryTests",
             dependencies: ["GraphMemory", "Records"]),

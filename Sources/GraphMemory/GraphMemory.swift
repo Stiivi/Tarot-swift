@@ -5,6 +5,43 @@
 //  Created by Stefan Urbanek on 2021/10/5.
 //
 
+// FIXME: We are importing Records only because of Value
+import Records
+
+/// Protocol for a basic graph memory implementation. This protocol is
+/// a scaffolding for development - it helps to separate interface from the
+/// implementaiton.
+public protocol BasicGraphMemory {
+    var nodes: Set<Node> { get }
+    var links: Set<Link> { get }
+
+    /// Create a new empty node in the graph.
+    func createNode() -> Node
+    
+    /// Removes existing node and removes all links that are incoming or
+    /// outgoing from the node.
+    func remove(node: Node)
+    
+    /// Create a link in the memory.
+    func connect(from origin:Node, to target:Node) -> Link
+    /// Remove a link from the memory
+    func disconnect(link: Link)
+    
+    /// Set attribute of a node. Return previous attribute value.
+    func setAttribute(node: Node, attribute: String, value: Value) -> Value?
+    /// Remove a node attribute if exists. Returns previous value if it was set or
+    /// nil when there was no value set for the attribute.
+    func removeAttribute(node: Node, attribute: String) -> Value?
+
+    /// Set attribute of a link. Return previous attribute value.
+    func setAttribute(link: Link, attribute: String, value: Value) -> Value?
+
+    /// Remove a link attribute if exists. Returns previous value if it was set or
+    /// nil when there was no value set for the attribute.
+    func removeAttribute(link: Link, attribute: String) -> Value?
+}
+
+
 /// Graph Memory is a mutable graph container. It contains nodes and links and
 /// provides functionality for modifying the graph.
 ///
@@ -140,6 +177,7 @@ public class GraphMemory {
     ///
     /// - Returns: Newly created link
     ///
+    // FIXME: The `at name:` is a scaffolding, use properties
     @discardableResult
     public func connect(from origin: Node, to target: Node, at name: String) -> Link {
         let linkID = nextID()

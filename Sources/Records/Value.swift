@@ -9,7 +9,7 @@ import Foundation
 
 /// ValueType specifies a data type of a value that is used in interfaces.
 ///
-public enum ValueType: String, Equatable {
+public enum ValueType: String, Equatable, Codable {
     case bool
     case int
     case double

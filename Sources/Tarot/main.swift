@@ -5,6 +5,7 @@
 //  Created by Stefan Urbanek on 2021/10/19.
 //
 import GraphMemory
+import Foundation
 
 // Main
 
@@ -16,14 +17,24 @@ let FILE_MAP = [
     "stats": "types-stats.csv",
 ]
 
-
+func loadModel(url: URL) throws -> Model {
+    let json = try Data(contentsOf: url)
+    let decoder = JSONDecoder()
+    let model = try decoder.decode(Model.self,from: json)
+    return model
+}
+    
 func main() throws {
     let space = GraphMemory()
     
-    // try loadModel(DATA_PATH, fileMap: FILE_MAP)
-    print("Loading model...")
+    print("Load model...")
+    let modelURL =  Bundle.module_WORKAROUND.url(forResource: "model", withExtension: "json")
+
+    let model = try loadModel(url: modelURL!)
+    
+    print("Loading data...")
     do {
-        try loadModel(space, DATA_PATH, fileMap: FILE_MAP)
+        try loadData(space, DATA_PATH, fileMap: FILE_MAP)
     }
     catch ImportError.validationError(let issues) {
         for issue in issues {

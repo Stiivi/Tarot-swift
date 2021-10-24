@@ -9,11 +9,12 @@ import Records
 
 /// `LinkDescription` describes a link of a trait in a graph. It is used for
 /// looking up links in either direction based on the `isReverse` attribute.
-public class LinkDescription {
+public final class LinkDescription {
     // TODO: Change isReverse into enum Direction { outgoing, incoming }
     // TODO: Consider renaming to 'LinkTrait'
     
     public let name: String
+    // TODO: This is simplification for more complex predicate matching
     public let linkName: String
     public let isReverse: Bool
     
@@ -25,16 +26,38 @@ public class LinkDescription {
     ///     relationship, that is we are looking at objects where the receiving
     ///     node is a target
     ///
-    public init(_ name: String, _ linkName: String, isReverse: Bool=false) {
+    public required init(_ name: String, _ linkName: String, isReverse: Bool=false) {
         self.name = name
         self.linkName = linkName
         self.isReverse = isReverse
     }
 }
 
+extension LinkDescription: Codable {
+    enum CodingKeys: String, CodingKey {
+        case name
+        case linkName
+        case isReverse
+    }
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let name = try container.decode(String.self, forKey: .name)
+        let linkName = try container.decode(String.self, forKey: .linkName)
+        let isReverse = try container.decodeIfPresent(Bool.self, forKey: .isReverse)
+        self.init(name, linkName, isReverse: isReverse ?? false)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(linkName, forKey: .linkName)
+        try container.encode(isReverse, forKey: .isReverse)
+    }
+}
+
 /// Describes object property.
 /// 
-public class PropertyDescription {
+public final class PropertyDescription {
     public let name: String
     public let label: String
     public let valueType: ValueType
@@ -48,16 +71,39 @@ public class PropertyDescription {
     ///     provided then `name` will be used.
     ///   - valueType: type of the property value. Default is `string`
     ///
-    public init(_ name: String, label: String?=nil, valueType: ValueType = .string) {
+    public required init(_ name: String, label: String?=nil, valueType: ValueType = .string) {
         self.name = name
         self.label = label ?? name
         self.valueType = valueType
     }
 }
 
+extension PropertyDescription: Codable {
+    enum CodingKeys: String, CodingKey {
+        case name
+        case label
+        case valueType
+    }
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let name = try container.decode(String.self, forKey: .name)
+        let label = try container.decodeIfPresent(String.self, forKey: .label)
+        let valueType = try container.decodeIfPresent(ValueType.self, forKey: .valueType)
+        self.init(name, label: label ?? name, valueType: valueType ?? .string)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(label, forKey: .label)
+        try container.encode(valueType, forKey: .valueType)
+    }
+}
+
+
 /// `Trait` describes properties and links of a node.
 ///
-public class Trait {
+public final class Trait {
     public let name: String
     var _links: [String:LinkDescription]
     var _properties: [String:PropertyDescription]
@@ -65,7 +111,7 @@ public class Trait {
     public var links: [LinkDescription] { return Array(_links.values) }
     public var properties: [PropertyDescription] { return Array(_properties.values) }
 
-    public init(name: String, links: [LinkDescription]=[],
+    public required init(name: String, links: [LinkDescription]=[],
                 properties: [PropertyDescription]=[]) {
         self.name = name
         self._links = [:]
@@ -77,5 +123,24 @@ public class Trait {
         for property in properties {
             self._properties[property.name] = property
         }
+    }
+}
+
+extension Trait: Codable {
+    enum CodingKeys: String, CodingKey {
+        case name
+        case _links = "links"
+//        case _properties = properties
+    }
+    public convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let name = try container.decode(String.self, forKey: .name)
+        let links = try container.decodeIfPresent(Array<LinkDescription>.self, forKey: ._links)
+        self.init(name: name, links: links ?? [])
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(links, forKey: ._links)
     }
 }

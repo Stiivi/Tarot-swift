@@ -9,47 +9,8 @@ import Foundation
 import Records
 import GraphMemory
 
-var CardTrait = Trait(
-    name: "Card",
-    links: [
-        LinkDescription("amplifies", "amplifies"),
-        LinkDescription("amplified_by", "amplifies", isReverse: true),
-        LinkDescription("inhibits", "inhibits"),
-        LinkDescription("inhibited_by", "inhibits", isReverse: true),
-        LinkDescription("requires", "requires"),
-        LinkDescription("required_by", "requires", isReverse: true),
 
-        LinkDescription("suffer_missing", "suffer-missing"),
-        LinkDescription("suffer_present", "suffer-present"),
-        LinkDescription("suffer_each", "suffer-each"),
-    ],
-    properties: [
-        PropertyDescription("name"),
-        PropertyDescription("type"),
-        PropertyDescription("side"),
-        PropertyDescription("domain"),
-        PropertyDescription("status"),
-        PropertyDescription("level", valueType: .int),
-        PropertyDescription("text"),
-
-        PropertyDescription("engPower", valueType: .int),
-        PropertyDescription("compPower", valueType: .int),
-        PropertyDescription("storage", valueType: .int),
-
-        PropertyDescription("threat", valueType: .int),
-        PropertyDescription("confusion", valueType: .int),
-        PropertyDescription("complexity", valueType: .int),
-        PropertyDescription("consistency", valueType: .int),
-        PropertyDescription("speed", valueType: .int),
-        PropertyDescription("quality", valueType: .int),
-        PropertyDescription("trust", valueType: .int),
-        PropertyDescription("adaptability", valueType: .int),
-        PropertyDescription("security", valueType: .int),
-    ]
-    
-)
-
-class Card: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStringConvertible {
+class Card: Node, RecordRepresentable, CustomStringConvertible {
     static var recordSchema: Schema {
         Schema([
             Field("name", isUnique: true),
@@ -126,11 +87,6 @@ class Card: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStrin
     }
     
     public var description: String { name }
-    public var debugDescription: String {
-        "Card(\(name))"
-    }
-
-    
 }
 
 var IndicatorTrait = Trait(
@@ -150,7 +106,7 @@ var IndicatorTrait = Trait(
 )
 
 
-class Indicator: Node, RecordRepresentable, CustomStringConvertible, CustomDebugStringConvertible {
+class Indicator: Node, RecordRepresentable, CustomStringConvertible {
     static var recordSchema: Schema {
         Schema([
             Field("name", isUnique: true),
@@ -187,9 +143,6 @@ class Indicator: Node, RecordRepresentable, CustomStringConvertible, CustomDebug
     }
 
     public var description: String { name }
-    public var debugDescription: String {
-        "Indicator(\(name))"
-    }
 }
 
 var TarotTrait = Trait(

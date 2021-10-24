@@ -14,9 +14,10 @@ open class Node: Object {
     subscript(dynamicMember member: String) -> [Node]? {
         return self[member]
     }
-    
+   
+    // TODO: Consider changing this to be a non-optional
     subscript(member: String) -> [Node]? {
-        guard let space = self.graph else {
+        guard let graph = self.graph else {
             return nil
         }
         guard let trait = self.trait else {
@@ -28,16 +29,22 @@ open class Node: Object {
             return nil
         }
         
+        let links: [Link]
         let nodes: [Node]
         
+        // TODO: This is simplified matching
+        let predicate = AttributeValuePredicate(key: "name",
+                                                value: .string(linkDesc.linkName))
+        
         if linkDesc.isReverse {
-            nodes = space.incoming(self).map { $0.origin }
+            links = graph.incoming(self).filter { predicate.evaluate($0) }
+            nodes = links.map { $0.origin }
         }
         else {
-            nodes = space.outgoing(self).map { $0.target }
+            links = graph.outgoing(self).filter { predicate.evaluate($0) }
+            nodes = links.map { $0.target }
         }
         
         return nodes
     }
-
 }

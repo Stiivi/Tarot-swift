@@ -1,0 +1,95 @@
+{
+    "name": "Tarot",
+    "traits": [
+    {
+        "name": "Tarot",
+        "links": [
+            {
+                "name": "cards",
+                "linkName": "card"
+                
+            },
+            {
+                "name": "indicators",
+                "linkName": "indicator"
+            },
+            {
+                "comment": "THIS IS UNUSED PROTOTYPE",
+                "name": "indicator_cards",
+                "linkName": "RENDER THIS UNUSED LATER",
+                "where": "name == 'card' AND TARGET.type == 'Indicator'"
+                
+            }
+        ],
+        "properties": [
+            { "name": "name" },
+            { "name": "label" },
+            { "name": "shortName" },
+            { "name": "imageName" },
+            { "name": "description" },
+            { "name": "orientation" },
+        ]
+    },
+    {
+        "name": "Card",
+        "links": [
+            { "name": "amplifies", "linkName": "amplifies" },
+            { "name": "amplified_by", "linkName": "amplifies", "isReverse": true },
+            { "name": "inhibits", "linkName": "inhibits"},
+            { "name": "inhibited_by", "linkName": "inhibits", "isReverse": true },
+            { "name": "requires", "linkName": "requires"},
+            { "name": "required_by", "linkName": "requires", "isReverse": true },
+
+            { "name": "suffer_missing", "linkName": "suffer-missing" },
+            { "name": "suffer_present", "linkName": "suffer-present" },
+            { "name": "suffer_each", "linkName": "suffer-each" }
+        ],
+        "properties": [
+            { "name": "name" },
+            { "name": "type" },
+            { "name": "side" },
+            { "name": "domain"},
+            { "name": "status"},
+            { "name": "level", "valueType": "int"},
+            { "name": "text"},
+
+            { "name": "engineeringPower", "valueType": "int"},
+            { "name": "computePower", "valueType": "int"},
+            { "name": "storage", "valueType": "int"},
+
+            { "name": "threat", "valueType": "int"},
+            { "name": "confusion", "valueType": "int"},
+            { "name": "complexity", "valueType": "int"},
+            { "name": "consistency", "valueType": "int"},
+            { "name": "speed", "valueType": "int"},
+            { "name": "quality", "valueType": "int"},
+            { "name": "trust", "valueType": "int"},
+            { "name": "adaptability", "valueType": "int"},
+            { "name": "security", "valueType": "int"}
+        ]
+    },
+    {
+        "name": "Indicator",
+        "links": [
+            {
+                "name": "card",
+                "linkName": "card" },
+            {
+                "name": "represented_stat",
+                "linkName": "card",
+                "isReverse": true
+            },
+        ],
+        "properties": [
+            { "name": "name" },
+            { "name": "label" },
+            { "name": "shortName" },
+            { "name": "imageName" },
+            { "name": "description" },
+            { "name": "orientation" },
+        ]
+    }
+    
+    
+    ]
+}

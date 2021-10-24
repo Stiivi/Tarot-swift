@@ -11,8 +11,8 @@ public typealias OID = Int
 public typealias PropertyKey = String
 public typealias PropertyValue = String
 
-/// An object in a graph memory. There are two types of objects: links and
-/// nodes.
+/// An object in a graph memory. It represents one of two graph components:
+/// a node or a link. Objects can store information
 ///
 open class Object {
     /// Graph memory that the object is associated with.
@@ -43,5 +43,25 @@ open class Object {
         set(value) {
             attributes[key] = value
         }
+    }
+}
+
+extension Object: Hashable {
+    // TODO: Equality is based on identity withing graph
+    public static func == (lhs: Object, rhs: Object) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
+extension Object: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        var items = attributes.map { "\($0.key): \($0.value)" }
+        var joined = items.joined(separator: ", ")
+        
+        return "Object{\(joined)}"
     }
 }

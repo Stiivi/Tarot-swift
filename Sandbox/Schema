@@ -2,16 +2,23 @@
 -- Inspired by:
 -- https://developer.apple.com/documentation/cloudkit/integrating_a_text-based_schema_into_your_workflow?changes=la
 
-DEFINE SCHEMA
-    
+item := node_trait | link_trait
+
+node_trait := "NODE" "TRAIT" identifier [attributes] [links]
+attributes := {attribute}
+links := {link}
+attribute := identifier type [string]
+link := identifier [OUTGOING|INCOMING] [WHERE predicate]
+
+
 NODE TRAIT Tarot (
 )
 LINKS (
     --- Cards that belong to the tarot.
-    cards OUTGOING card
+    cards OUTGOING WHERE name = 'card',
     
-    domain_cards OUTGOING card WHERE type == 'domain'
-    indicator_cards OUTGOING card WHERE type == 'domain'
+    domain_cards OUTGOING WHERE name = 'card' AND TARGET.type == 'domain',
+    indicator_cards OUTGOING WHERE name = 'card' AND TARGET.type == 'domain',
 )
 
 NODE TRAIT Card (

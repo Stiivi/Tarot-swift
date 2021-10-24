@@ -2,6 +2,11 @@
 
 A description of this package.
 
+- Serious toy
+- Explore your domain, explore your model
+- Develop model with your data
+- Validate data with your model, validate model with your data
+
 # Modules
 
 ## Records
