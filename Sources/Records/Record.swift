@@ -19,7 +19,6 @@ public enum RecordError: Error, Equatable {
     case valueNotFound(String)
 }
 
-// TODO: Add RecordType
 
 /// Record is a mutable data structure for storing values for up-front known
 /// fields. Its intended use is for interfaces with external sources.
@@ -102,38 +101,3 @@ public class Record {
         return value?.doubleValue()
     }
 }
-
-
-
-/// A protocol for objects that can be represented by a record. Objects that are
-/// representable by a record can be initialized from a record and can be
-/// converted to a record.
-///
-/// Typical use-case for this protocol is conversion between external sources
-/// and application objects.
-///
-/// Note: Objects represented by records are non-recursive structures since
-/// there is no explicit way how to represent and handle references in records.
-///
-public protocol RecordRepresentable {
-    /// Create object instance from a record.
-    ///
-    init(record: Record) throws
-    
-    /// Creates a record that fully represents the object.
-    ///
-    func recordRepresentation() -> Record
-    
-    /// Minimal schema that is required when creating objects from records.
-    /// The records the obeject is being created from might contain additional
-    /// fields although only fields described in this schema are required.
-    /// Validators can use this method to validate records prior to creation to
-    /// prevent errors.
-    static var recordSchema: Schema { get }
-}
-
-extension RecordRepresentable {
-    /// Default implementation provides and empty schema as required schema.
-    static var recordSchema: Schema { Schema() }
-}
-

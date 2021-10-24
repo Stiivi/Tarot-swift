@@ -11,7 +11,7 @@ import XCTest
 @testable import GraphMemory
 @testable import Records
 
-class TestNode: Node, RecordRepresentable {
+class TestNode: Node {
     var recordSchema: Schema { Schema() }
     
     let name: String
@@ -35,7 +35,7 @@ final class ImporterTests: XCTestCase {
         let importer = Importer(memory: space)
         
         let record = Record(schema: schema, ["id": "1", "name": "one"])
-        let name = try importer.importNode(record, type: TestNode.self)
+        let name = try importer.importNode(record)
         let node = importer.namedNode(name)!
         
         let gnode = space.nodes.first!
@@ -54,7 +54,7 @@ final class ImporterTests: XCTestCase {
             Record(schema: schema, ["id":"3", "name": "three"]),
         ])
         
-        let names = try importer.importNodes(records, type: TestNode.self)
+        let names = try importer.importNodes(records).keys
         
         XCTAssertEqual(Set(names), ["1", "2", "3"])
     }

@@ -24,9 +24,8 @@ public enum ImportError: Error {
     case missingField(String)
     case typeError(String)
     case duplicateID
-    /// Node not found by name and namespace. The arguments are name and
-    /// namespace.
-    case unknownNode(String, String)
+    /// Node not found by name
+    case unknownNode(String)
 }
 
 public struct ImporterNaming {
@@ -49,20 +48,18 @@ public struct ImporterNaming {
 }
 
 /// Importer loads records from external source into the graph memory. One
-/// instance of the importer represents one import session.
+/// instance of the importer represents one import session within one namespace.
 ///
 public class Importer {
-    typealias NodeNamespace = Namespace<String,Node>
-    
     /// Graph memory into which the nodes will be imported
     let memory: GraphMemory
     
     /// Naming conventions for this import session.
     let naming: ImporterNaming
     
-    /// Namespaces where the keys of imported nodes are registered. Namespaces
+    /// Names
     /// are used for looking-up nodes by reference.
-    var namespaces: [String: NodeNamespace] = [:]
+    var names: [String:Node]
     
     /// Creates an importer for a graph memory.
     ///
@@ -71,61 +68,41 @@ public class Importer {
     ///     - space: Graph memory to import objects into.
     ///     - naming: Naming conventions for this import session.
     ///
-    public init(memory: GraphMemory, naming: ImporterNaming?=nil) {
+    public init(memory: GraphMemory, naming: ImporterNaming?=nil, references: [String:Node]?=nil) {
         self.memory = memory
         self.naming = naming ?? ImporterNaming()
-    }
     
-    /// Get a namespace by its name. If the namespace does not exist, then it
-    /// is created.
-    ///
-    /// - Parameters:
-    ///
-    ///     - namespace: Namespace name.
-    ///
-    /// - Returns: Node namespace.
-    ///
-    func getNamespace(_ namespace: String) -> NodeNamespace{
-        if let ns = namespaces[namespace] {
-            return ns
+        if let references = references {
+            names = references
         }
         else {
-            let ns = NodeNamespace()
-            namespaces[namespace] = ns
-            return ns
+            names = [:]
         }
     }
     
-    /// Get a node by name within a specified namespace.
+    /// Get a node by name
     ///
     /// - Parameters:
     ///
     ///     - name: Node name to be looked up.
-    ///     - namespace: Name of the namespace where to lookup the node.
-    ///       Default is "default"
     ///
     /// - Returns: Node if the node was found or `nil` if the node was not
     ///   found.
     ///
-    public func namedNode(_ name: String, namespace: String="default") -> Node? {
-        let ns = getNamespace(namespace)
-        
-        return ns[name]
+    public func namedNode(_ name: String) -> Node? {
+        return names[name]
     }
     
-    /// Sets name for a node in a namespace.
+    /// Sets name for a node.
     ///
     /// - Parameters:
     ///
     ///     - name: Name to be set for a node.
-    ///     - node: Node to be referenced in the namespace.
-    ///     - namespace: Name of the namespace to register the node name.
+    ///     - node: Node to be referenced
     ///       Default is "default".
     ///
-    public func setNodeName(_ name: String, node: Node,
-                            namespace: String="default") {
-        let ns = getNamespace(namespace)
-        ns[name] = node
+    public func setNodeName(_ name: String, node: Node) {
+        names[name] = node
     }
 
     /// Validate records in the record set whether the contents is convertible
@@ -138,9 +115,9 @@ public class Importer {
     ///
     /// - Returns: List of issues found within the record set.
     ///
-    public func validateNodeRecords(_ records: RecordSet, type: RecordRepresentable.Type) -> IssueList {
+    public func validateNodeRecords(_ records: RecordSet) -> IssueList {
         guard records.schema.hasField(naming.nodeKeyField) else {
-            let issue = Issue(.error, "Missing field with node key `\(naming.nodeKeyField)`.")
+            let issue = Issue(.error, "Missing node key field `\(naming.nodeKeyField)`.")
             return [issue]
         }
 
@@ -170,14 +147,6 @@ public class Importer {
             }
         }
         
-        // Validate required schema
-        //
-        let diff = records.schema.difference(with: type.recordSchema)
-
-        if diff.missingFields.count > 0 {
-            issues.error("Records are missing fields: \(diff.missingFields)")
-        }
-
         return issues
     }
 
@@ -186,22 +155,21 @@ public class Importer {
     /// - Parameters:
     ///
     ///     - url: URL of the CSV file
-    ///     - type: Subclass of Node that will be used to instantiate records
+    ///     - trait: Model node trait that is used for adjusting types of the node
+    ///       properties
     ///     - fieldMap: a dictionary to map CSV field names into record
     ///       field names. Keys are CSV field names, values are record field
     ///       names
-    ///     - action: Optional action to be exectued when the node is
-    ///       successfully imported. Argument to the block is `(name, node)`
     ///
-    /// - Returns: List of node names registered in the namespace.
+    /// - Returns: Dictionary of imported nodes where keys are node names and
+    ///            values are imported nodes.
     ///
     /// - Throws: ``ImportError``
     ///
     @discardableResult
-    public func importNodesFromCSV(_ url: URL, namespace: String = "default",
-                            type: RecordRepresentable.Type,
-                            fieldMap: [String:String]=[:],
-                            action: ((String, Node) -> Void)?=nil) throws -> [String] {
+    public func importNodesFromCSV(_ url: URL,
+                                   trait: Trait?=nil,
+                                   fieldMap: [String:String]=[:]) throws -> [String:Node] {
         guard let records = try RecordSet(contentsOfCSVFile: url) else {
             throw ImportError.resourceLoadError(url)
         }
@@ -210,16 +178,13 @@ public class Importer {
             records.schema = records.schema.renamed(fieldMap)
         }
         
-        let issues = validateNodeRecords(records, type: type)
+        let issues = validateNodeRecords(records)
 
         guard !issues.hasErrors else {
             throw ImportError.validationError(issues)
         }
         
-        let names: [String]
-        names = try importNodes(records, namespace: namespace, type: type,
-                                action: action)
-        return names
+        return try importNodes(records, trait: trait)
     }
 
     /// Import nodes from a record set. The `records` are expeced to be
@@ -229,34 +194,25 @@ public class Importer {
     ///
     ///     - records: a `RecordSet` of records that represent nodes to be
     ///       imported
-    ///     - namespace: a namespace into which the keys of imported records
-    ///       are going to be registered.
     ///     - type: subclass of Node that will be used to instantiate the
     ///       records
-    ///     - action: Optional action to be exectued when the node is
-    ///       successfully imported. Argument to the block is `(name, node)`
     ///
-    /// - Returns: List of node names registered in the namespace.
+    /// - Returns: Dictionary of imported nodes where keys are node names and
+    ///            values are imported nodes.
     /// - Throws: ``ImportError``
     ///
     @discardableResult
-    public func importNodes(_ records: RecordSet, namespace: String="default",
-                            type: RecordRepresentable.Type,
-                            action: ((String, Node) -> Void)?=nil) throws -> [String] {
+    public func importNodes(_ records: RecordSet,
+                            trait: Trait?=nil) throws -> [String:Node] {
         // FIXME: Should return list of imported nodes or a dictionary.
-        var names: [String] = []
+        var imported: [String:Node] = [:]
         
         for record in records {
-            // FIXME: Type mismatch, we need to make Node RecordRepresentable
-            // TODO: Collect the nodes and return them
-            let name = try importNode(record,
-                                      namespace: namespace,
-                                      type: type,
-                                      action: action)
-            names.append(name)
+            let name = try importNode(record, trait: trait)
+            imported[name] = names[name]!
         }
      
-        return names
+        return imported
     }
     
     /// Imports a record as a node. An instance of Node or Node's subclass is
@@ -266,21 +222,17 @@ public class Importer {
     ///
     ///     - records: a `RecordSet` of records that represent nodes to be
     ///       imported
-    ///     - namespace: a namespace into which the imported node will be
-    ///       registered.
     ///     - type: subclass of Node that will be used to instantiate the
     ///       records
     ///     - action: Optional action to be exectued when the node is
     ///       successfully imported. Argument to the block is `(name, node)`
     ///
-    /// - Returns: name of the imported note that was registered in the
-    ///   namespace
+    /// - Returns: Name of the imported note that was registered.
     /// - Throws: ``ImportError``
     ///
     @discardableResult
-    func importNode(_ record: Record, namespace: String="default",
-                    type: RecordRepresentable.Type,
-                    action: ((String, Node) -> Void)?=nil) throws -> String {
+    func importNode(_ record: Record,
+                    trait: Trait?=nil) throws -> String {
         guard let keyValue = record[naming.nodeKeyField] else {
             throw ImportError.missingField(naming.nodeKeyField)
         }
@@ -288,7 +240,21 @@ public class Importer {
             throw ImportError.typeError(naming.nodeKeyField)
         }
 
-        let node = try type.init(record: record) as! Node
+        let node = Node()
+        
+        for field in record.schema.fieldNames {
+            // TODO: Do we need to preserve nils?
+            guard let value = record[field] else {
+                continue
+            }
+            
+            if let trait = trait, let property = trait.property(name: field) {
+                node[field] = value.convert(to:property.valueType)
+            }
+            else {
+                node[field] = value
+            }
+        }
 
         memory.add(node)
         
@@ -296,11 +262,7 @@ public class Importer {
             throw ImportError.duplicateID
         }
         else {
-            setNodeName(nodeKey, node:node, namespace:namespace)
-        }
-        
-        if let action = action {
-            action(nodeKey, node)
+            setNodeName(nodeKey, node:node)
         }
         
         return nodeKey
@@ -311,11 +273,10 @@ public class Importer {
     ///
     /// - Parameters:
     ///     - records: A record set to be validated
-    ///     - namespace: a namespace to look-up node references
     ///
     /// - Returns: List of issues found within the record set.
     ///
-    public func validateLinkRecords(_ records: RecordSet, namespace: String="default") -> IssueList {
+    public func validateLinkRecords(_ records: RecordSet) -> IssueList {
         let issues = IssueList()
 
         var hasSchemaIssues: Bool = false
@@ -356,14 +317,14 @@ public class Importer {
         for originValue in origins {
             // FIXME: Test for stringValue != nil
             let origin = originValue.stringValue()!
-            if namedNode(origin, namespace: namespace) == nil {
+            if namedNode(origin) == nil {
                 issues.error("Unknown origin node reference: \(origin)")
             }
         }
         let targets = records.distinctValues(of: naming.originField)
         for targetValue in targets {
             let target = targetValue.stringValue()!
-            if namedNode(target, namespace: namespace) == nil {
+            if namedNode(target) == nil {
                 issues.error("Unknown target node reference: \(target)")
             }
         }
@@ -375,7 +336,6 @@ public class Importer {
     ///
     /// - Parameters:
     ///     - url: URL of the CSV file
-    ///     - namespace: a namespace to look-up node references
     ///
     /// - Throws: ``ImportError``
     ///
@@ -384,28 +344,27 @@ public class Importer {
             throw ImportError.resourceLoadError(url)
         }
                
-        let issues = validateLinkRecords(records, namespace: namespace)
+        let issues = validateLinkRecords(records)
 
         guard !issues.hasErrors else {
             throw ImportError.validationError(issues)
         }
         
-        try importLinks(records, namespace: namespace)
+        try importLinks(records)
     }
 
 
     /// Import links from a record set. The record set is expected to have at
     /// least three fields: origin, target and name, where the `origin`
-    /// and `target` are named references to nodes within the `namespace`. The
+    /// and `target` are named references to nodes within registered names. The
     /// `name` field is the link name.
     ///
     /// - Parameters:
     ///     - records: Record set with links
-    ///     - namespace: Namespace to look-up nodes from
     ///
     /// - Throws: ``ImportError``
     ///
-    public func importLinks(_ records: RecordSet, namespace: String="default") throws {
+    public func importLinks(_ records: RecordSet) throws {
 
         for record in records {
             guard let originKeyValue = record[naming.originField] else {
@@ -427,14 +386,19 @@ public class Importer {
                 throw ImportError.typeError(naming.linkNameField)
             }
 
-            guard let origin = namedNode(originKey, namespace: namespace) else {
-                throw ImportError.unknownNode(originKey, namespace)
+            guard let origin = namedNode(originKey) else {
+                throw ImportError.unknownNode(originKey)
             }
-            guard let target = namedNode(targetKey, namespace: namespace) else {
-                throw ImportError.unknownNode(targetKey, namespace)
+            guard let target = namedNode(targetKey) else {
+                throw ImportError.unknownNode(targetKey)
             }
 
-            memory.connect(from: origin, to: target, at: name)
+            let link = memory.connect(from: origin, to: target, at: name)
+            
+            for field in record.schema.fieldNames {
+                link[field] = record[field]
+            }
+
         }
     }
 }

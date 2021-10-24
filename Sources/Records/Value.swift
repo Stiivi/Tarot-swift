@@ -134,6 +134,18 @@ public enum Value: Equatable, Hashable {
     public var isEmpty: Bool {
         return stringValue() == "" || intValue() == 0 || doubleValue() == 0.0
     }
+    
+    /// Converts value to a value of another type, if possible. Caller is
+    /// advised to call ``ValueType.isConertible()`` to prevent potential
+    /// convention errors.
+    public func convert(to otherType:ValueType) -> Value? {
+        switch (otherType) {
+        case .int: return self.intValue().map { .int($0) } ?? nil
+        case .string: return self.stringValue().map { .string($0) } ?? nil
+        case .bool: return self.boolValue().map { .bool($0) } ?? nil
+        case .double: return self.doubleValue().map { .double($0) } ?? nil
+        }
+    }
 }
 
 extension Value: CustomStringConvertible {

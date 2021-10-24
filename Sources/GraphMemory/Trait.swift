@@ -124,6 +124,18 @@ public final class Trait {
             self._properties[property.name] = property
         }
     }
+    
+    /// Get a property description by name.
+    ///
+    public func property(name: String) -> PropertyDescription? {
+        return _properties[name]
+    }
+    
+    /// Get a link description by name.
+    ///
+    public func link(name: String) -> LinkDescription? {
+        return _links[name]
+    }
 }
 
 extension Trait: Codable {

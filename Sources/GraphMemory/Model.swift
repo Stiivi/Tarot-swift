@@ -45,7 +45,7 @@ public final class Model {
     ///
     /// - Returns: a trait if the trait with the given name is found,
     ///            otherwise `nil`.
-    func trait(name: String) -> Trait? {
+    public func trait(name: String) -> Trait? {
         return traits.first { $0.name == name }
     }
 }
