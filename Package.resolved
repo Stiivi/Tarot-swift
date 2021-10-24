@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "DotWriter",
+        "repositoryURL": "/Users/stefan/Developer/Projects/DotWriter",
+        "state": {
+          "branch": null,
+          "revision": "fe1400c787e61082ec7096193a50ca10f24b688e",
+          "version": "0.1.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

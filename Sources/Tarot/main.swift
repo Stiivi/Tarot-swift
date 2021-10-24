@@ -18,16 +18,19 @@ let FILE_MAP = [
 
 
 func main() throws {
+    let space = GraphMemory()
+    
     // try loadModel(DATA_PATH, fileMap: FILE_MAP)
     print("Loading model...")
     do {
-        try loadModel(DATA_PATH, fileMap: FILE_MAP)
+        try loadModel(space, DATA_PATH, fileMap: FILE_MAP)
     }
     catch ImportError.validationError(let issues) {
         for issue in issues {
             print(issue)
         }
     }
+    space.writeDot(path: "/tmp/graph.dot", name: "cards")
     print("Done.")
 }
 

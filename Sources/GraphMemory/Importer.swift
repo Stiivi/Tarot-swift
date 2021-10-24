@@ -48,20 +48,43 @@ public struct ImporterNaming {
     }
 }
 
-/// Importer loads records from external source into the graph.
+/// Importer loads records from external source into the graph memory. One
+/// instance of the importer represents one import session.
 ///
 public class Importer {
     typealias NodeNamespace = Namespace<String,Node>
     
-    let space: GraphMemory
+    /// Graph memory into which the nodes will be imported
+    let memory: GraphMemory
+    
+    /// Naming conventions for this import session.
     let naming: ImporterNaming
+    
+    /// Namespaces where the keys of imported nodes are registered. Namespaces
+    /// are used for looking-up nodes by reference.
     var namespaces: [String: NodeNamespace] = [:]
     
-    public init(space: GraphMemory, naming: ImporterNaming?=nil) {
-        self.space = space
+    /// Creates an importer for a graph memory.
+    ///
+    /// - Parameters:
+    ///
+    ///     - space: Graph memory to import objects into.
+    ///     - naming: Naming conventions for this import session.
+    ///
+    public init(memory: GraphMemory, naming: ImporterNaming?=nil) {
+        self.memory = memory
         self.naming = naming ?? ImporterNaming()
     }
     
+    /// Get a namespace by its name. If the namespace does not exist, then it
+    /// is created.
+    ///
+    /// - Parameters:
+    ///
+    ///     - namespace: Namespace name.
+    ///
+    /// - Returns: Node namespace.
+    ///
     func getNamespace(_ namespace: String) -> NodeNamespace{
         if let ns = namespaces[namespace] {
             return ns
@@ -72,13 +95,35 @@ public class Importer {
             return ns
         }
     }
-    func namedNode(_ name: String, namespace: String="default") -> Node? {
+    
+    /// Get a node by name within a specified namespace.
+    ///
+    /// - Parameters:
+    ///
+    ///     - name: Node name to be looked up.
+    ///     - namespace: Name of the namespace where to lookup the node.
+    ///       Default is "default"
+    ///
+    /// - Returns: Node if the node was found or `nil` if the node was not
+    ///   found.
+    ///
+    public func namedNode(_ name: String, namespace: String="default") -> Node? {
         let ns = getNamespace(namespace)
         
         return ns[name]
     }
     
-    func setNodeName(_ name: String, node: Node, namespace: String="default") {
+    /// Sets name for a node in a namespace.
+    ///
+    /// - Parameters:
+    ///
+    ///     - name: Name to be set for a node.
+    ///     - node: Node to be referenced in the namespace.
+    ///     - namespace: Name of the namespace to register the node name.
+    ///       Default is "default".
+    ///
+    public func setNodeName(_ name: String, node: Node,
+                            namespace: String="default") {
         let ns = getNamespace(namespace)
         ns[name] = node
     }
@@ -139,11 +184,14 @@ public class Importer {
     /// Validates and imports nodes from a CSV file located at given URL.
     ///
     /// - Parameters:
+    ///
     ///     - url: URL of the CSV file
     ///     - type: Subclass of Node that will be used to instantiate records
     ///     - fieldMap: a dictionary to map CSV field names into record
     ///       field names. Keys are CSV field names, values are record field
     ///       names
+    ///     - action: Optional action to be exectued when the node is
+    ///       successfully imported. Argument to the block is `(name, node)`
     ///
     /// - Returns: List of node names registered in the namespace.
     ///
@@ -152,7 +200,8 @@ public class Importer {
     @discardableResult
     public func importNodesFromCSV(_ url: URL, namespace: String = "default",
                             type: RecordRepresentable.Type,
-                            fieldMap: [String:String]=[:]) throws -> [String] {
+                            fieldMap: [String:String]=[:],
+                            action: ((String, Node) -> Void)?=nil) throws -> [String] {
         guard let records = try RecordSet(contentsOfCSVFile: url) else {
             throw ImportError.resourceLoadError(url)
         }
@@ -168,7 +217,8 @@ public class Importer {
         }
         
         let names: [String]
-        names = try importNodes(records, namespace: namespace, type: type)
+        names = try importNodes(records, namespace: namespace, type: type,
+                                action: action)
         return names
     }
 
@@ -183,20 +233,26 @@ public class Importer {
     ///       are going to be registered.
     ///     - type: subclass of Node that will be used to instantiate the
     ///       records
+    ///     - action: Optional action to be exectued when the node is
+    ///       successfully imported. Argument to the block is `(name, node)`
     ///
     /// - Returns: List of node names registered in the namespace.
     /// - Throws: ``ImportError``
     ///
     @discardableResult
     public func importNodes(_ records: RecordSet, namespace: String="default",
-                            type: RecordRepresentable.Type) throws -> [String] {
+                            type: RecordRepresentable.Type,
+                            action: ((String, Node) -> Void)?=nil) throws -> [String] {
         // FIXME: Should return list of imported nodes or a dictionary.
         var names: [String] = []
         
         for record in records {
             // FIXME: Type mismatch, we need to make Node RecordRepresentable
             // TODO: Collect the nodes and return them
-            let name = try importNode(record, namespace: namespace, type: type)
+            let name = try importNode(record,
+                                      namespace: namespace,
+                                      type: type,
+                                      action: action)
             names.append(name)
         }
      
@@ -214,13 +270,17 @@ public class Importer {
     ///       registered.
     ///     - type: subclass of Node that will be used to instantiate the
     ///       records
+    ///     - action: Optional action to be exectued when the node is
+    ///       successfully imported. Argument to the block is `(name, node)`
     ///
     /// - Returns: name of the imported note that was registered in the
     ///   namespace
     /// - Throws: ``ImportError``
     ///
     @discardableResult
-    func importNode(_ record: Record, namespace: String="default", type: RecordRepresentable.Type) throws -> String {
+    func importNode(_ record: Record, namespace: String="default",
+                    type: RecordRepresentable.Type,
+                    action: ((String, Node) -> Void)?=nil) throws -> String {
         guard let keyValue = record[naming.nodeKeyField] else {
             throw ImportError.missingField(naming.nodeKeyField)
         }
@@ -230,7 +290,7 @@ public class Importer {
 
         let node = try type.init(record: record) as! Node
 
-        space.associate(node)
+        memory.add(node)
         
         if namedNode(nodeKey) != nil {
             throw ImportError.duplicateID
@@ -238,7 +298,11 @@ public class Importer {
         else {
             setNodeName(nodeKey, node:node, namespace:namespace)
         }
-
+        
+        if let action = action {
+            action(nodeKey, node)
+        }
+        
         return nodeKey
     }
     
@@ -370,7 +434,7 @@ public class Importer {
                 throw ImportError.unknownNode(targetKey, namespace)
             }
 
-            space.connect(from: origin, to: target, at: name)
+            memory.connect(from: origin, to: target, at: name)
         }
     }
 }

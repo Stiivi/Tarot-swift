@@ -15,11 +15,11 @@ final class GraphMemoryTests: XCTestCase {
         let a = Thing("Node A")
         let b = Thing("Node B")
 
-        graph.associate(a)
+        graph.add(a)
         XCTAssertTrue(graph.contains(node: a))
         XCTAssertFalse(graph.contains(node: b))
 
-        graph.associate(b)
+        graph.add(b)
         XCTAssertTrue(graph.contains(node: b))
     }
     func testConnect() throws {
@@ -27,9 +27,9 @@ final class GraphMemoryTests: XCTestCase {
         let space = GraphMemory()
         let a = Thing("Node A")
 
-        space.associate(a)
+        space.add(a)
         let b = Thing("Node B")
-        space.associate(b)
+        space.add(b)
 
         space.connect(from: a, to: b, at: "next")
 
@@ -46,8 +46,8 @@ final class GraphMemoryTests: XCTestCase {
         let a = Thing("Node A")
         let b = Thing("Node B")
 
-        space.associate(a)
-        space.associate(b)
+        space.add(a)
+        space.add(b)
 
         space.connect(from: a, to: b, at: "next")
         XCTAssertEqual(space.links.count, 1)
@@ -67,7 +67,7 @@ final class GraphMemoryTests: XCTestCase {
     func testRemove() throws {
         let space = GraphMemory()
         let a = Thing("Node A")
-        space.associate(a)
+        space.add(a)
         space.remove(node: a)
 
         XCTAssertEqual(space.nodes.count, 0)
@@ -77,9 +77,9 @@ final class GraphMemoryTests: XCTestCase {
         let a = Thing("Node A")
         let b = Thing("Node B")
         let c = Thing("Node C")
-        space.associate(a)
-        space.associate(b)
-        space.associate(c)
+        space.add(a)
+        space.add(b)
+        space.add(c)
 
         space.connect(from: a, to: b, at: "child")
         space.connect(from: a, to: c, at: "child")
@@ -102,8 +102,8 @@ final class GraphMemoryTests: XCTestCase {
         let a = Thing("Node A")
         let b = Thing("Node B")
 
-        space.associate(a)
-        space.associate(b)
+        space.add(a)
+        space.add(b)
         space.connect(from: a, to: b, at: "next")
 
         space.remove(node: a)
@@ -120,13 +120,13 @@ final class GraphMemoryTests: XCTestCase {
         let c2 = Thing("Card 2")
         let c3 = Thing("Card 3")
         
-        graph.associate(c1)
-        graph.associate(c2)
-        graph.associate(c3)
+        graph.add(c1)
+        graph.add(c2)
+        graph.add(c3)
 
         let stack = Thing("Stack")
 
-        graph.associate(stack)
+        graph.add(stack)
         stack.trait = trait
 
         graph.connect(from: stack, to: c1, at: "card")
@@ -144,23 +144,23 @@ final class GraphMemoryTests: XCTestCase {
         let trait = Trait(name: "Thing", links: [ld])
 
         let red = Thing("red")
-        graph.associate(red)
+        graph.add(red)
         red.trait = trait
 
         let green = Thing("green")
-        graph.associate(green)
+        graph.add(green)
         green.trait = trait
 
         let blue = Thing("blue")
-        graph.associate(blue)
+        graph.add(blue)
         blue.trait = trait
 
         let yellow = Thing("yellow")
-        graph.associate(yellow)
+        graph.add(yellow)
         yellow.trait = trait
 
         let white = Thing("white")
-        graph.associate(white)
+        graph.add(white)
         white.trait = trait
 
         graph.connect(from: white, to: red, at: "component")

@@ -16,7 +16,7 @@ open class Node: Object {
     }
     
     subscript(member: String) -> [Node]? {
-        guard let space = self.space else {
+        guard let space = self.graph else {
             return nil
         }
         guard let trait = self.trait else {
