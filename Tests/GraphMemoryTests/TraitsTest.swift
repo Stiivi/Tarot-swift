@@ -33,10 +33,10 @@ final class TraitsTests: XCTestCase {
         graph.connect(from: stack, to: c2, at: "card")
         graph.connect(from: stack, to: c3, at: "card")
 
-        XCTAssertEqual(Set(stack["cards"]!), Set([c1, c2, c3]))
+        XCTAssertEqual(Set(stack.related("cards")), Set([c1, c2, c3]))
         
-        let cards = stack.cards
-        XCTAssertEqual(cards!.count, 3)
+        let cards = stack.related("cards")
+        XCTAssertEqual(cards.count, 3)
     }
     
     func testReverseTrait() throws {
@@ -73,16 +73,16 @@ final class TraitsTests: XCTestCase {
 
         var colors: [Node] = []
         
-        colors = white.colors!
+        colors = white.related("colors")
         XCTAssertEqual(colors.count, 0)
 
-        colors = red.colors!
+        colors = red.related("colors")
         XCTAssertEqual(colors.count, 2)
 
-        colors = green.colors!
+        colors = green.related("colors")
         XCTAssertEqual(colors.count, 2)
 
-        colors = blue.colors!
+        colors = blue.related("colors")
         XCTAssertEqual(colors.count, 1)
     }
 

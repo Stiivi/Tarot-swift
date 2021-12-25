@@ -24,89 +24,106 @@ final class GraphMemoryTests: XCTestCase {
     }
     func testConnect() throws {
 
-        let space = GraphMemory()
+        let memory = GraphMemory()
         let a = Thing("Node A")
 
-        space.add(a)
+        memory.add(a)
         let b = Thing("Node B")
-        space.add(b)
+        memory.add(b)
 
-        space.connect(from: a, to: b, at: "next")
+        memory.connect(from: a, to: b)
 
-        XCTAssertEqual(space.links.count, 1)
+        XCTAssertEqual(memory.links.count, 1)
         
-        let link = space.links.first!
+        let link = memory.links.first!
 
         XCTAssertIdentical(link.origin, a)
         XCTAssertIdentical(link.target, b)
-        XCTAssertEqual(link.name, "next")
     }
-    func testDisconnect() throws {
-        let space = GraphMemory()
+    // Note: See comment in the commented-out GraphMemory.disconnect() code
+    // why we are not using it for now.
+    //
+//    func testDisconnect() throws {
+//        let memory = GraphMemory()
+//        let a = Thing("Node A")
+//        let b = Thing("Node B")
+//
+//        memory.add(a)
+//        memory.add(b)
+//
+//        memory.connect(from: a, to: b, at: "next")
+//        XCTAssertEqual(memory.links.count, 1)
+//        memory.disconnect(from: a, to: b, at: "next")
+//        XCTAssertEqual(memory.links.count, 0)
+//
+//        // Test whether multiple connections are removed
+//        memory.connect(from: a, to: b, at: "next")
+//        memory.connect(from: a, to: b, at: "next")
+//        memory.connect(from: a, to: b, at: "next")
+//
+//        XCTAssertEqual(memory.links.count, 3)
+//        memory.disconnect(from: a, to: b, at: "next")
+//        XCTAssertEqual(memory.links.count, 0)
+//    }
+    func testRemoveConnection() throws {
+        let memory = GraphMemory()
         let a = Thing("Node A")
         let b = Thing("Node B")
+        var link: Link
 
-        space.add(a)
-        space.add(b)
+        memory.add(a)
+        memory.add(b)
 
-        space.connect(from: a, to: b, at: "next")
-        XCTAssertEqual(space.links.count, 1)
-        space.disconnect(from: a, to: b, at: "next")
-        XCTAssertEqual(space.links.count, 0)
-
-        // Test whether multiple connections are removed
-        space.connect(from: a, to: b, at: "next")
-        space.connect(from: a, to: b, at: "next")
-        space.connect(from: a, to: b, at: "next")
-
-        XCTAssertEqual(space.links.count, 3)
-        space.disconnect(from: a, to: b, at: "next")
-        XCTAssertEqual(space.links.count, 0)
+        link = memory.connect(from: a, to: b)
+        XCTAssertEqual(memory.links.count, 1)
+        memory.disconnect(link: link)
+        XCTAssertEqual(memory.links.count, 0)
     }
 
-    func testRemove() throws {
-        let space = GraphMemory()
+    func testRemoveNode() throws {
+        let memory = GraphMemory()
         let a = Thing("Node A")
-        space.add(a)
-        space.remove(node: a)
+        memory.add(a)
+        memory.remove(a)
 
-        XCTAssertEqual(space.nodes.count, 0)
+        XCTAssertEqual(memory.nodes.count, 0)
     }
+
     func testOutgoingIncoming() throws {
-        let space = GraphMemory()
+        let memory = GraphMemory()
         let a = Thing("Node A")
         let b = Thing("Node B")
         let c = Thing("Node C")
-        space.add(a)
-        space.add(b)
-        space.add(c)
+        memory.add(a)
+        memory.add(b)
+        memory.add(c)
 
-        space.connect(from: a, to: b, at: "child")
-        space.connect(from: a, to: c, at: "child")
+        memory.connect(from: a, to: b, attributes: ["name": "child"])
+        memory.connect(from: a, to: c, attributes: ["name": "child"])
 
-        XCTAssertEqual(space.outgoing(a).count, 2)
-        XCTAssertEqual(space.outgoing(b).count, 0)
-        XCTAssertEqual(space.outgoing(c).count, 0)
+        XCTAssertEqual(memory.outgoing(a).count, 2)
+        XCTAssertEqual(memory.outgoing(b).count, 0)
+        XCTAssertEqual(memory.outgoing(c).count, 0)
 
-        XCTAssertEqual(space.incoming(a).count, 0)
-        XCTAssertEqual(space.incoming(b).count, 1)
-        XCTAssertEqual(space.incoming(c).count, 1)
+        XCTAssertEqual(memory.incoming(a).count, 0)
+        XCTAssertEqual(memory.incoming(b).count, 1)
+        XCTAssertEqual(memory.incoming(c).count, 1)
 
-        let links = space.outgoing(a)
-        XCTAssertEqual(links[0].name, "child")
-        XCTAssertEqual(links[1].name, "child")
+        let links = memory.outgoing(a)
+        XCTAssertEqual(links[0]["name"], "child")
+        XCTAssertEqual(links[1]["name"], "child")
     }
 
     func testRemoveConnected() throws {
-        let space = GraphMemory()
+        let memory = GraphMemory()
         let a = Thing("Node A")
         let b = Thing("Node B")
 
-        space.add(a)
-        space.add(b)
-        space.connect(from: a, to: b, at: "next")
+        memory.add(a)
+        memory.add(b)
+        memory.connect(from: a, to: b)
 
-        space.remove(node: a)
-        XCTAssertEqual(space.links.count, 0)
+        memory.remove(a)
+        XCTAssertEqual(memory.links.count, 0)
     }
 }

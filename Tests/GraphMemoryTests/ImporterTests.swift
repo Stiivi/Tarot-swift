@@ -32,7 +32,7 @@ final class ImporterTests: XCTestCase {
     func testBase() throws {
         let schema = Schema(["id", "name"], type: .string)
         let space = GraphMemory()
-        let importer = Importer(memory: space)
+        let importer = Loader(memory: space)
         
         let record = Record(schema: schema, ["id": "1", "name": "one"])
         let name = try importer.importNode(record)
@@ -46,7 +46,7 @@ final class ImporterTests: XCTestCase {
     func testMulti() throws {
         let schema = Schema(["id", "name"], type: .string)
         let space = GraphMemory()
-        let importer = Importer(memory: space)
+        let loader = Loader(memory: space)
 
         let records = RecordSet(schema: schema, [
             Record(schema: schema, ["id":"1", "name": "one"]),
@@ -54,7 +54,7 @@ final class ImporterTests: XCTestCase {
             Record(schema: schema, ["id":"3", "name": "three"]),
         ])
         
-        let names = try importer.importNodes(records).keys
+        let names = try loader.loadNodes(records: records).keys
         
         XCTAssertEqual(Set(names), ["1", "2", "3"])
     }
