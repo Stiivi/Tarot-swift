@@ -11,17 +11,10 @@ public class Link: Object {
     let origin: Node
     let target: Node
     
-    // FIXME: This is scaffolding
-    var name: String {
-        return self["name"]!.stringValue()!
-    }
-    
-    init(id: OID, origin: Node, target: Node, at name: String) {
+    init(id: OID, origin: Node, target: Node) {
         self.origin = origin
         self.target = target
         super.init(id: id)
-        // FIXME: This is scaffolding
-        self["name"] = .string(name)
     }
 }
 

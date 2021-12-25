@@ -7,26 +7,25 @@
 
 /// Node of a graph.
 ///
-@dynamicMemberLookup
 open class Node: Object {
-    var trait: Trait? = nil
+    public var trait: Trait? = nil
 
-    subscript(dynamicMember member: String) -> [Node]? {
-        return self[member]
-    }
-   
-    // TODO: Consider changing this to be a non-optional
-    subscript(member: String) -> [Node]? {
+    /// Returns related nodes to this node. Node relationshops are described in
+    /// ``LinkTrait``.
+    ///
+    /// - Returns: List of nodes.
+    ///
+    public func related(_ linkName: String) -> [Node] {
         guard let graph = self.graph else {
-            return nil
+            return []
         }
         guard let trait = self.trait else {
             // The node has no trait
-            return nil
+            return []
         }
-        guard let linkDesc = trait._links[member] else {
+        guard let linkDesc = trait._links[linkName] else {
             // There is no such link description
-            return nil
+            return []
         }
         
         let links: [Link]
@@ -37,11 +36,11 @@ open class Node: Object {
                                                 value: .string(linkDesc.linkName))
         
         if linkDesc.isReverse {
-            links = graph.incoming(self).filter { predicate.evaluate($0) }
+            links = graph.incoming(self).filter { predicate.matches($0) }
             nodes = links.map { $0.origin }
         }
         else {
-            links = graph.outgoing(self).filter { predicate.evaluate($0) }
+            links = graph.outgoing(self).filter { predicate.matches($0) }
             nodes = links.map { $0.target }
         }
         
