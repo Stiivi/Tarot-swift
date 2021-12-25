@@ -8,19 +8,23 @@
 // FIXME: We are importing Records only because of Value
 import Records
 
+// FIXME: Any use of this library should belong to an extension
+import Combine
+
 /// Protocol for a basic graph memory implementation. This protocol is
 /// a scaffolding for development - it helps to separate interface from the
 /// implementaiton.
-public protocol BasicGraphMemory {
+///
+public protocol GraphMemoryProtocol {
     var nodes: Set<Node> { get }
     var links: Set<Link> { get }
 
     /// Create a new empty node in the graph.
-    func createNode() -> Node
+    func add(_ node: Node)
     
     /// Removes existing node and removes all links that are incoming or
     /// outgoing from the node.
-    func remove(node: Node)
+    func remove(_ node: Node)
     
     /// Create a link in the memory.
     func connect(from origin:Node, to target:Node) -> Link
@@ -77,7 +81,12 @@ public class GraphMemory {
     
     /// Sequence for generating graph object IDs.
     private var idSequence: Int = 1
-
+    
+    
+    /// An object that will receive notifications on changes in the graph.
+    ///
+    public var delegate: GraphMemoryDelegate? = nil
+    
     /// Create an empty graph memory.
     ///
     public init() {
@@ -85,22 +94,28 @@ public class GraphMemory {
         self.linkIndex = [:]
     }
     
-    public func nextID() -> OID {
+    private func nextID() -> OID {
         let id = idSequence
         idSequence += 1
         return id
     }
     
+    // FIXME: Is this really needed?
+    /// Get a graph object by its ID. The object can be either a node or a link.
+    public func object(_ oid: OID) -> Object? {
+        return nodeIndex[oid] ?? linkIndex[oid]
+    }
+    
     /// Read-only collection of all nodes in the graph.
     ///
-    var nodes: AnyCollection<Node> {
-        return AnyCollection(nodeIndex.values)
+    public var nodes: Set<Node> {
+        return Set(nodeIndex.values)
     }
     
     /// Read-only collection of all links in the graph.
     ///
-    var links: AnyCollection<Link> {
-        return AnyCollection(linkIndex.values)
+    public var links: Set<Link> {
+        return Set(linkIndex.values)
     }
     
     /// Adds a node to the graph.
@@ -126,11 +141,13 @@ public class GraphMemory {
         node.id = id
 
         nodeIndex[id] = node
+        
+        delegate?.graph(self, didAdd: node)
     }
     /// Removes node from the space and removes all incoming and outgoing links
     /// for that node.
     ///
-    public func remove(node: Node) {
+    public func remove(_ node: Node) {
         guard node.graph === self else {
             fatalError("Trying to dissociate a node from another memory")
         }
@@ -141,14 +158,17 @@ public class GraphMemory {
         // First we remove all the conections
         for link in links {
             if link.origin === node || link.target === node {
-                remove(link: link)
+                disconnect(link: link)
             }
         }
         // FIXME: Check for in/out links
         nodeIndex[oid] = nil
 
         node.graph = nil
+        print("--- graph: removing node \(node.id)")
         node.id = nil
+
+        delegate?.graph(self, didRemove: node)
     }
 
     /// Tests whether the graph contains a node.
@@ -161,10 +181,7 @@ public class GraphMemory {
         }
         return self.nodeIndex[id] != nil
     }
-    
-    /// Creates a link (oriented edge) between two nodes, from `origin` to
-    /// `target`. The link name is used to reference to the link from nodes
-    /// and other contexts.
+        /// `target`. Assign attributes to the newly created nod.
     ///
     /// The link name does not have to be unique and there might be multiple
     /// links with the same name between two nodes.
@@ -173,40 +190,45 @@ public class GraphMemory {
     ///
     ///     - origin: The node from which the link originates.
     ///     - target: The node to which the link points.
-    ///     - name: Name of the link.
+    ///     - attributes: Attributes of the link.
     ///
     /// - Returns: Newly created link
     ///
-    // FIXME: The `at name:` is a scaffolding, use properties
     @discardableResult
-    public func connect(from origin: Node, to target: Node, at name: String) -> Link {
+    public func connect(from origin: Node, to target: Node, attributes: [String:Value]=[:]) -> Link {
         let linkID = nextID()
-        let link = Link(id: linkID, origin: origin, target: target, at: name)
+        let link = Link(id: linkID, origin: origin, target: target)
         self.linkIndex[linkID] = link
+        
+        for item in attributes {
+            link[item.key] = item.value
+        }
+        delegate?.graph(self, didConnect: link)
         return link
     }
     
-    /// Removes all links between node `origin` and `target` with given name.
-    ///
-    /// To remove a specific link use ``remove(link:)``.
-    ///
-    /// - Parameters:
-    ///
-    ///     - origin: The node from which the link originates.
-    ///     - target: The node to which the link points.
-    ///     - name: Name of the link.
-    ///
-    public func disconnect(from origin: Node, to target: Node, at name: String) {
-        let toRemove: [Link]
-        
-        toRemove = self.linkIndex.values.filter { link in
-            link.origin === origin && link.target === target && link.name == name
-        }
-        
-        for link in toRemove {
-            remove(link: link)
-        }
-    }
+//    Note: We can not disconnect all of links between two nodes as it is
+//          not a simple operation that can have an easy reversal.
+//
+//    /// Removes all links between node `origin` and `target`.
+//    ///
+//    /// To remove a specific link use ``remove(link:)``.
+//    ///
+//    /// - Parameters:
+//    ///
+//    ///     - origin: The node from which the link originates.
+//    ///     - target: The node to which the link points.
+//    ///
+//    public func disconnect(from origin: Node, to target: Node) {
+//        let toRemove: [Link]
+//
+//        toRemove = self.linkIndex.values.filter { link in
+//            link.origin === origin && link.target === target }
+//
+//        for link in toRemove {
+//            remove(link: link)
+//        }
+//    }
     
     /// Removes a specific link from the graph. Link must exist in the graph.
     ///
@@ -214,7 +236,7 @@ public class GraphMemory {
     ///
     ///     - link: Link to be removed.
     ///
-    public func remove(link: Link) {
+    public func disconnect(link: Link) {
         guard let id = link.id else {
             fatalError("Trying to remove unassociated link: \(link)")
         }
@@ -222,6 +244,7 @@ public class GraphMemory {
             fatalError("Trying to remove unknown link: \(link)")
         }
         self.linkIndex[id] = nil
+        delegate?.graph(self, didDisconnect: link)
     }
     
     /// Get a list of outgoing links from a node.
@@ -282,3 +305,8 @@ public class GraphMemory {
     }
 }
 
+extension GraphMemory: CustomStringConvertible {
+    public var description: String {
+        "GraphMemory(nodes: \(nodes.count), links: \(links.count))"
+    }
+}
