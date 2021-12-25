@@ -7,6 +7,10 @@
 
 import Foundation
 
+enum ModelError: Error {
+    case unableToLoadData(URL)
+}
+
 /// Model describes the semantics of the nodes and their links.
 ///
 public final class Model {
@@ -30,7 +34,7 @@ public final class Model {
         case description
         case traits
     }
-
+    
     /// Creates a model with traits.
     ///
     required public init(name: String, label: String?=nil,

@@ -156,3 +156,8 @@ extension Trait: Codable {
         try container.encode(links, forKey: ._links)
     }
 }
+
+// FIXME: This is to satisfy the NavigationView for the time being.
+extension Trait: Identifiable {
+    public var id: String { name }
+}
