@@ -14,33 +14,49 @@ class TarotTool {
     let dataURL: URL
     let memory: GraphMemory
     let model: Model
-    let naming: ImporterNaming
+    var tarot: Node?
     
     public init(dataURL: URL) throws {
         self.dataURL = dataURL
 
-        // We are using 'name' as an ID field for usability
-        //
-        var naming = ImporterNaming()
-        naming.nodeKeyField = "name"
-        
-        self.naming = naming
-        
+        // Load the model
+        // ---------------------------------------------------------------
+        let modelURL =  Bundle.module_WORKAROUND.url(forResource: "tarot-model",
+                                                     withExtension: "json")
+        let packageURL =  Bundle.module_WORKAROUND.url(forResource: "tarot-package",
+                                                       withExtension: "json")
+
+        do {
+            let json = try Data(contentsOf: modelURL!)
+            self.model = try JSONDecoder().decode(Model.self, from: json)
+        }
+        catch {
+            fatalError("Can not read model resource: \(error)")
+        }
+
+        // Load the data
+        // ---------------------------------------------------------------
         self.memory = GraphMemory()
 
-        // Load Model
-        // ---------------------------------------------------------------
-        let modelURL =  Bundle.module_WORKAROUND.url(forResource: "model", withExtension: "json")
-        let json = try Data(contentsOf: modelURL!)
-        model = try JSONDecoder().decode(Model.self, from: json)
+        let loader = Loader(memory: self.memory)
+        try loader.load(tabularPackage: packageURL!,
+                        dataRoot: dataURL,
+                        model: model)
     }
-    
-    public func loadData() throws {
+
+    public func __OLD__loadData() throws {
         print("Loading data ...")
 
         // 1. Create main Tarot node
         // ---------------------------------------------------------------
         let tarot = Node()
+        
+        guard let trait = model.trait(name: "Tarot") else {
+            fatalError("Model has no trait 'Tarot'")
+        }
+        tarot.trait = trait
+        
+        self.tarot = tarot
         memory.add(tarot)
 
         // 2. Import nodes
@@ -65,23 +81,23 @@ class TarotTool {
         // ---------------------------------------------------------------
         print("Connecting cards and other nodes")
         for node in cards.values {
-            memory.connect(from: tarot, to: node, at: "card")
+            memory.connect(from: tarot, to: node, attributes:["name": "card"])
         }
         
         for node in indicators.values {
-            memory.connect(from: tarot, to: node, at: "indicator")
+            memory.connect(from: tarot, to: node, attributes:["name": "indicator"])
         }
 
         for node in domains.values {
-            memory.connect(from: tarot, to: node, at: "domain")
+            memory.connect(from: tarot, to: node, attributes:["name": "domain"])
         }
 
         for node in relationships.values {
-            memory.connect(from: tarot, to: node, at: "relationshipType")
+            memory.connect(from: tarot, to: node, attributes:["name": "relationshipType"])
         }
 
         for node in levels.values {
-            memory.connect(from: tarot, to: node, at: "level")
+            memory.connect(from: tarot, to: node, attributes:["name": "level"])
         }
         
         // 4. Load relationships
@@ -91,22 +107,11 @@ class TarotTool {
     }
     
     public func loadNodesCSV(_ filename: String,
-                             trait traitName: String?=nil,
                              fieldMap: [String:String]=[:]) throws -> [String:Node] {
         let url = dataURL.appendingPathComponent(filename)
-        let importer = Importer(memory: memory, naming: naming)
-        let trait: Trait?
+        let loader = Loader(memory: memory)
         
-        if let traitName = traitName {
-            trait = model.trait(name: traitName)
-        }
-        else {
-            trait = nil
-        }
-        
-        return try importer.importNodesFromCSV(url,
-                                               trait: trait,
-                                               fieldMap: fieldMap)
+        return try loader.loadNodes(contentsOfCSVFile: url)
     }
     
     /// Loads links from a CSV file into the graph memory.
@@ -120,12 +125,11 @@ class TarotTool {
     ///
     public func loadLinksCSV(_ filename: String, references: [String:Node]) throws {
         let url = dataURL.appendingPathComponent(filename)
-        let importer = Importer(memory: memory,
-                                naming: naming,
-                                references: references)
+        let importer = Loader(memory: memory)
 
         try importer.importLinksFromCSV(url)
     }
+   
     
     public func writeDOT() {
         memory.writeDot(path: "/tmp/graph.dot", name: "cards")
