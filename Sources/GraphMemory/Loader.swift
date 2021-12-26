@@ -13,7 +13,7 @@ import Records
 
 /// Errors raised by the Importer
 ///
-public enum ImportError: Error {
+public enum LoaderError: Error {
     /// The validation of records that were attempted to be imported failed.
     /// The associated list contains list of issues identified.
     case validationError(IssueList)
@@ -213,13 +213,13 @@ public class Loader {
                           options: CSVReadingOptions=CSVReadingOptions()) throws -> [String:Node] {
         guard let records = try RecordSet(contentsOfCSVFile: url,
                                           options: options) else {
-            throw ImportError.resourceLoadError(url)
+            throw LoaderError.resourceLoadError(url)
         }
                
         let issues = validateNodeRecords(records)
 
         guard !issues.hasErrors else {
-            throw ImportError.validationError(issues)
+            throw LoaderError.validationError(issues)
         }
         
         return try loadNodes(records: records,
@@ -276,10 +276,10 @@ public class Loader {
                     namespace: String?=nil,
                     trait: Trait?=nil) throws -> String {
         guard let keyValue = record[fieldMap.nodeKeyField] else {
-            throw ImportError.missingField(fieldMap.nodeKeyField)
+            throw LoaderError.missingField(fieldMap.nodeKeyField)
         }
         guard let nodeKey = keyValue.stringValue() else {
-            throw ImportError.typeError(fieldMap.nodeKeyField)
+            throw LoaderError.typeError(fieldMap.nodeKeyField)
         }
 
         let node = Node()
@@ -302,7 +302,7 @@ public class Loader {
         memory.add(node)
         
         if namedNode(nodeKey, namespace: namespace) != nil {
-            throw ImportError.duplicateID
+            throw LoaderError.duplicateID
         }
         else {
             setNodeName(nodeKey, node:node, namespace: namespace)
@@ -383,13 +383,13 @@ public class Loader {
                                    namespace: String?=nil,
                                    options: CSVReadingOptions=CSVReadingOptions()) throws {
         guard let records = try RecordSet(contentsOfCSVFile: url, options:options) else {
-            throw ImportError.resourceLoadError(url)
+            throw LoaderError.resourceLoadError(url)
         }
                
         let issues = validateLinkRecords(records, namespace: namespace)
 
         guard !issues.hasErrors else {
-            throw ImportError.validationError(issues)
+            throw LoaderError.validationError(issues)
         }
         
         try importLinks(records, namespace: namespace)
@@ -410,23 +410,23 @@ public class Loader {
 
         for record in records {
             guard let originKeyValue = record[fieldMap.originField] else {
-                throw ImportError.missingField(fieldMap.originField)
+                throw LoaderError.missingField(fieldMap.originField)
             }
             guard let originKey = originKeyValue.stringValue() else {
-                throw ImportError.typeError(fieldMap.originField)
+                throw LoaderError.typeError(fieldMap.originField)
             }
             guard let targetKeyValue = record[fieldMap.targetField] else {
-                throw ImportError.missingField(fieldMap.targetField)
+                throw LoaderError.missingField(fieldMap.targetField)
             }
             guard let targetKey = targetKeyValue.stringValue() else {
-                throw ImportError.typeError(fieldMap.targetField)
+                throw LoaderError.typeError(fieldMap.targetField)
             }
 
             guard let origin = namedNode(originKey, namespace: namespace) else {
-                throw ImportError.unknownNode(originKey)
+                throw LoaderError.unknownNode(originKey)
             }
             guard let target = namedNode(targetKey, namespace: namespace) else {
-                throw ImportError.unknownNode(targetKey)
+                throw LoaderError.unknownNode(targetKey)
             }
 
             let link = memory.connect(from: origin, to: target)

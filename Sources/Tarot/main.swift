@@ -18,7 +18,7 @@ func makeSpace(options: Options) -> Space {
     do {
         space = try Space(packageURL: packageURL)
     }
-    catch ImportError.validationError(let issues) {
+    catch LoaderError.validationError(let issues) {
         for issue in issues {
             print(issue)
         }
