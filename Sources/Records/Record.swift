@@ -96,8 +96,8 @@ public class Record {
         return value?.boolValue()
     }
     // For RecordRepresentable
-    public func doubleValue(of fieldName: String) throws -> Double? {
+    public func floatValue(of fieldName: String) throws -> Float? {
         let value = try value(of: fieldName)
-        return value?.doubleValue()
+        return value?.floatValue()
     }
 }

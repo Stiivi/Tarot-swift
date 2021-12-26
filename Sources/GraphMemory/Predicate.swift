@@ -94,15 +94,15 @@ public struct NumberPredicate: PropertyPredicate {
     }
     
     let test: Test
-    let match: Double
+    let match: Float
     
-    public init(_ match: Double, test: Test = .equalTo) {
+    public init(_ match: Float, test: Test = .equalTo) {
         self.match = match
         self.test = test
     }
     
     public func matches(_ value: Value) -> Bool {
-        guard let number = value.doubleValue() else {
+        guard let number = value.floatValue() else {
             return false
         }
         switch test {
