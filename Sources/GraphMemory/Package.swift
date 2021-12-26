@@ -6,6 +6,7 @@
 //
 import Foundation
 import System
+import Records
 
 /// Description of a link resource.
 ///
@@ -93,12 +94,16 @@ public class PackageInfo: Decodable {
     /// Path to the resources. If not provided then the package path is used.
     let resourcesPath: FilePath?
     
+    /// Options for reading the resources
+    let resourceOptions: CSVReadingOptions?
+    
     enum CodingKeys: CodingKey {
         case label
         case nodes
         case links
         case fieldMap
         case resourcesPath
+        case resourceOptions
     }
     
     public required init(from decoder: Decoder) throws {
@@ -107,6 +112,7 @@ public class PackageInfo: Decodable {
         nodes = try values.decode([NodeResourceDescription].self, forKey: .nodes)
         links = try values.decode([LinkResourceDescription].self, forKey: .links)
         fieldMap = try values.decodeIfPresent(FieldMap.self, forKey: .fieldMap)
+        resourceOptions = try values.decodeIfPresent(CSVReadingOptions.self, forKey: .resourceOptions)
         
         let path = try values.decode(String.self, forKey: .resourcesPath)
         resourcesPath = FilePath(path)
@@ -144,6 +150,9 @@ public class Package {
     /// Mapping of field names in the tabular resources.
     var fieldMap: FieldMap? { info.fieldMap }
         
+    /// Options for reading the resources
+    var resourceOptions: CSVReadingOptions? { info.resourceOptions }
+    
     /// Base URL for resources.
     ///
     var resourcesURL: URL {

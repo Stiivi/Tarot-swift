@@ -209,8 +209,10 @@ public class Loader {
     @discardableResult
     public func loadNodes(contentsOfCSVFile url: URL,
                           namespace: String?=nil,
-                          trait: Trait?=nil) throws -> [String:Node] {
-        guard let records = try RecordSet(contentsOfCSVFile: url) else {
+                          trait: Trait?=nil,
+                          options: CSVReadingOptions=CSVReadingOptions()) throws -> [String:Node] {
+        guard let records = try RecordSet(contentsOfCSVFile: url,
+                                          options: options) else {
             throw ImportError.resourceLoadError(url)
         }
                
@@ -220,7 +222,9 @@ public class Loader {
             throw ImportError.validationError(issues)
         }
         
-        return try loadNodes(records: records, namespace: namespace, trait: trait)
+        return try loadNodes(records: records,
+                             namespace: namespace,
+                             trait: trait)
     }
 
     /// Import nodes from a record set. The `records` are expeced to be
@@ -315,7 +319,8 @@ public class Loader {
     ///
     /// - Returns: List of issues found within the record set.
     ///
-    public func validateLinkRecords(_ records: RecordSet) -> IssueList {
+    public func validateLinkRecords(_ records: RecordSet,
+                                    namespace: String?=nil) -> IssueList {
         let issues = IssueList()
 
         var hasSchemaIssues: Bool = false
@@ -352,14 +357,14 @@ public class Loader {
         for originValue in origins {
             // FIXME: Test for stringValue != nil
             let origin = originValue.stringValue()!
-            if namedNode(origin) == nil {
+            if namedNode(origin, namespace: namespace) == nil {
                 issues.error("Unknown origin node reference: \(origin)")
             }
         }
         let targets = records.distinctValues(of: fieldMap.originField)
         for targetValue in targets {
             let target = targetValue.stringValue()!
-            if namedNode(target) == nil {
+            if namedNode(target, namespace: namespace) == nil {
                 issues.error("Unknown target node reference: \(target)")
             }
         }
@@ -374,18 +379,20 @@ public class Loader {
     ///
     /// - Throws: ``ImportError``
     ///
-    public func importLinksFromCSV(_ url: URL, namespace: String = "default") throws {
-        guard let records = try RecordSet(contentsOfCSVFile: url) else {
+    public func importLinksFromCSV(contentsOfCSVFile url: URL,
+                                   namespace: String?=nil,
+                                   options: CSVReadingOptions=CSVReadingOptions()) throws {
+        guard let records = try RecordSet(contentsOfCSVFile: url, options:options) else {
             throw ImportError.resourceLoadError(url)
         }
                
-        let issues = validateLinkRecords(records)
+        let issues = validateLinkRecords(records, namespace: namespace)
 
         guard !issues.hasErrors else {
             throw ImportError.validationError(issues)
         }
         
-        try importLinks(records)
+        try importLinks(records, namespace: namespace)
     }
 
 
@@ -399,7 +406,7 @@ public class Loader {
     ///
     /// - Throws: ``ImportError``
     ///
-    public func importLinks(_ records: RecordSet) throws {
+    public func importLinks(_ records: RecordSet, namespace: String?=nil) throws {
 
         for record in records {
             guard let originKeyValue = record[fieldMap.originField] else {
@@ -415,19 +422,17 @@ public class Loader {
                 throw ImportError.typeError(fieldMap.targetField)
             }
 
-            guard let origin = namedNode(originKey) else {
+            guard let origin = namedNode(originKey, namespace: namespace) else {
                 throw ImportError.unknownNode(originKey)
             }
-            guard let target = namedNode(targetKey) else {
+            guard let target = namedNode(targetKey, namespace: namespace) else {
                 throw ImportError.unknownNode(targetKey)
             }
 
             let link = memory.connect(from: origin, to: target)
-            
             for field in record.schema.fieldNames {
                 link[field] = record[field]
             }
-
         }
     }
     
@@ -443,19 +448,8 @@ public class Loader {
     ///       are stored if different from the package description
     ///
     // FIXME: Model does not belong here, it is from semantic layer
-    public func load(tabularPackage: URL, dataRoot: URL?=nil, model: Model) throws {
-        let root: URL
-        
-        if let dataRoot = dataRoot {
-            root = dataRoot
-        }
-        else {
-            root = tabularPackage.deletingLastPathComponent()
-        }
-        
+    public func load(package: Package, model: Model) throws {
         // Load the tabular package description
-        let json = try Data(contentsOf: tabularPackage)
-        let package = try JSONDecoder().decode(TabularPackage.self, from: json)
         
         // FIXME: Either this or the init version must go away
         if let fieldMap = package.fieldMap {
@@ -464,7 +458,7 @@ public class Loader {
         
         for nodeDesc in package.nodes {
             print("Loading nodes from \(nodeDesc.resource)")
-            let url = root.appendingPathComponent(nodeDesc.resource)
+            let url = package.url(forResource: nodeDesc.resource)
             let trait: Trait?
             
             if let traitName = nodeDesc.trait {
@@ -476,7 +470,16 @@ public class Loader {
 
             try loadNodes(contentsOfCSVFile: url,
                           namespace: nodeDesc.namespace,
-                          trait: trait)
+                          trait: trait,
+                          options: package.resourceOptions ?? CSVReadingOptions())
+        }
+        for linkDesc in package.links {
+            print("Loading links from \(linkDesc.resource)")
+            let url = package.url(forResource: linkDesc.resource)
+
+            try importLinksFromCSV(contentsOfCSVFile: url,
+                          namespace: linkDesc.namespace,
+                          options: package.resourceOptions ?? CSVReadingOptions())
         }
         
     }

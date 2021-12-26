@@ -5,6 +5,31 @@
 //  Created by Stefan Urbanek on 2021/8/31.
 //
 
+
+/// Set of options to read CSV files.
+///
+public class CSVReadingOptions: Decodable {
+    
+    /// Record delimiter character. Default is a comma `,`.
+    ///
+    public let delimiter: Character
+    
+    public init(delimiter: Character=",") {
+        self.delimiter = delimiter
+    }
+
+    enum CodingKeys: CodingKey {
+        case delimiter
+    }
+    
+    public required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let str = try values.decode(String.self, forKey: .delimiter)
+        // TODO: Handle error here
+        delimiter = str.first!
+    }
+}
+
 /// CSVReader reads a string ctonaining a comma separated values and then
 /// generates list of rows where a row is a list of values. All values are
 /// string values.
@@ -25,21 +50,23 @@ class CSVReader: Sequence, IteratorProtocol {
         case inQuote
     }
     
-    var fieldSeparator: Character = ","
+    var options: CSVReadingOptions
     
     var iterator: String.Iterator
     var currentChar: Character?
     var state: State = .newField
     public var tokenText: String = ""
     
-    init(_ iterator: String.Iterator) {
+    init(_ iterator: String.Iterator, options: CSVReadingOptions=CSVReadingOptions()) {
         self.iterator = iterator
         currentChar = self.iterator.next()
+        self.options = options
     }
     
-    init(_ string: String = "") {
+    init(_ string: String = "", options: CSVReadingOptions=CSVReadingOptions()) {
         iterator = string.makeIterator()
         currentChar = iterator.next()
+        self.options = options
     }
     
     var atEnd: Bool { currentChar == nil }
@@ -68,7 +95,7 @@ class CSVReader: Sequence, IteratorProtocol {
             advance()
             return .recordSeparator
         }
-        else if currentChar == fieldSeparator {
+        else if currentChar == options.delimiter {
             advance()
             return .fieldSeparator
         }
@@ -90,7 +117,7 @@ class CSVReader: Sequence, IteratorProtocol {
                 }
                 else { // any character except quote
                     if gotQuote {
-                        if currentChar == fieldSeparator {
+                        if currentChar == options.delimiter {
                             // We got a field separator after a quote
                             break
                         }
@@ -115,7 +142,7 @@ class CSVReader: Sequence, IteratorProtocol {
         }
         else {
             while !atEnd {
-                if currentChar == fieldSeparator {
+                if currentChar == options.delimiter {
                     break
                 }
                 else if currentChar?.isNewline ?? false {

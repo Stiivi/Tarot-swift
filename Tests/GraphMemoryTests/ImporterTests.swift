@@ -7,6 +7,8 @@
 
 import Foundation
 
+// TODO: Import links using namespace
+
 import XCTest
 @testable import GraphMemory
 @testable import Records

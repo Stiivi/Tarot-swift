@@ -51,10 +51,11 @@ public class RecordSet: Sequence {
     /// value types will be `string`.
     ///
     /// Initializer fails if the CSV file does not have a header.
-    public convenience init?(contentsOfCSVFile url: URL) throws {
+    public convenience init?(contentsOfCSVFile url: URL,
+                             options: CSVReadingOptions=CSVReadingOptions()) throws {
         let string = try String(contentsOf: url)
         
-        self.init(csvString: string)
+        self.init(csvString: string, options: options)
     }
 
     /// Create a new record set with contents of a CSV string. Schema of the
@@ -62,8 +63,9 @@ public class RecordSet: Sequence {
     /// value types will be `string`.
     ///
     /// Initializer fails if the CSV file does not have a header.
-    public init(csvString string: String) {
-        let reader = CSVReader(string)
+    public init(csvString string: String,
+                options: CSVReadingOptions=CSVReadingOptions()) {
+        let reader = CSVReader(string, options: options)
 
         if let header = reader.next() {
             _schema = Schema(header, type: .string)
