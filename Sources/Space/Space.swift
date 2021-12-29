@@ -26,6 +26,8 @@ import Foundation
  
  */
 
+import GraphMemory
+import Interface
 
 // TODO: Add semantics to connections, such as "name"
 // TODO: Add removal of multiple nodes

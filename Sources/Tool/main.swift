@@ -92,6 +92,45 @@ extension Tarot {
     }
 }
 
+extension Tarot {
+    struct Extract: ParsableCommand {
+        static var configuration
+            = CommandConfiguration(abstract: "Extract objects")
+
+        @OptionGroup var options: Options
+
+        @Option(name: [.long, .customShort("t")],
+                help: "Trait name")
+        var traitName: String?
+
+        /// Extract objects into a JSON file.
+        ///
+        // Design notes:
+        //
+        // tarot extract Card
+        //
+        mutating func run() {
+            let space = makeSpace(options: options)
+
+            let nodes: [Node]
+            
+            if let traitName = traitName {
+                nodes = space.memory.filter(taitName: traitName)
+            }
+            else {
+                nodes = space.memory.nodes
+            }
+            
+            let encoder = JSONEncoder()
+            for node in nodes {
+                let dict = node.asDictionary()
+                let data = try encoder.encode(dict)
+            }
+        }
+    }
+}
+
+
 
 extension Tarot {
     struct WriteDOT: ParsableCommand {

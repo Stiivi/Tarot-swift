@@ -8,8 +8,8 @@
 /// Link represents a graph edge - conection between two nodes.
 ///
 public class Link: Object {
-    let origin: Node
-    let target: Node
+    public let origin: Node
+    public let target: Node
     
     init(id: OID, origin: Node, target: Node) {
         self.origin = origin

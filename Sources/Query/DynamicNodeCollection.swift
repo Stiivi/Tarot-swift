@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import GraphMemory
 
 /// Selection of nodes based on a predicate.
 ///
 // We borrow the word "selection" from relational algebra. Although we are
 // aware that it is not as pure as relational algebra's concept.
-public class DynamicNodeCollection {
+public class DynamicNodeCollection: RandomAccessCollection {
     public typealias Element = Node
     public typealias Index = Array<Node>.Index
     public typealias SubSequence = Array<Node>.SubSequence

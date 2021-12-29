@@ -55,6 +55,9 @@ extension LinkDescription: Codable {
     }
 }
 
+// TODO: Rename to AttributeDescription
+// Reasons: we are calling it attributes; properties usually mean attributes
+// and references, we do not have references here.
 /// Describes object property.
 /// 
 public final class PropertyDescription {

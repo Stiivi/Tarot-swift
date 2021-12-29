@@ -10,6 +10,8 @@
 
 import Foundation
 import Records
+import GraphMemory
+import Metamodel
 
 /// Errors raised by the Importer
 ///

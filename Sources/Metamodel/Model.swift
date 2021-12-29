@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GraphMemory
 
 enum ModelError: Error {
     case unableToLoadData(URL)

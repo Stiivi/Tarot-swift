@@ -6,6 +6,7 @@
 //
 
 import DotWriter
+import GraphMemory
 
 /// Extension for writing GraphViz .dot files from the graph memory.
 ///

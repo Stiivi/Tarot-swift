@@ -17,7 +17,7 @@ public typealias PropertyValue = String
 open class Object: Identifiable {
     /// Graph memory that the object is associated with.
     ///
-    var graph: GraphMemory?
+    public internal(set) var graph: GraphMemory?
     
     
     /// Object attributes
@@ -67,4 +67,27 @@ extension Object: CustomStringConvertible {
         
         return "Object(id: \(idString), attributes: [\(joined)])"
     }
+}
+
+
+extension Object {
+    /// Returns object represented as a dictionary. Keys are attribute keys and
+    /// values are object's attribute values.
+    ///
+    /// This method can be used for extracting the object in a structured form,
+    /// such as JSON. Or it can be used for debugging.
+    ///
+    /// Currently there is no inverse function that would convert a dictionary
+    /// to an object.
+    ///
+//    public func asDictionary() -> [String:Any] {
+//        let items = attributes.map {
+//            let key = $0.key
+//            let value: Any
+//            
+//            switch $0.value {
+//            case .
+//            }
+//        }
+//    }
 }

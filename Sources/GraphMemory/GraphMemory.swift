@@ -303,6 +303,7 @@ public class GraphMemory {
         
         return flag
     }
+    
 }
 
 extension GraphMemory: CustomStringConvertible {

@@ -27,6 +27,7 @@ import Foundation
  */
  
 import Records
+import GraphMemory
 
 extension GraphMemory {
     
