@@ -27,22 +27,22 @@ public protocol GraphMemoryProtocol {
     func remove(_ node: Node)
     
     /// Create a link in the memory.
-    func connect(from origin:Node, to target:Node) -> Link
+    func connect(from origin:Node, to target:Node, attributes:[String:Value]) -> Link
     /// Remove a link from the memory
     func disconnect(link: Link)
     
-    /// Set attribute of a node. Return previous attribute value.
-    func setAttribute(node: Node, attribute: String, value: Value) -> Value?
-    /// Remove a node attribute if exists. Returns previous value if it was set or
-    /// nil when there was no value set for the attribute.
-    func removeAttribute(node: Node, attribute: String) -> Value?
-
-    /// Set attribute of a link. Return previous attribute value.
-    func setAttribute(link: Link, attribute: String, value: Value) -> Value?
-
-    /// Remove a link attribute if exists. Returns previous value if it was set or
-    /// nil when there was no value set for the attribute.
-    func removeAttribute(link: Link, attribute: String) -> Value?
+//    /// Set attribute of a node. Return previous attribute value.
+//    func setAttribute(node: Node, attribute: String, value: Value) -> Value?
+//    /// Remove a node attribute if exists. Returns previous value if it was set or
+//    /// nil when there was no value set for the attribute.
+//    func removeAttribute(node: Node, attribute: String) -> Value?
+//
+//    /// Set attribute of a link. Return previous attribute value.
+//    func setAttribute(link: Link, attribute: String, value: Value) -> Value?
+//
+//    /// Remove a link attribute if exists. Returns previous value if it was set or
+//    /// nil when there was no value set for the attribute.
+//    func removeAttribute(link: Link, attribute: String) -> Value?
 }
 
 
@@ -71,7 +71,7 @@ public protocol GraphMemoryProtocol {
 /// "simulation environment". It is not made a generic as it is not intended
 /// for general purpose use. It does not mean it might not change in the future.
 ///
-public class GraphMemory {
+public class GraphMemory: GraphMemoryProtocol {
     
     /// Mapping between node IDs and node objects.
     private var nodeIndex: [OID:Node] = [:]
@@ -170,7 +170,7 @@ public class GraphMemory {
 
         delegate?.graph(self, didRemove: node)
     }
-
+    
     /// Tests whether the graph contains a node.
     ///
     /// - Returns: `true` if the graph contains `node`
@@ -181,7 +181,7 @@ public class GraphMemory {
         }
         return self.nodeIndex[id] != nil
     }
-        /// `target`. Assign attributes to the newly created nod.
+    
     ///
     /// The link name does not have to be unique and there might be multiple
     /// links with the same name between two nodes.
