@@ -12,7 +12,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Tarot",
-            targets: ["GraphMemory", "Interface", "Metamodel", "Query"]),
+            targets: ["GraphMemory", "Interface", "Metamodel", "Query", "Space"]),
         .executable(
             name: "tarot",
             targets: ["Tool"]),
@@ -33,14 +33,14 @@ let package = Package(
             name: "GraphMemory",
             dependencies: ["Records"]),
         .target(
-            name: "Interface",
-            dependencies: ["GraphMemory", "Metamodel", "DotWriter"]),
-        .target(
             name: "Metamodel",
             dependencies: ["GraphMemory"]),
         .target(
             name: "Query",
             dependencies: ["GraphMemory"]),
+        .target(
+            name: "Interface",
+            dependencies: ["GraphMemory", "Metamodel", "DotWriter"]),
         .target(
             name: "Space",
             dependencies: ["GraphMemory", "Interface"]),
@@ -48,16 +48,25 @@ let package = Package(
         .executableTarget(
             name: "Tool",
             dependencies: [
-                "GraphMemory", "Interface", "Metamodel", "Query",
+                "Space", "Query",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ],
             resources: [ ]
         ),
         .testTarget(
             name: "GraphMemoryTests",
-            dependencies: ["GraphMemory", "Records"]),
+            dependencies: ["Space", "Records"]),
         .testTarget(
             name: "RecordsTests",
             dependencies: ["Records"]),
+        .testTarget(
+            name: "MetamodelTests",
+            dependencies: ["Metamodel"]),
+        .testTarget(
+            name: "QueryTests",
+            dependencies: ["Query"]),
+        .testTarget(
+            name: "InterfacesTests",
+            dependencies: ["Interface"]),
     ]
 )

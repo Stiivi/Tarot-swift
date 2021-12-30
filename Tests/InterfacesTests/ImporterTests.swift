@@ -12,6 +12,7 @@ import Foundation
 import XCTest
 @testable import GraphMemory
 @testable import Records
+@testable import Interface
 
 class TestNode: Node {
     var recordSchema: Schema { Schema() }

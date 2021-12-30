@@ -56,7 +56,7 @@ final class SchemaTests: XCTestCase {
              Field("name", type: .int),
              Field("flag", type: .string)])
         let bad1 = Schema([Field("flag", type: .int)])
-        let bad2 = Schema([Field("flag", type: .double)])
+        let bad2 = Schema([Field("flag", type: .float)])
 
         XCTAssertTrue(good.isConvertible(to: original))
         XCTAssertFalse(bad1.isConvertible(to: original))

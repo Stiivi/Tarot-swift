@@ -1,13 +1,6 @@
 import XCTest
 @testable import GraphMemory
 
-class Thing: Node {
-    let label: String
-    
-    init(_ label: String) {
-        self.label = label
-    }
-}
 
 final class GraphMemoryTests: XCTestCase {
     func testAdd() throws {

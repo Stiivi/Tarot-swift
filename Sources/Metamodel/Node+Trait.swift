@@ -7,7 +7,10 @@
 
 import Foundation
 import GraphMemory
+import Records
 
+
+// TODO: This is not clean - we should not assume the label to be "name"
 extension Node {
     /// Returns related nodes to this node. Node relationshops are described in
     /// ``LinkTrait``.
@@ -31,15 +34,15 @@ extension Node {
         let nodes: [Node]
         
         // TODO: This is simplified matching
-        let predicate = AttributeValuePredicate(key: "name",
-                                                value: .string(linkDesc.linkName))
+        let labelKey = "name"
+        let labelValue: Value = .string(linkDesc.linkName)
         
         if linkDesc.isReverse {
-            links = graph.incoming(self).filter { predicate.matches($0) }
+            links = graph.incoming(self).filter { $0[labelKey] == labelValue }
             nodes = links.map { $0.origin }
         }
         else {
-            links = graph.outgoing(self).filter { predicate.matches($0) }
+            links = graph.outgoing(self).filter { $0[labelKey] == labelValue }
             nodes = links.map { $0.target }
         }
         

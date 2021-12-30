@@ -7,6 +7,7 @@
 
 import Foundation
 import XCTest
+@testable import Metamodel
 @testable import GraphMemory
 
 final class TraitsTests: XCTestCase {

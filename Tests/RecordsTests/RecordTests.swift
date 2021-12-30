@@ -60,11 +60,11 @@ final class RecordTests: XCTestCase {
         
         XCTAssertEqual(error, RecordError.typeMismatch("label", .bool))
 
-        XCTAssertThrowsError(try r.doubleValue(of: "label")) {
+        XCTAssertThrowsError(try r.floatValue(of: "label")) {
             error = $0 as? RecordError
         }
         
-        XCTAssertEqual(error, RecordError.typeMismatch("label", .double))
+        XCTAssertEqual(error, RecordError.typeMismatch("label", .float))
     }
 
 }

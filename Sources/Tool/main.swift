@@ -7,6 +7,8 @@
 import GraphMemory
 import Foundation
 import ArgumentParser
+import Space
+import Interface
 
 
 /// Create a space from a package specified in the options.
@@ -115,16 +117,18 @@ extension Tarot {
             let nodes: [Node]
             
             if let traitName = traitName {
-                nodes = space.memory.filter(taitName: traitName)
+                nodes = space.memory.filter(traitName: traitName)
             }
             else {
-                nodes = space.memory.nodes
+                nodes = Array(space.memory.nodes)
             }
             
             let encoder = JSONEncoder()
             for node in nodes {
-                let dict = node.asDictionary()
-                let data = try encoder.encode(dict)
+                // FIXME: Implement this
+                fatalError("Not implemented")
+                // let dict = node.asDictionary()
+                // let data = try encoder.encode(dict)
             }
         }
     }
