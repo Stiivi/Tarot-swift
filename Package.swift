@@ -11,8 +11,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "Tarot",
-            targets: ["GraphMemory", "Interface", "Metamodel", "Query", "Space"]),
+            name: "TarotKit",
+            targets: ["TarotKit"]),
         .executable(
             name: "tarot",
             targets: ["Tool"]),
@@ -30,43 +30,21 @@ let package = Package(
             name: "Records",
             dependencies: []),
         .target(
-            name: "GraphMemory",
-            dependencies: ["Records"]),
-        .target(
-            name: "Metamodel",
-            dependencies: ["GraphMemory"]),
-        .target(
-            name: "Query",
-            dependencies: ["GraphMemory"]),
-        .target(
-            name: "Interface",
-            dependencies: ["GraphMemory", "Metamodel", "DotWriter"]),
-        .target(
-            name: "Space",
-            dependencies: ["GraphMemory", "Interface"]),
-
+            name: "TarotKit",
+            dependencies: ["Records", "DotWriter"]),
         .executableTarget(
             name: "Tool",
             dependencies: [
-                "Space", "Query",
+                "TarotKit",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ],
             resources: [ ]
         ),
         .testTarget(
-            name: "GraphMemoryTests",
-            dependencies: ["Space", "Records"]),
-        .testTarget(
             name: "RecordsTests",
             dependencies: ["Records"]),
         .testTarget(
-            name: "MetamodelTests",
-            dependencies: ["Metamodel"]),
-        .testTarget(
-            name: "QueryTests",
-            dependencies: ["Query"]),
-        .testTarget(
-            name: "InterfacesTests",
-            dependencies: ["Interface"]),
+            name: "TarotTests",
+            dependencies: ["TarotKit", "Records", "DotWriter"]),
     ]
 )

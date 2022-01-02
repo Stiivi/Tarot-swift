@@ -4,11 +4,9 @@
 //
 //  Created by Stefan Urbanek on 2021/10/19.
 //
-import GraphMemory
 import Foundation
+import TarotKit
 import ArgumentParser
-import Space
-import Interface
 
 
 /// Create a space from a package specified in the options.

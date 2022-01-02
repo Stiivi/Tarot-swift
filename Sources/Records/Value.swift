@@ -117,7 +117,7 @@ public enum Value: Equatable, Hashable {
     
     /// Get a string value. Any type can be converted to a string.
     /// 
-    public func stringValue() -> String? {
+    public func stringValue() -> String {
         switch self {
         case .string(let value): return String(value)
         case .bool(let value): return String(value)
@@ -141,7 +141,7 @@ public enum Value: Equatable, Hashable {
     public func convert(to otherType:ValueType) -> Value? {
         switch (otherType) {
         case .int: return self.intValue().map { .int($0) } ?? nil
-        case .string: return self.stringValue().map { .string($0) } ?? nil
+        case .string: return .string(self.stringValue())
         case .bool: return self.boolValue().map { .bool($0) } ?? nil
         case .float: return self.floatValue().map { .float($0) } ?? nil
         }
@@ -165,7 +165,7 @@ public enum Value: Equatable, Hashable {
 
 extension Value: CustomStringConvertible {
     public var description: String {
-        return stringValue() ?? "(unknown value)"
+        return stringValue()
     }
 }
 
