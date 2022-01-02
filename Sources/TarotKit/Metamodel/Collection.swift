@@ -5,6 +5,7 @@
 //  Created by Stefan Urbanek on 26/12/2021.
 //
 
+import Records
 
 extension GraphMemory {
     /// Create an ordered node collection
@@ -13,7 +14,7 @@ extension GraphMemory {
     }
 }
 
-/// Wrapper for a node representing a collection.
+/// View of a node representing a collection.
 ///
 /// A collection node is a node that has several specific links to other nodes
 /// that are considered collection's items.
@@ -61,27 +62,36 @@ extension GraphMemory {
 ///
 public class Collection {
     /// Node representing the collection
-    var node: Node
+    var representedNode: Node
     /// Name of a link property to be looked at when locating collection
     /// members. Typically it would be `name`.
     ///
-    var itemLinkAttribute: String  { node["itemLinkAttribute"]?.stringValue() ?? "label"}
+    var itemLinkAttribute: String  { representedNode["itemLinkAttribute"]?.stringValue() ?? "label"}
     
     /// Value of the item forming link property. Typically it would be `item`
     ///
-    var itemLinkValue: String { node["itemLinkValue"]?.stringValue() ?? "item" }
-    var linkOrderAttribute: String? { node["linkSortAttribute"]?.stringValue() }
+    var itemLinkValue: String { representedNode["itemLinkValue"]?.stringValue() ?? "item" }
+    var linkOrderAttribute: String? { representedNode["linkOrderAttribute"]?.stringValue() }
     
     // TODO: NULLS FIRST/LAST
     
     /// Creates a collection rooted in `node`.
     ///
     public init(_ node: Node) {
-        self.node = node
+        self.representedNode = node
     }
     
+    /// List of collection items.
+    ///
     var items: [Node] {
-        guard let outgoing = node.graph?.outgoing(node) else {
+        return itemLinks.map { $0.target }
+    }
+    
+    /// List of links that point to the collection items.
+    ///
+    // TODO: Distinguish between ordered and un-ordered
+    var itemLinks: [Link] {
+        guard let outgoing = representedNode.graph?.outgoing(representedNode) else {
             // FIXME: I guess this should be an error
             return []
         }
@@ -100,6 +110,17 @@ public class Collection {
                 
             }
         }
-        return links.map { $0.target }
+        
+        return links
+    }
+    
+    /// Add a node to the collection.
+    ///
+    func add(node item: Node, attributes: [String:Value] = [:]) {
+        var linkAttributes = attributes
+        
+        linkAttributes[itemLinkAttribute] = .string(itemLinkValue)
+
+        representedNode.graph?.connect(from: representedNode, to: item, attributes: linkAttributes)
     }
 }

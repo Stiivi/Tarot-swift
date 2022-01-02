@@ -193,10 +193,20 @@ public class GraphMemory: GraphMemoryProtocol {
     @discardableResult
     public func connect(from origin: Node, to target: Node, attributes: [String:Value]=[:]) -> Link {
         guard origin.graph === self else {
-            fatalError("Connecting from an origin from a different graph")
+            if origin.graph == nil {
+                fatalError("Connecting to a non-associated origin")
+            }
+            else {
+                fatalError("Connecting from an origin from a different graph")
+            }
         }
         guard target.graph === self else {
-            fatalError("Connecting to a target from a different graph")
+            if target.graph == nil {
+                fatalError("Connecting to a non-associated target")
+            }
+            else {
+                fatalError("Connecting to a target from a different graph")
+            }
         }
         
         let linkID = nextID()

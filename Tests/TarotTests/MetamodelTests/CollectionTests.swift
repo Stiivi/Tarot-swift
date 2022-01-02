@@ -10,10 +10,14 @@ import XCTest
 @testable import TarotKit
 
 final class CollectionTests: XCTestCase {
-    func testBasic() throws {
-        let graph = GraphMemory()
+    var nodes: [Node]! = nil
+    var graph: GraphMemory! = nil
+    var collectionNode: Node! = nil
+    
+    override func setUp() {
+        graph = GraphMemory()
         
-        let nodes = [
+        nodes = [
             Node(attributes: ["name":"one", "number": "10"]),
             Node(attributes: ["name":"two", "number": "20"]),
             Node(attributes: ["name":"three", "number": "30"]),
@@ -22,21 +26,23 @@ final class CollectionTests: XCTestCase {
         for node in nodes {
             graph.add(node)
         }
-        
-        let collectionNode = Node(
-            attributes: ["itemLinkAttribute": "label",
-                        "itemLinkValue": "item",
-                        "linkSortAttribute": "order"]
-        )
+
+        collectionNode = Node()
         graph.add(collectionNode)
 
-        graph.connect(from: collectionNode, to: nodes[0], attributes: ["label":"item", "order": 3])
-        graph.connect(from: collectionNode, to: nodes[1], attributes: ["label":"item", "order": 2])
-        graph.connect(from: collectionNode, to: nodes[2], attributes: ["label":"item", "order": 1])
+        graph.connect(from: collectionNode, to: nodes[0],
+                      attributes: ["label":"item", "order":3])
+        graph.connect(from: collectionNode, to: nodes[1],
+                      attributes: ["label":"item", "order":2])
+        graph.connect(from: collectionNode, to: nodes[2],
+                      attributes: ["label":"item", "order":1])
+    }
 
+    func testItems() throws {
         let collection = Collection(collectionNode)
         
+        collectionNode["linkOrderAttribute"] = "order"
         XCTAssertEqual([nodes[2], nodes[1], nodes[0]], collection.items)
-
     }
+    
 }

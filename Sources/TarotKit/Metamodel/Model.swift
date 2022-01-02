@@ -20,10 +20,6 @@ public final class Model {
     ///
     public var name: String
     
-    /// Description of the model.
-    ///
-    public var description: String?
-
     enum CodingKeys: String, CodingKey {
         case name
         case traits

@@ -48,7 +48,27 @@ struct Tarot: ParsableCommand {
 
 struct Options: ParsableArguments {
     @Option(name: [.long, .customShort("p")], help: "Path to a package directory")
-    var packagePath = "Data.tarot"
+    var packagePath = "Data.tarotpackage"
+    
+    @Option(name: [.long, .customShort("d")], help: "Path to a Tarot database")
+    var database = "Data.tarot"
+}
+
+extension Tarot {
+    struct Create: ParsableCommand {
+        static var configuration
+            = CommandConfiguration(abstract: "Create a Tarot database.")
+
+        @OptionGroup var options: Options
+
+        mutating func run() {
+            let space = makeSpace(options: options)
+            for node in space.memory.nodes {
+                let traitName = node.trait?.name ?? "no trait"
+                print("\(node.id!)(\(traitName))")
+            }
+        }
+    }
 }
 
 extension Tarot {

@@ -40,18 +40,37 @@ public class Space {
     /// Semantics of the graph memory.
     public let model: Model
     
+    /// Node that represents the space's catalog - mapping of names to objects.
+    /// Typically catalog items are collections.
+    ///
+    /// Catalog is a collection node.
+    ///
+    public let catalog: Dictionary
+    
     /// Create an empty space with a given model.
     ///
-    public init(model: Model) {
+    public init(model: Model? = nil) {
         memory = GraphMemory()
-        self.model = model
+        if let model = model {
+            self.model = model
+        }
+        else {
+            self.model = Model(name: "__default", traits: [])
+        }
+
+        let catalogNode = Node()
+        catalogNode["__system_object_name"] = "Catalog"
+        memory.add(catalogNode)
+
+        // FIXME: What happens if someone deletes the catalog node?
+        catalog = Dictionary(catalogNode)
     }
     
     /// Create a space from a package. Populate the graph memory with nodes
     /// and links contained in the package.
     ///
     /// For more information see: `class:Package`
-    public init(packageURL: URL) throws {
+    public convenience init(packageURL: URL) throws {
         let package: Package
         
         // Load the package info from `info.json`
@@ -72,19 +91,19 @@ public class Space {
             fatalError("Can not load package '\(packageURL)': \(error)")
         }
 
+        let model: Model
         // Try to load the package model from `model.json`
         //
         do {
             let json = try Data(contentsOf: package.modelURL)
-            self.model = try JSONDecoder().decode(Model.self, from: json)
+            model = try JSONDecoder().decode(Model.self, from: json)
         }
         catch {
             fatalError("Can not read model resource: \(error)")
         }
-
-        // Create the memory
-        memory = GraphMemory()
         
+        self.init(model: model)
+
         // Load the data
         // ---------------------------------------------------------------
 
@@ -103,4 +122,5 @@ public class Space {
         }
 
     }
+
 }
