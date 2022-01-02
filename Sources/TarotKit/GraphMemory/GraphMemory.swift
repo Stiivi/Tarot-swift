@@ -7,6 +7,7 @@
 
 // FIXME: We are importing Records only because of Value
 import Records
+import Darwin
 
 /// Protocol for a basic graph memory implementation. This protocol is
 /// a scaffolding for development - it helps to separate interface from the
@@ -68,7 +69,7 @@ public protocol GraphMemoryProtocol {
 /// "simulation environment". It is not made a generic as it is not intended
 /// for general purpose use. It does not mean it might not change in the future.
 ///
-public class GraphMemory: GraphMemoryProtocol {
+public class GraphMemory {
     
     /// Mapping between node IDs and node objects.
     private var nodeIndex: [OID:Node] = [:]
@@ -91,7 +92,16 @@ public class GraphMemory: GraphMemoryProtocol {
         self.linkIndex = [:]
     }
     
+    // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
+    // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
+    // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
     private func nextID() -> OID {
+        // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
+        // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
+        // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
+        // SEE: add(link)
+        // TODO: Provide IDs externally, do not generate here
+        // TODO: Do not generate IDs this lame way, it was ok from the beginning
         let id = idSequence
         idSequence += 1
         return id
@@ -102,7 +112,17 @@ public class GraphMemory: GraphMemoryProtocol {
     public func object(_ oid: OID) -> Object? {
         return nodeIndex[oid] ?? linkIndex[oid]
     }
-    
+
+    /// Get a node by its ID.
+    public func node(_ oid: OID) -> Node? {
+        return nodeIndex[oid]
+    }
+
+    /// Get a link by its ID.
+    public func link(_ oid: OID) -> Link? {
+        return linkIndex[oid]
+    }
+
     /// Read-only collection of all nodes in the graph.
     ///
     public var nodes: Set<Node> {
@@ -128,19 +148,26 @@ public class GraphMemory: GraphMemoryProtocol {
         guard node.graph == nil else {
             fatalError("Trying to associate already associated node: \(node)")
         }
-        guard node.id == nil else {
-            fatalError("Trying to associate a node with non-empty id: \(node)")
+        if let id = node.id {
+            guard nodeIndex[id] == nil else {
+                fatalError("Trying to associate a node with id that already exists: \(id)")
+            }
+            // FIXME: THIS IS TEMPORARY FIX, SEE ABOVE
+            idSequence = max(id, idSequence) + 1
         }
-        let id = nextID()
+        else {
+            let id = nextID()
+            node.id = id
+        }
         
         // Register the object
         node.graph = self
-        node.id = id
 
-        nodeIndex[id] = node
+        nodeIndex[node.id!] = node
         
         delegate?.graph(self, didAdd: node)
     }
+    
     /// Removes node from the space and removes all incoming and outgoing links
     /// for that node.
     ///
@@ -187,11 +214,13 @@ public class GraphMemory: GraphMemoryProtocol {
     ///     - origin: The node from which the link originates.
     ///     - target: The node to which the link points.
     ///     - attributes: Attributes of the link.
+    ///     - id: Unique link identifier. Link with given identifier must not
+    ///     exist. If not provided, new one is assigned.
     ///
     /// - Returns: Newly created link
     ///
     @discardableResult
-    public func connect(from origin: Node, to target: Node, attributes: [String:Value]=[:]) -> Link {
+    public func connect(from origin: Node, to target: Node, attributes: [String:Value]=[:], id: OID?=nil) -> Link {
         guard origin.graph === self else {
             if origin.graph == nil {
                 fatalError("Connecting to a non-associated origin")
@@ -209,7 +238,23 @@ public class GraphMemory: GraphMemoryProtocol {
             }
         }
         
-        let linkID = nextID()
+        let linkID: OID
+
+        if let id = id {
+            guard linkIndex[id] == nil else {
+                fatalError("Link with id '\(id)' already exists.")
+            }
+            guard nodeIndex[id] == nil else {
+                fatalError("Link id '\(id)' is already assigned to a node.")
+            }
+            linkID = id
+            // FIXME: THIS IS TEMPORARY FIX, SEE ABOVE
+            idSequence = max(id, idSequence) + 1
+        }
+        else {
+            linkID = nextID()
+        }
+        
         let link = Link(id: linkID, origin: origin, target: target)
         link.graph = self
         self.linkIndex[linkID] = link
@@ -217,6 +262,7 @@ public class GraphMemory: GraphMemoryProtocol {
         for item in attributes {
             link[item.key] = item.value
         }
+        
         delegate?.graph(self, didConnect: link)
         return link
     }

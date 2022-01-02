@@ -25,6 +25,7 @@
  */
 
 import Foundation
+import Records
 
 // TODO: Add semantics to connections, such as "name"
 // TODO: Add removal of multiple nodes
@@ -33,7 +34,6 @@ import Foundation
 /// with its model as a semantics.
 ///
 public class Space {
-    
     /// Graph memory containing objects within the space.
     public let memory: GraphMemory
     
@@ -122,5 +122,91 @@ public class Space {
         }
 
     }
+}
 
+
+/// Store reading and writing.
+///
+extension Space {
+    // TODO: Consider those two to be reference values that might be checked by the store
+    /// Key for link origin in the record stored in the persistent store.
+    /// It is intentionally longer to not to conflic with potential user keys.
+    static let originRecordKey = "__link_origin"
+    /// Key for link target in the record stored in the persistent store.
+    /// It is intentionally longer to not to conflic with potential user keys.
+    static let targetRecordKey = "__link_target"
+
+    /// Write the whole space in a store.
+    public func save(to store: PersistentStore) throws {
+        // TODO: This is prone to corruption
+        try store.deleteAll()
+        
+        // Write nodes
+        // ---------------------------------------------------------------
+        for node in memory.nodes {
+            let id = String(node.id!)
+            let record = StoreRecord(type: "node",  id: id, values: node.attributes)
+            try store.save(record: record)
+        }
+        
+        // Write links
+        // ---------------------------------------------------------------
+        for link in memory.links {
+            let id = String(link.id!)
+            let record = StoreRecord(type: "link", id: id, values: link.attributes)
+
+            record[Space.originRecordKey] = .int(link.origin.id!)
+            record[Space.targetRecordKey] = .int(link.target.id!)
+            try store.save(record: record)
+        }
+    }
+    
+    /// Read the whole space from a store.
+    /// Create a space from a storage.
+    ///
+
+    public convenience init(store: PersistentStore) throws {
+        // FIXME: Model is not preserved here
+
+        self.init()
+
+        // Read nodes
+        // ---------------------------------------------------------------
+        // TODO: Document that we are using __id here
+        for record in try store.fetchAll(type: "node") {
+            let id = OID(record.id)
+            
+            var attributes: [String:Value] = [:]
+            for key in record.keys {
+                attributes[key] = record[key]
+            }
+            
+            let node = Node(id: id, attributes: attributes)
+            memory.add(node)
+        }
+        
+        // Read links
+        // ---------------------------------------------------------------
+        for record in try store.fetchAll(type: "link") {
+            let id = OID(record.id)
+
+            // FIXME: Handle errors here instead of forcing unwrap
+            let originID = OID(record[Self.originRecordKey]!.intValue()!)
+            let targetID = OID(record[Self.targetRecordKey]!.intValue()!)
+
+            let origin = memory.node(originID)!
+            let target = memory.node(targetID)!
+            
+            var attributes: [String:Value] = [:]
+            for key in record.keys {
+                if key != Self.originRecordKey && key != Self.targetRecordKey {
+                    attributes[key] = record[key]
+                }
+            }
+            
+            memory.connect(from: origin, to: target, attributes: attributes, id: id)
+        }
+        
+    }
+    
 }

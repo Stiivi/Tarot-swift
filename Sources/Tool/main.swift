@@ -13,20 +13,30 @@ import ArgumentParser
 ///
 func makeSpace(options: Options) -> Space {
     let space: Space
-    let packageURL = URL(fileURLWithPath: options.packagePath, isDirectory: true)
-
+    let dataURL = URL(fileURLWithPath: options.database, isDirectory: true)
+    let store: FilePackageStore
     do {
-        space = try Space(packageURL: packageURL)
-    }
-    catch LoaderError.validationError(let issues) {
-        for issue in issues {
-            print(issue)
-        }
-        fatalError("Validation errors found. Abandoning.")
+        store = try FilePackageStore(url: dataURL)
     }
     catch {
-        fatalError("Unable to create space: \(error)")
+        fatalError("Unable to open database at: \(dataURL)")
     }
+    
+    do {
+        space = try Space(store: store)
+    }
+    catch {
+        fatalError("Unable to initialize space: \(error)")
+    }
+//    catch LoaderError.validationError(let issues) {
+//        for issue in issues {
+//            print(issue)
+//        }
+//        fatalError("Validation errors found. Abandoning.")
+//    }
+//    catch {
+//        fatalError("Unable to create space: \(error)")
+//    }
     
     return space
 }
@@ -39,6 +49,8 @@ struct Tarot: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "Tarot utility.",
         subcommands: [
+            Create.self,
+            Import.self,
             List.self,
             Print.self,
             WriteDOT.self,
@@ -47,29 +59,47 @@ struct Tarot: ParsableCommand {
 }
 
 struct Options: ParsableArguments {
-    @Option(name: [.long, .customShort("p")], help: "Path to a package directory")
-    var packagePath = "Data.tarotpackage"
-    
-    @Option(name: [.long, .customShort("d")], help: "Path to a Tarot database")
+        @Option(name: [.long, .customShort("d")], help: "Path to a Tarot database")
     var database = "Data.tarot"
 }
 
 extension Tarot {
     struct Create: ParsableCommand {
         static var configuration
-            = CommandConfiguration(abstract: "Create a Tarot database.")
+            = CommandConfiguration(abstract: "Create an empty Tarot database.")
 
         @OptionGroup var options: Options
 
         mutating func run() {
-            let space = makeSpace(options: options)
-            for node in space.memory.nodes {
-                let traitName = node.trait?.name ?? "no trait"
-                print("\(node.id!)(\(traitName))")
+            let url = URL(fileURLWithPath: options.database, isDirectory: true)
+
+            do {
+                try FilePackageStore.initialize(url: url)
+            }
+            catch {
+                fatalError("Unable to create a file storage: \(error)")
             }
         }
     }
 }
+
+extension Tarot {
+    struct Import: ParsableCommand {
+        static var configuration
+            = CommandConfiguration(abstract: "Import graph from a tabular package")
+
+        @OptionGroup var options: Options
+
+        @Argument(help: "Tabular package")
+        var packageURL: String
+
+        mutating func run() {
+            let space = makeSpace(options: options)
+            print("HELLO FROM IMPORT")
+        }
+    }
+}
+
 
 extension Tarot {
     struct List: ParsableCommand {
