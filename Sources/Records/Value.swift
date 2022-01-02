@@ -64,7 +64,36 @@ public enum Value: Equatable, Hashable {
     case bool(Bool)
     case int(Int)
     case float(Float)
-       
+    
+    /// Initialize value from any object and match type according to the
+    /// argument type. If no type can be matched, then returns nil.
+    ///
+    /// Matches to types:
+    ///
+    /// - string: String
+    /// - bool: Bool
+    /// - int: Int
+    /// - float: Float
+    ///
+    public init?(any value: Any) {
+        if let value = value as? Int {
+            self = .int(value)
+        }
+        else if let value = value as? String {
+            self = .string(value)
+        }
+        else if let value = value as? Bool {
+            self = .bool(value)
+        }
+        else if let value = value as? Float {
+            self = .float(value)
+        }
+        else {
+            return nil
+        }
+    }
+    
+    
     public var valueType: ValueType {
         switch self {
         case .string: return .string
@@ -125,7 +154,18 @@ public enum Value: Equatable, Hashable {
         case .float(let value): return String(value)
         }
     }
-    
+
+    /// Get a type erased value.
+    ///
+    public func anyValue() -> Any {
+        switch self {
+        case .string(let value): return String(value)
+        case .bool(let value): return Bool(value)
+        case .int(let value): return Int(value)
+        case .float(let value): return Float(value)
+        }
+    }
+
     /// `true` if the value is considered empty empty.
     /// String value is considered empty if the lenght of
     /// a string is zero, numeric value is considered empty if the value is
