@@ -19,7 +19,7 @@ func makeSpace(options: Options) -> Space {
         store = try FilePackageStore(url: dataURL)
     }
     catch {
-        fatalError("Unable to open database at: \(dataURL)")
+        fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
     }
     
     do {
@@ -41,6 +41,18 @@ func makeSpace(options: Options) -> Space {
     return space
 }
 
+func finalizeSpace(space: Space, options: Options) throws {
+    let dataURL = URL(fileURLWithPath: options.database, isDirectory: true)
+    let store: FilePackageStore
+    do {
+        store = try FilePackageStore(url: dataURL)
+    }
+    catch {
+        fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
+    }
+
+    try space.save(to: store)
+}
 
 // The Command
 // ------------------------------------------------------------------------
@@ -82,24 +94,6 @@ extension Tarot {
         }
     }
 }
-
-extension Tarot {
-    struct Import: ParsableCommand {
-        static var configuration
-            = CommandConfiguration(abstract: "Import graph from a tabular package")
-
-        @OptionGroup var options: Options
-
-        @Argument(help: "Tabular package")
-        var packageURL: String
-
-        mutating func run() {
-            let space = makeSpace(options: options)
-            print("HELLO FROM IMPORT")
-        }
-    }
-}
-
 
 extension Tarot {
     struct List: ParsableCommand {

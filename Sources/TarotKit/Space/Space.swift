@@ -70,7 +70,7 @@ public class Space {
     /// and links contained in the package.
     ///
     /// For more information see: `class:Package`
-    public convenience init(packageURL: URL) throws {
+    public func loadPackage(from packageURL: URL) throws {
         let package: Package
         
         // Load the package info from `info.json`
@@ -80,7 +80,7 @@ public class Space {
         }
         catch let error as CocoaError {
             if error.isFileError {
-                let path = error.filePath!
+                let path = error.filePath ?? "(no path)"
                 fatalError("Can not load package. File error: \(path)")
             }
             else {
@@ -102,7 +102,7 @@ public class Space {
             fatalError("Can not read model resource: \(error)")
         }
         
-        self.init(model: model)
+        self.model.merge(model)
 
         // Load the data
         // ---------------------------------------------------------------

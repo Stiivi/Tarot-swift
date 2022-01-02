@@ -50,7 +50,7 @@ public class FilePackageStore: PersistentStore {
     /// URL to info file
     ///
     var infoURL: URL {
-        rootURL.appendingPathComponent("info.plist", isDirectory: false)
+        rootURL.appendingPathComponent("info.json", isDirectory: false)
     }
 
     /// Create a store that writes objects as JSON files in a directory at given
@@ -67,12 +67,17 @@ public class FilePackageStore: PersistentStore {
         self.rootURL = url
 
         let decoder = JSONDecoder()
-        let url = try rootURL.appendingPathComponent("info.plist", isDirectory: false)
+        let url = try rootURL.appendingPathComponent("info.json", isDirectory: false)
         let data = try Data(contentsOf: url)
         info = try decoder.decode(FilePackageStoreInfo.self, from: data)
 
-        
-        try recordTypeMap = readIndex(name: "type_index")
+        do {
+            try recordTypeMap = readIndex(name: "type_index")
+        }
+        catch {
+            // FIXME: Report error
+            recordTypeMap = [:]
+        }
     }
     
     /// Initialize a directory object store at given path. The method creates
@@ -181,10 +186,10 @@ public class FilePackageStore: PersistentStore {
 
         // We create a JSON serializable record – a dictionary.
         //
-        var attributes: [String:Value] = [:]
+        var attributes: [String:Any] = [:]
         
         for key in record.keys {
-            attributes[key] = record[key]
+            attributes[key] = record[key]?.anyValue()
         }
         
         let dict: [String:Any] = [
@@ -198,6 +203,7 @@ public class FilePackageStore: PersistentStore {
 
         try data!.write(to: url)
         recordTypeMap[record.id] = type
+        try writeIndex(name: "type_index", recordTypeMap)
     }
 
     /// Fetch object content from the object store

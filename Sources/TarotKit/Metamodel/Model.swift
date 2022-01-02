@@ -39,6 +39,25 @@ public final class Model {
     public func trait(name: String) -> Trait? {
         return traits.first { $0.name == name }
     }
+    
+    
+    /// Merge another model into this model. The new model replaces the entities
+    /// in existing model.
+    ///
+    // TODO: Handle conflict resolution
+    // TODO: Notify that the model has changed
+    public func merge(_ model: Model) {
+        var newTraits: [String:Trait] = [:]
+        for trait in traits {
+            newTraits[trait.name] = trait
+        }
+        
+        for trait in model.traits {
+            newTraits[trait.name] = trait
+        }
+        
+        traits = Array(newTraits.values)
+    }
 }
 
 extension Model: Codable {
