@@ -22,6 +22,19 @@ Design principle:
 For more detailed information, please refer to the documentation in
 [TarotKit/Documentation](TarotKit/Documentation).
 
+# Development
+
+There is a lot of `#TODO:` and `#FIXME:` markers all over the code. They usually
+mark technical debt that I had no time to work on at the moment but was aware
+of what needs to be done.
+
+## On Generics
+
+The project is intentionally not providing any generics for now. The interface
+is opinionated and creates a specific use-case domain of the library. At least 
+at this stage generics, especially having a generic graph, would make the
+library less pleasant to be used, especially by not experienced users. 
+
 # Disclaimer
 
 Please, do no lament over the code. I am very well aware of what is in there and
