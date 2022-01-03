@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Record.swift
 //  
 //
 //  Created by Stefan Urbanek on 2021/10/7.
@@ -7,6 +7,7 @@
 
 import Foundation
 
+// FIXME: Merge with StoreRecord, make it generic record structure for the framework
 
 /// Errors raised when working with records using strict functions.
 ///

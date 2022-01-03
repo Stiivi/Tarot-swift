@@ -114,6 +114,7 @@ public class Space {
     /// and links contained in the package.
     ///
     /// For more information see: `class:Package`
+    // #TODO: [IMPORTANT] Use Loader.load(into:memory) or into:space
     public func loadPackage(from packageURL: URL) throws {
         let package: Package
         

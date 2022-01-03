@@ -5,6 +5,9 @@
 //  Created by Stefan Urbanek on 29/12/2021.
 //
 
+// TODO: Rename to SequentialWriter
+// TODO: Create analogous counterpart: SequentialReader
+
 /*
  
  EXPORT (flatten, untalngle the graph)

@@ -60,7 +60,6 @@ public struct TraitPredicate: ObjectPredicate {
     }
 }
 
-// FIXME: This is scaffolding class, a bit complex
 /// Predicate that compares multiple parameters and their values for equality.
 ///
 public struct AttributeValuePredicate: ObjectPredicate {
@@ -80,6 +79,7 @@ public struct AttributeValuePredicate: ObjectPredicate {
 protocol PropertyPredicate {
     func matches(_ value: Value) -> Bool
 }
+
 // MARK: Number Predicates
 
 struct NumberPredicate: PropertyPredicate {

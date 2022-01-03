@@ -15,7 +15,7 @@ public enum ValueType: String, Equatable, Codable {
     case float
     case string
     // TODO: case date
-    // TODO: case float
+    // TODO: case double
     
     /// Returns `true` if the value of this type is convertible to
     /// another type using `xxxValue()` conversion.
@@ -51,8 +51,8 @@ public enum ValueType: String, Equatable, Codable {
     }
 }
 
-/// Multy-type value representation. The type can represent one of the following
-/// values:
+/// Multy-type scalar value representation. The type can represent one of the
+/// following values:
 ///
 /// - `bool` – a boolean value
 /// - `int` – an integer value
@@ -60,9 +60,16 @@ public enum ValueType: String, Equatable, Codable {
 /// - `string` – a string representing a valid identifier
 ///
 public enum Value: Equatable, Hashable {
+    /// A string value representation
     case string(String)
+    
+    /// A bollean value representation
     case bool(Bool)
+    
+    /// An integer value representation
     case int(Int)
+    
+    /// A floating point number value representation
     case float(Float)
     
     /// Initialize value from any object and match type according to the

@@ -5,6 +5,8 @@
 //  Created by Stefan Urbanek on 2021/10/27.
 //
 
+// FIXME: This is ugly. It was created for one SwiftUI experiment.
+// FIXME: Either remove this or redesign it.
 
 /// Selection of nodes based on a predicate.
 ///

@@ -11,8 +11,10 @@ import Records
 /// Describes an object's attribute.
 ///
 public final class AttributeDescription {
-    /// Attribute name
+    /// Attribute name.
     public let name: String
+    
+    /// Type of the attribute value.
     public let valueType: ValueType
     
     /// Create an attribute description.

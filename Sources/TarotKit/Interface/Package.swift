@@ -7,6 +7,7 @@
 
 // TODO: Rename this to TabularPackage or TabularFilePackage
 // TODO: Consider removing JSON files and make it all .csv/table based
+// TODO: Use SequentialReader or SetReader (neither does not exist yet)
 
 import Foundation
 import System

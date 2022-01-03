@@ -347,23 +347,61 @@ public class GraphMemory {
 
         return result
     }
-
-    /// Determines whether the `node` is an orphan, that is whether the node has
-    /// no incoming neither outgoing links.
+    
+    /// Get a list of links that are related to the neighbors of the node. That
+    /// is, list of links where the node is either an origin or a target.
+    ///
+    /// - Returns: List of links.
     ///
     /// - Complexity: O(n). All links are traversed.
     ///
-    public func isOrphan(_ node: Node) -> Bool {
-        let flag: Bool
+    public func neighbors(_ node: Node) -> [Link] {
+        let result: [Link]
         
-        // Check whether there exists at least one link of which the `node`
-        // is an origin or a target.
-        //
-        flag = links.contains {
-            $0.origin === node || $0.target === node
+        result = self.linkIndex.values.filter {
+            $0.target === node || $0.origin === node
         }
-        
-        return flag
+
+        return result
+    }
+    
+    /// Determines whether the node has no outgoing links. That is, if there
+    /// are no links which have the node as origin.
+    ///
+    /// - Returns: `true` if there are no outgoing links from the node.
+    /// - Complexity: O(n). All links are traversed.
+    ///
+    public func isSink(_ node: Node) -> Bool {
+        guard node.graph === self else {
+            fatalError("Node is not associated with this graph.")
+        }
+        return links.contains { $0.origin === node }
+    }
+    
+    /// Determines whether the node has no incoming links. That is, if there
+    /// are no links which have the node as target.
+    ///
+    /// - Returns: `true` if there are no incoming links to the node.
+    /// - Complexity: O(n). All links are traversed.
+    ///
+    public func isSource(_ node: Node) -> Bool {
+        guard node.graph === self else {
+            fatalError("Node is not associated with this graph.")
+        }
+        return links.contains { $0.target === node }
+    }
+    
+    /// Determines whether the `node` is an orphan, that is whether the node has
+    /// no incoming neither outgoing links.
+    ///
+    /// - Returns: `true` if there are no links referring to the node.
+    /// - Complexity: O(n). All links are traversed.
+    ///
+    public func isOrphan(_ node: Node) -> Bool {
+        guard node.graph === self else {
+            fatalError("Node is not associated with this graph.")
+        }
+        return links.contains { $0.origin === node || $0.target === node }
     }
     
 }

@@ -1,6 +1,5 @@
 //
-//  File.swift
-//  File
+//  CSVReader.swift
 //
 //  Created by Stefan Urbanek on 2021/8/31.
 //

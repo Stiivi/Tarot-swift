@@ -127,7 +127,7 @@ extension Tarot {
 
             print("Node: \(reference)")
             
-            guard let object = space.memory.object(reference) else {
+            guard let object: Object = space.memory.node(reference) ?? space.memory.link(reference) else {
                 fatalError("Unknown object: \(reference)")
             }
 

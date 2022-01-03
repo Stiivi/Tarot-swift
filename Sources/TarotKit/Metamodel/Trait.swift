@@ -5,8 +5,8 @@
 //  Created by Stefan Urbanek on 2021/10/6.
 //
 
+// TODO: traits are not final idea, they are planned to be redesigned
 
-// TODO: This belongs to "metamodel"
 /*
    Explanation:
  
@@ -23,13 +23,33 @@ import Records
 /// `Trait` describes properties and links of a node.
 ///
 public final class Trait {
+    
+    /// Trait name.
+    ///
     public let name: String
     var _links: [String:LinkDescription]
     var _attributes: [String:AttributeDescription]
     
+    /// List of link descriptions. Links described here have a special meaning
+    /// for nodes of this trait. Although it does not mean that the node might
+    /// not have other kinds of links.
+    ///
     public var links: [LinkDescription] { return Array(_links.values) }
+    
+    /// List of attribute descriptions. Attributes described here have a
+    /// specific meaning for nodes of this trait. Although nodes might have
+    /// other attributes set as well.
+    ///
     public var attributes: [AttributeDescription] { return Array(_attributes.values) }
 
+    /// Creates a trait with given name, list of link descriptions and
+    /// attribute descriptions.
+    ///
+    /// - Parameters:
+    ///   - name: Trait name. It is expected to be unique within a model.
+    ///   - links: List of link descriptions.
+    ///   - attributes: List of attribute descriptions.
+    ///
     public required init(name: String, links: [LinkDescription]=[],
                 attributes: [AttributeDescription]=[]) {
         self.name = name
@@ -74,9 +94,4 @@ extension Trait: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(links, forKey: ._links)
     }
-}
-
-// FIXME: This is to satisfy the NavigationView for the time being.
-extension Trait: Identifiable {
-    public var id: String { name }
 }

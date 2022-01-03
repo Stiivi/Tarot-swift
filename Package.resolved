@@ -3,7 +3,7 @@
     "pins": [
       {
         "package": "DotWriter",
-        "repositoryURL": "/Users/stefan/Developer/Projects/DotWriter",
+        "repositoryURL": "https://github.com/Stiivi/DotWriter.git",
         "state": {
           "branch": null,
           "revision": "fe1400c787e61082ec7096193a50ca10f24b688e",
