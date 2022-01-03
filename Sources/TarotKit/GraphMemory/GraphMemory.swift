@@ -5,15 +5,29 @@
 //  Created by Stefan Urbanek on 2021/10/5.
 //
 
+// -------------------------------------------------------------------------
+// IMPORTANT: This is the core structure of this framework. Be very considerate
+//            when adding new functionality. If functionality can be achieved
+//            by using existing functionality, then add it to an extension
+//            (file GraphMemory+Convenience or similar). Optimisation is not
+//            a reason to add functionality here at this moment.
+// -------------------------------------------------------------------------
+
+
 // FIXME: We are importing Records only because of Value
+// TODO: Move Value functionality from Records to this module
 import Records
-import Darwin
 
 /// Protocol for a basic graph memory implementation. This protocol is
 /// a scaffolding for development - it helps to separate interface from the
 /// implementaiton.
 ///
 public protocol GraphMemoryProtocol {
+    // TODO: There is add(Node) but no add(Link)
+    // TODO: There is connect(...) as a creation method but not add(Link)
+    // TODO: There is connect(...) as a creation method but not createNode(...)
+    // TODO: Rename this to remove(Link) to be consistent with remove(Node)
+ 
     var nodes: Set<Node> { get }
     var links: Set<Link> { get }
 
@@ -70,15 +84,14 @@ public protocol GraphMemoryProtocol {
 /// for general purpose use. It does not mean it might not change in the future.
 ///
 public class GraphMemory {
-    
     /// Mapping between node IDs and node objects.
     private var nodeIndex: [OID:Node] = [:]
     
     /// Mapping between link IDs and link objects.
     private var linkIndex: [OID:Link] = [:]
     
-    /// Sequence for generating graph object IDs.
-    private var idSequence: Int = 1
+    /// ID generator for graph objects created by the graph.
+    private var idGenerator: UniqueIDGenerator
     
     
     /// An object that will receive notifications on changes in the graph.
@@ -87,38 +100,25 @@ public class GraphMemory {
     
     /// Create an empty graph memory.
     ///
-    public init() {
+    /// - Parameters:
+    ///   - idGenerator: Generator of unique IDs. Default is ``SequenceIDGenerator``.
+    ///
+    public init(idGenerator: UniqueIDGenerator=SequenceIDGenerator()) {
+        self.idGenerator = idGenerator
         self.nodeIndex = [:]
         self.linkIndex = [:]
     }
     
-    // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
-    // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
-    // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
-    private func nextID() -> OID {
-        // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
-        // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
-        // FIXME: THIS IS BROKEN ON LOAD!!! WE MIGHT ASSIGN EXISTING ID!!! FIX NOW!!!
-        // SEE: add(link)
-        // TODO: Provide IDs externally, do not generate here
-        // TODO: Do not generate IDs this lame way, it was ok from the beginning
-        let id = idSequence
-        idSequence += 1
-        return id
-    }
-    
-    // FIXME: Is this really needed?
-    /// Get a graph object by its ID. The object can be either a node or a link.
-    public func object(_ oid: OID) -> Object? {
-        return nodeIndex[oid] ?? linkIndex[oid]
-    }
-
-    /// Get a node by its ID.
+    /// Get a node by its ID. Returns `nil` if there is no node with the id
+    /// in the graph.
+    ///
     public func node(_ oid: OID) -> Node? {
         return nodeIndex[oid]
     }
 
-    /// Get a link by its ID.
+    /// Get a link by its ID. Returns `nil` if there is no link with the id in
+    /// the graph.
+    ///
     public func link(_ oid: OID) -> Link? {
         return linkIndex[oid]
     }
@@ -153,11 +153,10 @@ public class GraphMemory {
                 fatalError("Trying to associate a node with id that already exists: \(id)")
             }
             // FIXME: THIS IS TEMPORARY FIX, SEE ABOVE
-            idSequence = max(id, idSequence) + 1
+            idGenerator.markUsed(id)
         }
         else {
-            let id = nextID()
-            node.id = id
+            node.id = idGenerator.next()
         }
         
         // Register the object
@@ -248,11 +247,10 @@ public class GraphMemory {
                 fatalError("Link id '\(id)' is already assigned to a node.")
             }
             linkID = id
-            // FIXME: THIS IS TEMPORARY FIX, SEE ABOVE
-            idSequence = max(id, idSequence) + 1
+            idGenerator.markUsed(id)
         }
         else {
-            linkID = nextID()
+            linkID = idGenerator.next()
         }
         
         let link = Link(id: linkID, origin: origin, target: target)
