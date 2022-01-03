@@ -119,8 +119,12 @@ public class PackageInfo: Decodable {
         fieldMap = try values.decodeIfPresent(FieldMap.self, forKey: .fieldMap)
         resourceOptions = try values.decodeIfPresent(CSVReadingOptions.self, forKey: .resourceOptions)
         
-        let path = try values.decode(String.self, forKey: .resourcesPath)
-        resourcesPath = FilePath(path)
+        if let path = try values.decodeIfPresent(String.self, forKey: .resourcesPath) {
+            resourcesPath = FilePath(path)
+        }
+        else {
+            resourcesPath = nil
+        }
     }
 }
 
