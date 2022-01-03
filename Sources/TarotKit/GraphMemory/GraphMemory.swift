@@ -25,7 +25,7 @@ public protocol GraphMemoryProtocol {
     func remove(_ node: Node)
     
     /// Create a link in the memory.
-    func connect(from origin:Node, to target:Node, attributes:[String:Value]) -> Link
+    func connect(from origin:Node, to target:Node, attributes:[AttributeKey:AttributeValue]) -> Link
     /// Remove a link from the memory
     func disconnect(link: Link)
     
@@ -220,7 +220,7 @@ public class GraphMemory {
     /// - Returns: Newly created link
     ///
     @discardableResult
-    public func connect(from origin: Node, to target: Node, attributes: [String:Value]=[:], id: OID?=nil) -> Link {
+    public func connect(from origin: Node, to target: Node, attributes: [AttributeKey:AttributeValue]=[:], id: OID?=nil) -> Link {
         guard origin.graph === self else {
             if origin.graph == nil {
                 fatalError("Connecting to a non-associated origin")

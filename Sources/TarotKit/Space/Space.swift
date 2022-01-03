@@ -30,8 +30,52 @@ import Records
 // TODO: Add semantics to connections, such as "name"
 // TODO: Add removal of multiple nodes
 
-/// Space represents a problem or a project. Space associates a graph memory
-/// with its model as a semantics.
+/// Space is an object that provides working context to the graph memory.
+/// A Space represents a problem or a project. Space associates a graph memory
+/// with its semantic model.
+///
+/// ## Catalog
+///
+/// Space also provides a catalog of named nodes in the graph, usually
+/// collections. Catalog is used to refer to objects of interest directly
+/// without need of search for them.
+///
+/// To set names for objects in the catalog:
+///
+/// ```swift
+/// let space: Space
+/// let chapter: Node
+///
+/// space.catalog["Chapter 1"] = chapter
+/// ```
+///
+/// To retrieve a named object from the catalog:
+///
+/// ```swift
+/// let space: Space
+/// let chapter = space.catalog["Chapter 1"]
+///
+/// ```
+///
+///
+/// ## Persistence
+///
+/// Space can be persisted into a store and later loaded from the store. For
+/// example to initialize a space from a file store:
+///
+/// ```swift
+/// let dataURL = URL(fileURLWithPath: "Cards.tarot", isDirectory: true)
+/// let store = try FilePackageStore(url: dataURL)
+/// let space = try Space(store: store)
+/// ```
+///
+/// Later we can persist the space into the store:
+///
+/// ```swift
+/// try space.save(to: store)
+///```
+///
+/// For further reading about stores read <doc:Persistence>
 ///
 public class Space {
     /// Graph memory containing objects within the space.

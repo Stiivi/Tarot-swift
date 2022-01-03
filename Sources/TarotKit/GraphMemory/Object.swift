@@ -9,11 +9,15 @@
 import Records
 
 public typealias OID = Int
-public typealias PropertyKey = String
-public typealias PropertyValue = String
+public typealias AttributeKey = String
+public typealias AttributeValue = Value
 
-/// An object in a graph memory. It represents one of two graph components:
-/// a node or a link. Objects can store information
+/// An abstract class representing all objects in a graph memory. Concrete
+/// kinds of graph objects are ``Node`` and ``Link``. Graph objects can store
+/// information in form of attributes and their values.
+///
+/// All object's attributes are optional. It is up to the user to add
+/// constraints or validations for the attributes of graph objects.
 ///
 open class Object: Identifiable {
     /// Graph memory that the object is associated with.
@@ -21,11 +25,13 @@ open class Object: Identifiable {
     public internal(set) var graph: GraphMemory?
     
     
-    /// Object attributes
-    var attributes: [String:Value] = [:]
+    /// A dictionary of object's attributes.
+    ///
+    public internal (set) var attributes: [AttributeKey:AttributeValue] = [:]
     
-    /// Keys of attributes that are set
-    var attributeKeys: [String] {
+    /// List of all keys of object's attributes that are set to some value.
+    ///
+    var attributeKeys: [AttributeKey] {
         return Array(attributes.keys)
     }
 
@@ -38,12 +44,12 @@ open class Object: Identifiable {
     
     /// Create an empty object. The object needs to be associated with a memory.
     ///
-    public init(id: OID?=nil, attributes: [String:Value]=[:]) {
+    public init(id: OID?=nil, attributes: [AttributeKey:AttributeValue]=[:]) {
         self.id = id
         self.attributes = attributes
     }
 
-    public subscript(_ key:String) -> Value? {
+    public subscript(_ key:AttributeKey) -> AttributeValue? {
         get {
             return attributes[key]
         }

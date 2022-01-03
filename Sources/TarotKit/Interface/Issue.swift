@@ -7,10 +7,18 @@
 
 import Foundation
 
+/// An object representing a ``Loader`` issue.
+///
 public struct Issue: CustomStringConvertible {
+    
+    /// Severity of the issue.
     public enum Severity: String, Equatable {
+        
+        /// Not a real issue, but we want user to know about what is going on
         case info
+        /// An issue of mild concern that might not require a treatment.
         case warning
+        /// An issue of high concern that requires treatment.
         case error
         
         /// `true` if the issue represents an error
@@ -35,6 +43,7 @@ public struct Issue: CustomStringConvertible {
     /// `true` if the issue is an error or a warning
     public var isRisky: Bool { severity == .error || severity == .warning }
 
+    /// Create an issue.
     public init(_ severity: Severity, _ message: String, context: String?=nil, help: String?=nil){
         self.severity = severity
         self.message = message

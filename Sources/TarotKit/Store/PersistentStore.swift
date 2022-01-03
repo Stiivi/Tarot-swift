@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// Protocol describing a store for persisting graph objects.
+/// 
 public protocol PersistentStore {
     // TODO: Make sure this is same as Record.id type
     typealias ID = String

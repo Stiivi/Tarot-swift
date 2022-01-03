@@ -5,6 +5,7 @@
 //  Created by Stefan Urbanek on 2021/10/6.
 //
 
+// FIXME: Rename this to TabularPackageLoader or RecordSetLoader
 // FIXME: Consolidate error reporting mechanism
 // FIXME: There are mutliple error reporting mechanisms: exception, issue list
 
@@ -28,6 +29,9 @@ public enum LoaderError: Error {
     case unknownNode(String)
 }
 
+/// Mapping of fields in an external source. Field map is used by the
+/// ``Loader``.
+///
 public struct FieldMap {
     /// Name of a field which contains unique node identifier.
     public var nodeKeyField: String = "id"

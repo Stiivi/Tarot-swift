@@ -5,6 +5,9 @@
 //  Created by Stefan Urbanek on 02/01/2022.
 //
 
+// TODO: This should be moved into Interfaces as it is used only for reading and writing
+
+
 import Foundation
 import Records
 
@@ -26,7 +29,44 @@ public struct FilePackageStoreInfo: Codable {
     let version: Int
 }
 
-/// Store the object memory in a directory with one JSON file per object
+/// Store the object memory in a directory with one JSON file per graph object.
+///
+/// ## File Structure
+///
+/// The structure of the directory is:
+///
+/// - `info.json` – metadata about the store, such as version of the writing
+///    object
+/// - `type_index.json` – mapping between object IDs and their types
+/// - `nodes/` – directory with node files, one JSON file per node
+/// - `links/` – directory with link files, one JSON file per link
+///
+/// There might additional object types found in the store, although they should
+/// be considered private.
+///
+/// Example:
+///
+/// ```
+/// Cards.tarot/
+///     info.json
+///     type_index.json
+///     nodes/
+///         1.json
+///         2.json
+///         3.json
+///     links/
+///         4.json
+///         5.json
+/// ```
+///
+/// The object JSON files have the following top-level structure
+///
+/// - `id`: object's ID
+/// - `type`: type of the object, either `node` or `link`
+/// - `attributes`: a dictionary with object's attributes
+///
+/// - Note: This store is not optimized for performance neither robustness. Any
+///         external changes to the store might corrupt the store's integrity.
 ///
 public class FilePackageStore: PersistentStore {
     /// Current version of the file package store object.

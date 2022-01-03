@@ -4,6 +4,10 @@
 //
 //  Created by Stefan Urbanek on 2021/11/6.
 //
+
+// TODO: Rename this to TabularPackage or TabularFilePackage
+// TODO: Consider removing JSON files and make it all .csv/table based
+
 import Foundation
 import System
 import Records

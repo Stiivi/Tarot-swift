@@ -29,7 +29,7 @@ public protocol ObjectPredicate {
     func matches(_ object: Object) -> Bool
 }
 
-public struct CompoundPredicate {
+struct CompoundPredicate {
     enum Aggregation {
         case and
         case or
@@ -77,12 +77,12 @@ public struct AttributeValuePredicate: ObjectPredicate {
     }
 }
 
-public protocol PropertyPredicate {
+protocol PropertyPredicate {
     func matches(_ value: Value) -> Bool
 }
 // MARK: Number Predicates
 
-public struct NumberPredicate: PropertyPredicate {
+struct NumberPredicate: PropertyPredicate {
     public enum Test {
         case lessThan
         case lessOrEqualThan
@@ -118,7 +118,7 @@ public struct NumberPredicate: PropertyPredicate {
 
 // MARK: Text Predicates
 
-public struct TextPredicate: PropertyPredicate {
+struct TextPredicate: PropertyPredicate {
     public enum Test {
         case startsWith
         case doesNotStartWith
@@ -157,7 +157,7 @@ public struct TextPredicate: PropertyPredicate {
 
 // MARK: Value Predicates
 
-public struct ValuePredicate: PropertyPredicate {
+struct ValuePredicate: PropertyPredicate {
     public enum Test {
         case empty
         case notEmpty

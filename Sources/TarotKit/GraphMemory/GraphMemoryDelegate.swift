@@ -59,7 +59,7 @@ extension GraphMemoryDelegate {
     }
 }
 
-public class GraphChange {
+class GraphChange {
     let type: GraphChangeType
     
     init(_ type: GraphChangeType) {
@@ -67,7 +67,7 @@ public class GraphChange {
     }
 }
 
-public enum GraphChangeType: String {
+enum GraphChangeType: String {
     case didAddNode
     case didRemoveNode
     case didConnect
