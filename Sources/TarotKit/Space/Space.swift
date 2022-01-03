@@ -122,12 +122,10 @@ public class Space {
         }
 
     }
-}
 
 
-/// Store reading and writing.
-///
-extension Space {
+    // Store reading and writing.
+    //
     // TODO: Consider those two to be reference values that might be checked by the store
     /// Key for link origin in the record stored in the persistent store.
     /// It is intentionally longer to not to conflic with potential user keys.
@@ -159,16 +157,26 @@ extension Space {
             record[Space.targetRecordKey] = .int(link.target.id!)
             try store.save(record: record)
         }
+        
+        // Write named objects
+        // ---------------------------------------------------------------
+        let record = StoreRecord(type: "reference", id: "catalog")
+        record["node"] = .int(catalog.representedNode.id!)
+        try store.save(record: record)
+
     }
     
     /// Read the whole space from a store.
     /// Create a space from a storage.
     ///
 
-    public convenience init(store: PersistentStore) throws {
+    public init(store: PersistentStore) throws {
         // FIXME: Model is not preserved here
 
-        self.init()
+        memory = GraphMemory()
+        // Create an empty model for now
+        // FIXME: Load the model from the store
+        model = Model(name: "__default", traits: [])
 
         // Read nodes
         // ---------------------------------------------------------------
@@ -206,7 +214,21 @@ extension Space {
             
             memory.connect(from: origin, to: target, attributes: attributes, id: id)
         }
+    
+        let catalogNode: Node
+        // FIXME: Handle errors here
+        if let record = try store.fetch(id: "catalog") {
+            let catalogNodeID = OID(record["node"]!.intValue()!)
+            catalogNode = memory.node(catalogNodeID)!
+        }
+        else {
+            catalogNode = Node()
+            catalogNode["__system_object_name"] = "Catalog"
+            memory.add(catalogNode)
+        }
         
+        // FIXME: What happens if someone deletes the catalog node?
+        catalog = Dictionary(catalogNode)
     }
     
 }
