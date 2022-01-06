@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import TarotKit
+import ArgumentParser
 
 /// Create a space from a package specified in the options.
 ///

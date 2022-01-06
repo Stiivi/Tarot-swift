@@ -12,7 +12,7 @@ import ArgumentParser
 extension Tarot {
     struct Import: ParsableCommand {
         static var configuration
-            = CommandConfiguration(abstract: "Import graph from a tabular package")
+            = CommandConfiguration(abstract: "Import graph from an external resource, such as file")
 
         @OptionGroup var options: Options
 
