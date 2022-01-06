@@ -17,6 +17,20 @@ open class Node: Object {
 /// Convenience methods that forward to the graph memory.
 ///
 extension Node {
+    
+    public var outgoing: [Link] {
+        return graph!.outgoing(self)
+    }
+
+    public var incoming: [Link] {
+        return graph!.incoming(self)
+    }
+
+    @discardableResult
+    public func connect(to target: Node, attributes: [AttributeKey:AttributeValue] = [:]) -> Link {
+        return graph!.connect(from: self, to: target, attributes: attributes)
+    }
+    
     /// Flag whether the node has no outgoing links.
     /// See ``GraphMemory/isSink(_:)`` for more information.
     public var isSink: Bool  { graph!.isSink(self) }
