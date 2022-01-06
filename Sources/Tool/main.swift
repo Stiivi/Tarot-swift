@@ -27,7 +27,7 @@ struct Tarot: ParsableCommand {
 }
 
 struct Options: ParsableArguments {
-        @Option(name: [.long, .customShort("d")], help: "Path to a Tarot database")
+    @Option(name: [.long, .customShort("d")], help: "Path to a Tarot database")
     var database = "Data.tarot"
 }
 
