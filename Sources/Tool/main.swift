@@ -9,50 +9,6 @@ import TarotKit
 import ArgumentParser
 
 
-/// Create a space from a package specified in the options.
-///
-func makeSpace(options: Options) -> Space {
-    let space: Space
-    let dataURL = URL(fileURLWithPath: options.database, isDirectory: true)
-    let store: FilePackageStore
-    do {
-        store = try FilePackageStore(url: dataURL)
-    }
-    catch {
-        fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
-    }
-    
-    do {
-        space = try Space(store: store)
-    }
-    catch {
-        fatalError("Unable to initialize space: \(error)")
-    }
-//    catch LoaderError.validationError(let issues) {
-//        for issue in issues {
-//            print(issue)
-//        }
-//        fatalError("Validation errors found. Abandoning.")
-//    }
-//    catch {
-//        fatalError("Unable to create space: \(error)")
-//    }
-    
-    return space
-}
-
-func finalizeSpace(space: Space, options: Options) throws {
-    let dataURL = URL(fileURLWithPath: options.database, isDirectory: true)
-    let store: FilePackageStore
-    do {
-        store = try FilePackageStore(url: dataURL)
-    }
-    catch {
-        fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
-    }
-
-    try space.save(to: store)
-}
 
 // The Command
 // ------------------------------------------------------------------------
@@ -135,48 +91,6 @@ extension Tarot {
         }
     }
 }
-
-extension Tarot {
-    struct Extract: ParsableCommand {
-        static var configuration
-            = CommandConfiguration(abstract: "Extract objects")
-
-        @OptionGroup var options: Options
-
-        @Option(name: [.long, .customShort("t")],
-                help: "Trait name")
-        var traitName: String?
-
-        /// Extract objects into a JSON file.
-        ///
-        // Design notes:
-        //
-        // tarot extract Card
-        //
-        mutating func run() {
-            let space = makeSpace(options: options)
-
-            let nodes: [Node]
-            
-            if let traitName = traitName {
-                nodes = space.memory.filter(traitName: traitName)
-            }
-            else {
-                nodes = Array(space.memory.nodes)
-            }
-            
-            let encoder = JSONEncoder()
-            for node in nodes {
-                // FIXME: Implement this
-                fatalError("Not implemented")
-                // let dict = node.asDictionary()
-                // let data = try encoder.encode(dict)
-            }
-        }
-    }
-}
-
-
 
 extension Tarot {
     struct WriteDOT: ParsableCommand {
