@@ -110,65 +110,6 @@ public class Space {
         catalog = Dictionary(catalogNode)
     }
     
-    /// Create a space from a package. Populate the graph memory with nodes
-    /// and links contained in the package.
-    ///
-    /// For more information see: `class:Package`
-    // #TODO: [IMPORTANT] Use Loader.load(into:memory) or into:space
-    public func loadPackage(from packageURL: URL) throws {
-        let package: Package
-        
-        // Load the package info from `info.json`
-        //
-        do {
-            package = try Package(url: packageURL)
-        }
-        catch let error as CocoaError {
-            if error.isFileError {
-                let path = error.filePath ?? "(no path)"
-                fatalError("Can not load package. File error: \(path)")
-            }
-            else {
-                fatalError("Can not load package: \(error)")
-            }
-        }
-        catch {
-            fatalError("Can not load package '\(packageURL)': \(error)")
-        }
-
-        let model: Model
-        // Try to load the package model from `model.json`
-        //
-        do {
-            let json = try Data(contentsOf: package.modelURL)
-            model = try JSONDecoder().decode(Model.self, from: json)
-        }
-        catch {
-            fatalError("Can not read model resource: \(error)")
-        }
-        
-        self.model.merge(model)
-
-        // Load the data
-        // ---------------------------------------------------------------
-
-        let loader = Loader(memory: self.memory)
-        do {
-            try loader.load(package: package, model: model)
-        }
-        catch let error as CocoaError {
-            if error.isFileError {
-                let path = error.filePath!
-                fatalError("Can not load into graph memory. File error: \(path). Details: \(error)")
-            }
-            else {
-                fatalError("Can not load into graph memory: \(error)")
-            }
-        }
-
-    }
-
-
     // Store reading and writing.
     //
     // TODO: Consider those two to be reference values that might be checked by the store

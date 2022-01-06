@@ -165,7 +165,7 @@ public class PackageLoader: Loader {
             return [issue]
         }
 
-        let issues = IssueList()
+        var issues = IssueList()
         
         // Validate value completeness
         //
@@ -324,7 +324,7 @@ public class PackageLoader: Loader {
     ///
     public func validateLinkRecords(_ records: RecordSet,
                                     namespace: String?=nil) -> IssueList {
-        let issues = IssueList()
+        var issues = IssueList()
 
         var hasSchemaIssues: Bool = false
 
