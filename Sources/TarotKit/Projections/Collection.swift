@@ -7,26 +7,19 @@
 
 import Records
 
-extension GraphMemory {
-    /// Create an ordered node collection
-    public func orderedNodeCollection() -> [Node] {
-       return []
-    }
-}
-
-/// View of a node representing a collection.
+/// Projection of a node representing a collection of nodes.
 ///
 /// A collection node is a node that has several specific links to other nodes
 /// that are considered collection's items.
 ///
-/// - Parameters:
+/// The projected node might optionally contain the following attributes that
+/// will be considered when working with the collection:
 ///
-///     - node: The node representing the collection.
-///     - itemLinkAttribute: attribute of the node which contains name of an
+/// - ``itemLinkLabelAttribute``: attribute of the node which contains name of an
 ///       attribute of a links pointing to the items. Default value is `label`
-///     - itemLinkValue: value of the `itemLinkAttribute` that specifies the
+/// - ``itemLinkValue``: value of the ``itemLinkLabelAttribute`` that specifies the
 ///       collection's items. Default value is `item`.
-///     - linkSortAttribute: optional name of a link attribute that is used
+/// - ``linkOrderAttribute``: optional name of a link attribute that is used
 ///       to order the items. If not specified then the order is undefined.
 ///
 /// For example let us have nodes representing paragraphs.
@@ -36,7 +29,7 @@ extension GraphMemory {
 ///
 /// Because the system does not enforce any specific link labelling, we follow
 /// the labelling we have created for our space. Say we label the links under
-/// link's attribute `label`. Then our collection's ``itemLinkAttribute`` would
+/// link's attribute `label`. Then our collection's ``itemLinkLabelAttribute`` would
 /// be `label` and ``itemLinkValue`` woul be `item`. Example of such link would
 /// be:
 ///
@@ -60,18 +53,31 @@ extension GraphMemory {
 /// let collection = Collection(chapter)
 /// ```
 ///
-public class Collection {
+public class Collection: NodeProjection {
+    // TODO: Split into Ordered and Unordered Collection
     /// Node representing the collection
-    var representedNode: Node
+    public var representedNode: Node
     /// Name of a link property to be looked at when locating collection
     /// members. Typically it would be `name`.
     ///
-    var itemLinkAttribute: String  { representedNode["itemLinkAttribute"]?.stringValue() ?? "label"}
+    public var itemLinkLabelAttribute: String  {
+        representedNode["itemLinkAttribute"]?.stringValue() ?? "label"
+    }
     
     /// Value of the item forming link property. Typically it would be `item`
     ///
-    var itemLinkValue: String { representedNode["itemLinkValue"]?.stringValue() ?? "item" }
-    var linkOrderAttribute: String? { representedNode["linkOrderAttribute"]?.stringValue() }
+    public var itemLinkValue: String {
+        representedNode["itemLinkValue"]?.stringValue() ?? "item"
+    }
+    
+    /// Attribute that specifies default order of items when ordered items are
+    /// requested.
+    ///
+    // TODO: Move this to OrderedCollection
+    // REASON: `items` is returning non-ordered collection of items
+    var linkOrderAttribute: String {
+        representedNode["linkOrderAttribute"]?.stringValue() ?? "order"
+    }
     
     // TODO: NULLS FIRST/LAST
     
@@ -89,38 +95,54 @@ public class Collection {
     
     /// List of links that point to the collection items.
     ///
-    // TODO: Distinguish between ordered and un-ordered
     var itemLinks: [Link] {
-        guard let outgoing = representedNode.graph?.outgoing(representedNode) else {
-            // FIXME: I guess this should be an error
-            return []
-        }
+        let outgoing = representedNode.outgoing
+
         var links: [Link] = outgoing.filter { link in
-            link[itemLinkAttribute]?.stringValue() == itemLinkValue
+            link[itemLinkLabelAttribute]?.stringValue() == itemLinkValue
             }
-        if let linkOrderAttribute = self.linkOrderAttribute {
-            links.sort { left, right in
-                guard let lhs = left[linkOrderAttribute] else {
-                    return false
-                }
-                guard let rhs = right[linkOrderAttribute] else {
-                    return false
-                }
-                return lhs.isLessThan(other: rhs)
-                
-            }
-        }
         
         return links
     }
+
+    /// Number of items in the collection.
+    public var count: Int {
+        return itemLinks.count
+    }
+
+    enum EmptyOrder {
+        case first
+        case last
+    }
+
+    func orderedItemLinks(orderBy: String?=nil, empty: EmptyOrder = .first) -> [Link] {
+        var links = itemLinks
+        let orderByAttribute = orderBy ?? linkOrderAttribute
+        
+        links.sort { left, right in
+            guard let lhs = left[orderByAttribute] else {
+                return empty == .last
+            }
+            guard let rhs = right[orderByAttribute] else {
+                return empty == .last
+            }
+            return lhs.isLessThan(other: rhs)
+            
+        }
+
+        return links
+    }
     
+
     /// Add a node to the collection.
     ///
+    // TODO: This belongs to UnorderedCollection
     func add(node item: Node, attributes: [String:Value] = [:]) {
         var linkAttributes = attributes
         
-        linkAttributes[itemLinkAttribute] = .string(itemLinkValue)
+        linkAttributes[itemLinkLabelAttribute] = .string(itemLinkValue)
 
-        representedNode.graph?.connect(from: representedNode, to: item, attributes: linkAttributes)
+        representedNode.connect(to: item, attributes: linkAttributes)
     }
 }
+
