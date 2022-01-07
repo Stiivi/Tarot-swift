@@ -13,6 +13,47 @@ Design principle:
 - Multple perspectives on structures exists and is more common than exception
 - Primarily porovide mechanisms, then provide convenience policies
 
+## Know Debt and Out of Scope
+
+The following features are out of scope for now. When they might become
+considered as important is not known at this moment. One of the reasons why
+they might be out of scope is that they might be going into the way of
+idea exploration and idea refinement.
+
+
+- Error handling – important, but postponed for a bit later (``fatalError()`` is fine for now)
+- Performance – postponed for later
+- Thread safety – postponed for later
+- Generics - not intended (see a note below)
+
+The framework needs to be done right from structure and interfaces perspective
+first.
+
+
+## Status
+
+The whole framework should be treated as "exploration of an idea space". It is
+a experimentation playground for concepts.
+
+
+### Status Annotation
+
+Documentation of some symbols contains a remark about its current development
+status, if it is relevant to be pointed out. The possible status is:
+
+- `Idea` – the feature is just an idea, it might disappear without warning. If
+  if is an object, its structure and functionality might contain elements that 
+  are there "just to make it work" and that might not be designed thoroughly.
+  Ideas are there to be studied.
+- `Experimental` – feature seems to be more reasonable to be used, yet still
+  is not in its final form. Not only structure might change, but also the
+  elements themselves might be redesigned. Name might change.
+- `Unstable` – Structure might change, yet the impact is lower than of an
+  experimental feature. It is to be used with caution. Name is less likely to
+  be changed.
+- `Stable` – Feature reached its maturity. Changes are unlikely.
+
+
 ## On Generics
 
 The goal of the project is to provide a concrete, opinionated model for knowledge

@@ -20,6 +20,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Stiivi/DotWriter.git", from: "0.1.0"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
+        .package(url: "ssh://git@github.com/apple/swift-markdown.git", .branch("main")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -29,12 +30,15 @@ let package = Package(
             dependencies: []),
         .target(
             name: "TarotKit",
-            dependencies: ["Records", "DotWriter"]),
+            dependencies: ["Records", "DotWriter",
+                            .product(name: "Markdown", package: "swift-markdown"),
+            ]),
         .executableTarget(
             name: "Tool",
             dependencies: [
-                "TarotKit",
+                "TarotKit", "DotWriter",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Markdown", package: "swift-markdown"),
             ],
             resources: [ ]
         ),
@@ -43,6 +47,9 @@ let package = Package(
             dependencies: ["Records"]),
         .testTarget(
             name: "TarotTests",
-            dependencies: ["TarotKit", "Records", "DotWriter"]),
+            dependencies: ["TarotKit", "Records", "DotWriter",
+                           .product(name: "Markdown", package: "swift-markdown"),
+
+                          ]),
     ]
 )
