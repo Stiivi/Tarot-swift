@@ -11,7 +11,7 @@ import Records
 // TODO: Assign traits for nodes
 // FIXME: Handle errors
 
-public class RelationalPackageLoader {
+public class RelationalPackageLoader: Loader {
     let space: Space
 
     /// A nested dictionary of mapping of primary keys to nodes. The top level
@@ -20,7 +20,7 @@ public class RelationalPackageLoader {
     ///
     var keyNodeMap: [String:[Value:Node]] = [:]
 
-    init(space: Space) {
+    public required init(space: Space) {
         self.space = space
     }
     
@@ -53,6 +53,33 @@ public class RelationalPackageLoader {
         return keyNodeMap[name]?[key]
     }
 
+    /// Load graph contained in the package into the associated space.
+    ///
+    /// For more information see: `class:Package`
+    ///
+    public func load(from source: URL) throws {
+        // Load the package info from `info.json`
+        //
+        guard let package = RelationalPackage(url: source) else {
+            fatalError("Unable to load package: \(source)")
+        }
+        
+        let model: Model
+        // Try to load the package model from `model.json`
+        //
+        let json = try Data(contentsOf: package.modelURL)
+        model = try JSONDecoder().decode(Model.self, from: json)
+        
+        // FIXME: Move model handling outside of this
+        space.model.merge(model)
+
+        // Load the data
+        // ---------------------------------------------------------------
+
+        try load(package: package)
+    }
+
+    
     /// Loads a relational package into the space.
     ///
     ///
@@ -67,6 +94,8 @@ public class RelationalPackageLoader {
     ///
     /// Lastly it creates links for foreign references.
     ///
+    /// - Throws: ``LoaderError``
+    ///
     public func load(package: RelationalPackage) throws {
         let options = package.readingOptions ?? CSVReadingOptions()
         
@@ -74,7 +103,7 @@ public class RelationalPackageLoader {
         // ---------------------------------------------------------------
         
         for relation in package.nodeRelations {
-            let url = package.url(forResource: relation.name)
+            let url = package.url(forResource: relation.resource)
             
             let records = try RecordSet(contentsOfCSVFile: url,
                                         options: options)
@@ -85,7 +114,7 @@ public class RelationalPackageLoader {
         // 2. Load all the links
         // ---------------------------------------------------------------
         for relation in package.linkRelations {
-            let url = package.url(forResource: relation.name)
+            let url = package.url(forResource: relation.resource)
             
             let records = try RecordSet(contentsOfCSVFile: url,
                                         options: options)
@@ -156,6 +185,7 @@ public class RelationalPackageLoader {
     
     /// Import links from a record set.
     ///
+    @discardableResult
     public func loadLinks(_ records: RecordSet, relation: LinkRelation) throws -> [Link] {
         var links: [Link] = []
         
@@ -167,19 +197,20 @@ public class RelationalPackageLoader {
         return links
     }
     
+    @discardableResult
     public func loadLink(_ record: Record, relation: LinkRelation) throws -> Link {
         guard let originKey = record[relation.originKey] else {
-            throw LoaderError._missingField(relation.originKey, relation.name)
+            throw LoaderError.missingField(relation.originKey, relation.name)
         }
 
         guard let targetKey = record[relation.targetKey] else {
-            throw LoaderError._missingField(relation.targetKey, relation.name)
+            throw LoaderError.missingField(relation.targetKey, relation.name)
         }
         guard let origin = node(forKey: originKey, relation: relation.originRelation) else {
-            throw LoaderError._unknownNode(originKey, relation.originRelation)
+            throw LoaderError.unknownNode(originKey, relation.originRelation)
         }
         guard let target = node(forKey: targetKey, relation: relation.targetRelation) else {
-            throw LoaderError._unknownNode(targetKey, relation.targetRelation)
+            throw LoaderError.unknownNode(targetKey, relation.targetRelation)
         }
         
         var attributes: AttributeDictionary = [:]

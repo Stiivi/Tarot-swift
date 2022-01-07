@@ -8,9 +8,19 @@
 // FIXME: This is only for Value. Decouple value from Record.
 import Records
 
+/// Type for graph object identifier. There should be no expectation about
+/// the value of the identifier.
+///
 public typealias OID = Int
+
+/// Type for object attribute key.
 public typealias AttributeKey = String
+
+/// Type for object attribute values.
 public typealias AttributeValue = Value
+
+/// Type for a dictionary of graph object attributes.
+public typealias AttributeDictionary = [AttributeKey:AttributeValue]
 
 /// An abstract class representing all objects in a graph memory. Concrete
 /// kinds of graph objects are ``Node`` and ``Link``. Graph objects can store

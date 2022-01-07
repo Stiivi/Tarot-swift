@@ -78,15 +78,20 @@ guessed.
         
         switch format {
         case "package":
-            loader = PackageLoader(space: space)
+            loader = RelationalPackageLoader(space: space)
         case "markdown":
-            loader = MarkdownLoader(space: space)
+            loader = DummyLoader(space: space)
+            // loader = MarkdownLoader(space: space)
         default:
             fatalError("Unknown input format: \(format)")
         }
+        // FIXME: !!! THIS !!!
+        // reader = PackageReader()
+        // reader.open()
+        // reader.close()
+        
         
         try loader.load(from: sourceURL)
-    
         try finalizeSpace(space: space, options: options)
     }
 }

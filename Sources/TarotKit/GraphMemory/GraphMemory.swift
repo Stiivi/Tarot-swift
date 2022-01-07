@@ -83,6 +83,7 @@ public protocol GraphMemoryProtocol {
 /// "simulation environment". It is not made a generic as it is not intended
 /// for general purpose use. It does not mean it might not change in the future.
 ///
+// NOTE: Status: Stable
 public class GraphMemory {
     /// Mapping between node IDs and node objects.
     private var nodeIndex: [OID:Node] = [:]
@@ -152,7 +153,6 @@ public class GraphMemory {
             guard nodeIndex[id] == nil else {
                 fatalError("Trying to associate a node with id that already exists: \(id)")
             }
-            // FIXME: THIS IS TEMPORARY FIX, SEE ABOVE
             idGenerator.markUsed(id)
         }
         else {

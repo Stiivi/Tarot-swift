@@ -1,8 +1,8 @@
 //
-//  File.swift
+//  Loader.swift
 //  
 //
-//  Created by Stefan Urbanek on 06/01/2022.
+//  Created by Stefan Urbanek on 07/01/2022.
 //
 
 import Foundation
@@ -17,48 +17,24 @@ public protocol Loader {
     init(space: Space)
     
     /// Load graph from `source` into the associated space.
-    /// 
+    ///
     func load(from source: URL) throws
 }
 
-/// An object that specifies a link that might be created.
+/// Errors raised by the Importer
 ///
-public struct LinkSpecification {
-    /// Attributes to be set for the link.
-    let attributes: [String:Value]
-
-    /// Reference to the origin object. The reference is subject to
-    /// interpretation by the loader and the loading context.
-    let originReference: String
-
-    /// Reference to the target object. The reference is subject to
-    /// interpretation by the loader and the loading context.
-    let targetReference: String
+public enum LoaderError: Error, Equatable {
+    /// Record is missing a primary key field. Value is relation name.
+    case missingPrimaryKey(String)
+    
+    /// Record is missing a field. First value is a field name, second value is
+    /// relation name.
+    case missingField(String, String)
+    
+    /// A duplicate primary key has been found. First value is the key value and
+    /// the second value is relation name.
+    case duplicateKey(Value, String)
+    
+    /// A node with given key can not be find.
+    case unknownNode(Value, String)
 }
-
-// TODO: Status: Idea
-public protocol Reader {
-    /// Validate the source and return a list of issues that were found.
-    func validate() -> IssueList
-    
-    /// Model that describes the graph provided by the reader. If the reader
-    /// does not provide any model then the value is `nil`.
-    var model: Model? { get }
-    
-    /// Name of node groups if the reader provides nodes in different named
-    /// groups, for example namespaces. If the reader provides only one group,
-    /// it might return an empty list.
-    ///
-    var nodeGroups: [String] { get }
-    
-    /// List of nodes in a named group. If `nil` is provided then default
-    /// group is assumed.
-    ///
-    func nodes(in group: String?) -> [Node]
-
-    /// List of links in a named group. If `nil` is provided then default
-    /// group is assumed.
-    ///
-    func links(in group: String?) -> [LinkSpecification]
-}
-

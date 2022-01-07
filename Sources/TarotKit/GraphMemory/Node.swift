@@ -9,6 +9,7 @@
 
 /// Object representing a node of a graph.
 ///
+// FIXME: make Final (same with link)
 open class Node: Object {
     public var trait: Trait? = nil
 }

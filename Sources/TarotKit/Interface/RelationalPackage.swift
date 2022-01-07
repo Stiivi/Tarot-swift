@@ -13,9 +13,12 @@ import System
 /// Description of a relational resource containing nodes.
 ///
 public struct NodeRelation: Codable {
-    /// Name of the relational resource containing records describing nodes.
-    ///
+    // Name of the relation.
     public let name: String
+    
+    /// Name of the relational resource containing records describing nodes.
+    /// If not provided then it will be the same as the name.
+    public let resource: String
 
     /// Name of a field that contains a unique key identifying the record.
     /// Default value is `id`.
@@ -29,9 +32,10 @@ public struct NodeRelation: Codable {
     ///
     public let foreignKeys: [String:String]
     
-    public init(name: String, primaryKey: String?=nil,
+    public init(name: String, primaryKey: String?=nil, resource: String?=nil,
                 foreignKeys: [String:String]?=nil) {
         self.name = name
+        self.resource = resource ?? name
         self.primaryKey = primaryKey ?? "id"
         self.foreignKeys = foreignKeys ?? [:]
     }
@@ -40,11 +44,13 @@ public struct NodeRelation: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let name = try container.decode(String.self, forKey: .name)
+        let resource = try container.decodeIfPresent(String.self, forKey: .resource)
         let primaryKey = try container.decodeIfPresent(String.self, forKey: .primaryKey)
         let foreignKeys = try container.decodeIfPresent([String:String].self, forKey: .foreignKeys)
 
         self.init(name: name,
                   primaryKey: primaryKey,
+                  resource: resource ?? name,
                   foreignKeys: foreignKeys)
     }
 
@@ -54,8 +60,11 @@ public struct NodeRelation: Codable {
 /// Description of a relational resource containing links.
 ///
 public struct LinkRelation: Codable {
-    /// Name of the relational resource containing records that describe links.
+    /// Name of the relation.
     public let name: String
+    /// Name of the relational resource containing records that describe links.
+    /// If not provided then it will be the same as the name.
+    public let resource: String
     /// Name of a field that contains link origin key. Default value is `origin`
     public let originKey: String
     /// Name of a record set that contains origin nodes.
@@ -66,9 +75,10 @@ public struct LinkRelation: Codable {
     /// the same resource as the origin resource is assumed.
     public let targetRelation: String
 
-    public init(name: String, originKey: String?=nil, originRelation: String,
+    public init(name: String, resource: String?=nil, originKey: String?=nil, originRelation: String,
                 targetKey: String?=nil, targetRelation: String?=nil) {
         self.name = name
+        self.resource = resource ?? name
         self.originKey = originKey ?? "origin"
         self.originRelation = originRelation
         self.targetKey = targetKey ?? "target"
@@ -79,12 +89,14 @@ public struct LinkRelation: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let name = try container.decode(String.self, forKey: .name)
+        let resource = try container.decodeIfPresent(String.self, forKey: .resource)
         let originKey = try container.decodeIfPresent(String.self, forKey: .originKey)
         let originRelation = try container.decode(String.self, forKey: .originRelation)
         let targetKey = try container.decodeIfPresent(String.self, forKey: .targetKey)
         let targetRelation = try container.decodeIfPresent(String.self, forKey: .targetRelation)
 
         self.init(name: name,
+                  resource: resource ?? name,
                   originKey: originKey,
                   originRelation: originRelation,
                   targetKey: targetKey,
