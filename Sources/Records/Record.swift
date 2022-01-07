@@ -30,6 +30,13 @@ public class Record {
     public var schema: Schema
     var dict: [Schema.FieldKey:Value] = [:]
     
+    var fieldNames: [String] { schema.fieldNames }
+    
+    // TODO: This should be the only initialzer. we do not need schema any more
+    public convenience init(_ dict: [String:Value?]) {
+        let fields = Array(dict.keys)
+        self.init(schema: Schema(fields), dict)
+    }
     /// Creates an empty record with given fields and optionally values.
     public init(schema:Schema, _ values: [Value?]?=nil) {
         self.schema = schema

@@ -7,6 +7,7 @@ import Foundation
 /// Collection of records with common schema.
 ///
 ///
+// TODO: It is an immutable SetAlgebra type
 public class RecordSet: Sequence {
     /// Schema of the record set.
     var _schema: Schema
@@ -51,7 +52,7 @@ public class RecordSet: Sequence {
     /// value types will be `string`.
     ///
     /// Initializer fails if the CSV file does not have a header.
-    public convenience init?(contentsOfCSVFile url: URL,
+    public convenience init(contentsOfCSVFile url: URL,
                              options: CSVReadingOptions=CSVReadingOptions()) throws {
         let string = try String(contentsOf: url)
         
