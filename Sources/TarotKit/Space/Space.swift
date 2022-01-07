@@ -89,7 +89,7 @@ public class Space {
     ///
     /// Catalog is a collection node.
     ///
-    public let catalog: Dictionary
+    public var catalog: Dictionary? = nil
     
     /// Create an empty space with a given model.
     ///
@@ -101,13 +101,6 @@ public class Space {
         else {
             self.model = Model(name: "__default", traits: [])
         }
-
-        let catalogNode = Node()
-        catalogNode["__system_object_name"] = "Catalog"
-        memory.add(catalogNode)
-
-        // FIXME: What happens if someone deletes the catalog node?
-        catalog = Dictionary(catalogNode)
     }
     
     // Store reading and writing.
@@ -144,11 +137,13 @@ public class Space {
             try store.save(record: record)
         }
         
-        // Write named objects
+        // Write catalog reference if it exists
         // ---------------------------------------------------------------
-        let record = StoreRecord(type: "reference", id: "catalog")
-        record["node"] = .int(catalog.representedNode.id!)
-        try store.save(record: record)
+        if let catalog = self.catalog {
+            let record = StoreRecord(type: "reference", id: "catalog")
+            record["node"] = .int(catalog.representedNode.id!)
+            try store.save(record: record)
+        }
 
     }
     
@@ -201,20 +196,15 @@ public class Space {
             memory.connect(from: origin, to: target, attributes: attributes, id: id)
         }
     
-        let catalogNode: Node
         // FIXME: Handle errors here
         if let record = try store.fetch(id: "catalog") {
             let catalogNodeID = OID(record["node"]!.intValue()!)
-            catalogNode = memory.node(catalogNodeID)!
+            let node = memory.node(catalogNodeID)!
+            catalog = Dictionary(node)
         }
         else {
-            catalogNode = Node()
-            catalogNode["__system_object_name"] = "Catalog"
-            memory.add(catalogNode)
+            catalog = nil
         }
-        
-        // FIXME: What happens if someone deletes the catalog node?
-        catalog = Dictionary(catalogNode)
     }
     
 }
