@@ -38,12 +38,12 @@ final class RelationalPackageLoaderTests: XCTestCase {
         XCTAssertThrowsError(try loader.loadNode(emptyRecord,
                                              relation: defaultRelation),
                              "Should throw error on no primary key") {
-            XCTAssertEqual($0 as! LoaderError, LoaderError.missingPrimaryKey("nodes"))
+            XCTAssertEqual($0 as! LoaderError, LoaderError.missingPrimaryKey("id", "nodes"))
         }
         XCTAssertThrowsError(try loader.loadNode(customRecord,
                                              relation: defaultRelation),
                              "Should throw error on no primary key") {
-            XCTAssertEqual($0 as! LoaderError, LoaderError.missingPrimaryKey("nodes"))
+            XCTAssertEqual($0 as! LoaderError, LoaderError.missingPrimaryKey("id", "nodes"))
         }
 
     }

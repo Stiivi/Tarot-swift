@@ -25,7 +25,7 @@ public protocol Loader {
 ///
 public enum LoaderError: Error, Equatable {
     /// Record is missing a primary key field. Value is relation name.
-    case missingPrimaryKey(String)
+    case missingPrimaryKey(String, String)
     
     /// Record is missing a field. First value is a field name, second value is
     /// relation name.

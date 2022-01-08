@@ -111,6 +111,8 @@ public struct LinkRelation: Codable {
 /// Relational entities are represented by `RecordSet` and it might contain
 /// list of nodes or list of links.
 ///
+// TODO: Add default `label` to foreignKeyLinkAttribute
+// TODO: Abstract it from file-system package centric
 public class RelationalPackageInfo: Decodable {
     /// List of sources containing nodes
     ///
@@ -118,12 +120,18 @@ public class RelationalPackageInfo: Decodable {
     /// List of sources containing links
     ///
     public let links: [LinkRelation]
+    
+    /// Name of an attribute that would be set in links representing foreign
+    /// key references. The value will be name of the field in the originating
+    /// relation. Default value is `label`.
+    ///
+    public let foreignKeyLinkAttribute: String?
 
     /// Options for reading the resources
     public let readingOptions: CSVReadingOptions?
 
     /// Path to the resources. If not provided then the package path is used.
-    public let resourcesPath: FilePath?
+    public let resourcesPath: String?
 
 }
 
@@ -158,7 +166,8 @@ public class RelationalPackage {
     /// Base URL for resources.
     ///
     public var resourcesURL: URL {
-        if let path = info.resourcesPath {
+        if let resourcesPath = info.resourcesPath {
+            let path = FilePath(resourcesPath)
             if path.isRelative {
                 let url: URL
                 url = packageRoot.appendingPathComponent(path.string,
@@ -199,6 +208,7 @@ public class RelationalPackage {
         let infoURL = packageRoot.appendingPathComponent("info.json")
         
         do {
+            // TODO: Handle error here for better reporting
             let json = try Data(contentsOf: infoURL)
             info = try JSONDecoder().decode(RelationalPackageInfo.self, from: json)
         }
