@@ -8,110 +8,33 @@
 import Foundation
 import Markdown
 
-
-public struct Walker: MarkupWalker {
-    var collected: [BlockMarkup] = []
-    public typealias Result = Void
-    
-    public mutating func visitBlockQuote(_ blockQuote: BlockQuote) -> Result {
-        collected.append(blockQuote)
-        let x = blockQuote as! Markup
-    }
-    public mutating func visitCodeBlock(_ codeBlock: CodeBlock) -> Result {
-        collected.append(codeBlock)
-    }
-    public mutating func visitCustomBlock(_ customBlock: CustomBlock) -> Result {
-        collected.append(customBlock)
-    }
-//    public mutating func visitDocument(_ document: Document) -> Result {
-//        return defaultVisit(document)
-//    }
-    public mutating func visitHeading(_ heading: Heading) -> Result {
-        return defaultVisit(heading)
-    }
-    public mutating func visitThematicBreak(_ thematicBreak: ThematicBreak) -> Result {
-        return defaultVisit(thematicBreak)
-    }
-    public mutating func visitHTMLBlock(_ html: HTMLBlock) -> Result {
-        return defaultVisit(html)
-    }
-    public mutating func visitListItem(_ listItem: ListItem) -> Result {
-        return defaultVisit(listItem)
-    }
-    public mutating func visitOrderedList(_ orderedList: OrderedList) -> Result {
-        return defaultVisit(orderedList)
-    }
-    public mutating func visitUnorderedList(_ unorderedList: UnorderedList) -> Result {
-        return defaultVisit(unorderedList)
-    }
-    public mutating func visitParagraph(_ paragraph: Paragraph) -> Result {
-        return defaultVisit(paragraph)
-    }
-    public mutating func visitBlockDirective(_ blockDirective: BlockDirective) -> Result {
-        return defaultVisit(blockDirective)
-    }
-    public mutating func visitInlineCode(_ inlineCode: InlineCode) -> Result {
-        return defaultVisit(inlineCode)
-    }
-    public mutating func visitCustomInline(_ customInline: CustomInline) -> Result {
-        return defaultVisit(customInline)
-    }
-    public mutating func visitEmphasis(_ emphasis: Emphasis) -> Result {
-        return defaultVisit(emphasis)
-    }
-    public mutating func visitImage(_ image: Image) -> Result {
-        return defaultVisit(image)
-    }
-    public mutating func visitInlineHTML(_ inlineHTML: InlineHTML) -> Result {
-        return defaultVisit(inlineHTML)
-    }
-    public mutating func visitLineBreak(_ lineBreak: LineBreak) -> Result {
-        return defaultVisit(lineBreak)
-    }
-    public mutating func visitLink(_ link: Markdown.Link) -> Result {
-        return defaultVisit(link)
-    }
-    public mutating func visitSoftBreak(_ softBreak: SoftBreak) -> Result {
-        return defaultVisit(softBreak)
-    }
-    public mutating func visitStrong(_ strong: Strong) -> Result {
-        return defaultVisit(strong)
-    }
-    public mutating func visitText(_ text: Text) -> Result {
-        return defaultVisit(text)
-    }
-    public mutating func visitStrikethrough(_ strikethrough: Strikethrough) -> Result {
-        return defaultVisit(strikethrough)
-    }
-    public mutating func visitTable(_ table: Table) -> Result {
-        return defaultVisit(table)
-    }
-    public mutating func visitTableHead(_ tableHead: Table.Head) -> Result {
-        return defaultVisit(tableHead)
-    }
-    public mutating func visitTableBody(_ tableBody: Table.Body) -> Result {
-        return defaultVisit(tableBody)
-    }
-    public mutating func visitTableRow(_ tableRow: Table.Row) -> Result {
-        return defaultVisit(tableRow)
-    }
-    public mutating func visitTableCell(_ tableCell: Table.Cell) -> Result {
-        return defaultVisit(tableCell)
-    }
-    public mutating func visitSymbolLink(_ symbolLink: SymbolLink) -> Result {
-        return defaultVisit(symbolLink)
-    }
-}
-
-//public class MarkdownSection: NodeView {
-//    
-//}
-
+/// An object that loads a Markdown document and creates one node per document
+/// section. Document section is a series of Markdown blocks following a
+/// heading. The heading is a section title.
+///
+/// Section node attributes:
+///
+/// - `title`: Section node attribute containing section title.
+/// - `level`: Section node attribute containing section level.
+/// - `source`: Document source URL if was provided. Only in top-level section.
+///
+/// Block node attributes:
+///
+/// - `text`: Block node attribute containing text.
+///
+/// Link attributes and values:
+///
+/// - `label`: Link label attribute.
+///     - `subsection`: Value for the label attribute for links to a subsection.
+///     - `block`: Label of a link to a block.
+/// - `order`: Sequential order of a block or a section.
+///
+/// - Note: This is a higher semantic markdown-to-graph converter. It preserves
+///         each block as a whole as a text. For example a list blocks is
+///         preserved as one node. List is not converted to one node per each
+///         list item.
+///
 public class MarkdownLoader: Loader {
-    public var document: Document! = nil
-    public var nodes: [Node] = []
-    public var links: [Link] = []
-    public var stack: [Node] = []
     public var currentHeading: Heading?
     public var currentNode: Node?
     
@@ -119,50 +42,147 @@ public class MarkdownLoader: Loader {
     
     required public init(space: Space) {
         self.space = space
-        let text: String = "text"
-        fatalError("Not implemented")
     }
     
     public func load(from source: URL) throws {
-        fatalError("Not implemented")
+        let document = try Markdown.Document(parsing: source)
+
+        let node = load(document: document)
+        node["source"] = .string(source.absoluteString)
+    }
+
+    /// Loads a markdown document to the graph.
+    ///
+    public func load(document: Markdown.Document) -> Node {
+        let reader = MarkdownReader(document: document)
+        let topSection = reader.readDocument()
+
+        return loadSection(topSection)
     }
     
-    public func walk() {
-        for child in document.children {
-            if let heading = child as? Heading {
-                // We got a heading
-                visitHeading(heading)
-            }
-            else if let block = child as? BlockMarkup {
-                visitBlock(block)
-                // We got a block markup
+    @discardableResult
+    func loadSection(_ section: MarkdownSectionSource) -> Node {
+        let sectionNode = Node()
+        
+        if let title = section.title {
+            sectionNode["title"] = .string(title)
+        }
+        sectionNode["level"] = .int(section.level)
+
+        // 1. Load subsections
+        for (index, subsection) in section.subsections.enumerated() {
+            let node = loadSection(subsection)
+            let attributes: AttributeDictionary = [
+                "label": "subsection",
+                "order": .int(index),
+            ]
+            space.memory.connect(from: sectionNode,
+                                 to: node,
+                                 attributes: attributes)
+        }
+        
+        // 2. Load blocks
+        for (index, block) in section.blocks.enumerated() {
+            let attributes: AttributeDictionary = [
+                "label": "block",
+                "order": .int(index),
+            ]
+            space.memory.connect(from: sectionNode,
+                                 to: block,
+                                 attributes: attributes)
+        }
+        
+        return sectionNode
+    }
+}
+
+public struct MarkdownSectionSource {
+    let level: Int
+    let title: String?
+    let blocks: [Node]
+    let subsections: [MarkdownSectionSource]
+}
+
+/// An object that reads a Markdown document and creates one node per document
+/// section. Document section is a series of Markdown blocks following a
+/// heading. The heading is a section title.
+///
+/// - Note: This is a higher semantic markdown-to-graph converter. It preserves
+///         each block as a whole as a text. For example a list blocks is
+///         preserved as one node. List is not converted to one node per each
+///         list item.
+///
+class MarkdownReader {
+    let document: Document
+    var iterator: MarkupChildren.Iterator
+    var current: Markup?
+    
+    public init(document: Markdown.Document) {
+        self.document = document
+        self.iterator = document.children.makeIterator()
+        self.current = self.iterator.next()
+    }
+    
+    public var atEnd: Bool { current == nil }
+
+    public func advance() {
+        current = iterator.next()
+    }
+    
+    public func readDocument() -> MarkdownSectionSource {
+        let documentSection = readSection(level: 0)
+        return documentSection
+    }
+
+    public func readSection(level: Int, title: String?=nil) -> MarkdownSectionSource {
+        var blocks: [Node] = []
+        var subsections: [MarkdownSectionSource] = []
+        
+        // Read introductory blocks before the first heading
+        while !atEnd && (current as? Heading) == nil {
+            let current = self.current!
+            let node = Node()
+            node["text"] = .string(current.format())
+            blocks.append(node)
+        }
+        
+        // Read sections.
+        //
+        // Each section begins with a heading which becomes the section's title.
+        // If we encounter a heading with equal or a higher level, then we
+        // are done with this section.
+        // If we encounter a heading with a lesser level, then we descend
+        // to a sub-section
+        //
+        while !atEnd {
+            if let heading = current as? Heading {
+                if heading.level > level {
+                    // Higher heading level menas that we are about to read
+                    // a subsection
+                    //
+                    let subtitle = heading.format()
+                    let subsection = readSection(level: heading.level, title: subtitle)
+                    subsections.append(subsection)
+                }
+                else {
+                    // Equal or higher heading level means that this section
+                    // is finished.
+                    //
+                    break
+                }
             }
             else {
-                // This should not happen ...
-                fatalError("Unhandled markdown child: \(child)")
+                // This should not happen as all non-headings are eaten
+                // at the beginning of each (sub-)section
+                fatalError("Unexpected non-heading while reading a section")
             }
         }
-    }
-    public func visitHeading(_ heading: Heading) {
-        if let current = currentHeading {
-            if heading.level == current.level {
-                
-            }
-            else if heading.level > current.level {
-//                stack.append()
-            }
-            else if heading.level < current.level {
-                
-            }
-        }
-        else {
-            currentHeading = heading
-            let node = Node()
-            node["title"] = .string(heading.plainText)
-            node["type"] = "title"
-        }
-    }
-    public func visitBlock(_ block: BlockMarkup) {
         
+        let section = MarkdownSectionSource(level: level,
+                                            title: title,
+                                            blocks: blocks,
+                                            subsections: subsections)
+                
+        return section
     }
 }
