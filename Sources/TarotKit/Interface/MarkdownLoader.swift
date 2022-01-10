@@ -1,9 +1,11 @@
 //
-//  File.swift
+//  MarkdownLoader.swift
 //  
 //
 //  Created by Stefan Urbanek on 03/01/2022.
 //
+
+// STATUS: Happy
 
 import Foundation
 import Markdown
@@ -47,27 +49,56 @@ public class MarkdownLoader: Loader {
     public func load(from source: URL) throws {
         let document = try Markdown.Document(parsing: source)
 
-        let node = load(document: document)
-        node["source"] = .string(source.absoluteString)
+        if let node = load(document: document) {
+            node["source"] = .string(source.absoluteString)
+        }
+        else {
+            // FIXME: How to handle this situation? This should not be an error
+            fatalError("Loading an empty markdown document. We do not know what to do.")
+        }
     }
 
     /// Loads a markdown document to the graph.
     ///
-    public func load(document: Markdown.Document) -> Node {
+    public func load(document: Markdown.Document) -> Node? {
         let reader = MarkdownReader(document: document)
-        let topSection = reader.readDocument()
+        
+        guard let topSection = reader.acceptDocument() else {
+            return nil
+        }
 
         return loadSection(topSection)
     }
     
+    /// Loads a markdown section into the graph by creating a node that
+    /// represents the section and nodes representing the section's blocks
+    /// and subsections.
+    ///
+    /// Section node has the following attributes set:
+    ///
+    /// - `title` – section title extracted from the section heading. Can be
+    ///   not set if the section represents the top-level document.
+    /// - `level` – level of the section. 0 for top-level document.
+    ///
+    /// Section has links to block nodes. Block links have `label` attribute
+    /// set to `block`.
+    ///
+    /// Section has links to sub-section nodes. Sub-section links have `label`
+    /// attribute set to `subsection`.
+    ///
+    /// Block and subsection links have an `order` attribute set that represents
+    /// order of that element.
+    ///
     @discardableResult
-    func loadSection(_ section: MarkdownSectionSource) -> Node {
-        let sectionNode = Node()
-        
+    func loadSection(_ section: MarkdownSection) -> Node {
+        var attributes: AttributeDictionary = [:]
+
         if let title = section.title {
-            sectionNode["title"] = .string(title)
+            attributes["title"] = .string(title)
         }
-        sectionNode["level"] = .int(section.level)
+        attributes["level"] = .int(section.level)
+        let sectionNode = Node(attributes: attributes)
+        space.memory.add(sectionNode)
 
         // 1. Load subsections
         for (index, subsection) in section.subsections.enumerated() {
@@ -83,24 +114,40 @@ public class MarkdownLoader: Loader {
         
         // 2. Load blocks
         for (index, block) in section.blocks.enumerated() {
-            let attributes: AttributeDictionary = [
+            // TODO: Trim the block text using trimmingCharacters(in: .whitespacesAndNewlines)
+            let blockAttributes: AttributeDictionary = [
                 "label": "block",
                 "order": .int(index),
+                "text": .string(block.format())
             ]
+            let blockNode = Node(attributes: attributes)
+            space.memory.add(blockNode)
+
             space.memory.connect(from: sectionNode,
-                                 to: block,
-                                 attributes: attributes)
+                                 to: blockNode,
+                                 attributes: blockAttributes)
         }
         
         return sectionNode
     }
 }
 
-public struct MarkdownSectionSource {
+/// Structure representing a markdown section.
+///
+public struct MarkdownSection {
+    /// Level of the section. 0 if the section represents the top-level
+    /// document.
     let level: Int
+    
+    /// Title of the section. Can be empty it represents top-level document.
     let title: String?
-    let blocks: [Node]
-    let subsections: [MarkdownSectionSource]
+    
+    /// Blocks that directly follow the section heading or a beginning of a
+    /// document.
+    let blocks: [BlockMarkup]
+    
+    /// Subsections of the section that are of a lower level.
+    let subsections: [MarkdownSection]
 }
 
 /// An object that reads a Markdown document and creates one node per document
@@ -117,72 +164,131 @@ class MarkdownReader {
     var iterator: MarkupChildren.Iterator
     var current: Markup?
     
+    /// Creates a markdown reader from a markdown document.
+    ///
     public init(document: Markdown.Document) {
         self.document = document
         self.iterator = document.children.makeIterator()
         self.current = self.iterator.next()
     }
     
+    /// Indicator whether the reader reached the end of the document. `true`
+    /// means that the reader is at the end and there are no more blocks
+    /// to be read.
+    ///
     public var atEnd: Bool { current == nil }
 
-    public func advance() {
+    /// Accept a block and get a next block.
+    ///
+    public func accept() {
         current = iterator.next()
     }
     
-    public func readDocument() -> MarkdownSectionSource {
-        let documentSection = readSection(level: 0)
-        return documentSection
-    }
+    /// Accepts a document as a top-level markdown section. The document
+    /// section will have no title and level will be 0.
+    ///
+    /// - Returns: `MarkdownSection` if a valid markdown section was present,
+    /// otherwise returns `nil`.
+    ///
+    public func acceptDocument() -> MarkdownSection? {
+        var blocks: [BlockMarkup] = []
+        var subsections: [MarkdownSection] = []
 
-    public func readSection(level: Int, title: String?=nil) -> MarkdownSectionSource {
-        var blocks: [Node] = []
-        var subsections: [MarkdownSectionSource] = []
-        
-        // Read introductory blocks before the first heading
-        while !atEnd && (current as? Heading) == nil {
-            let current = self.current!
-            let node = Node()
-            node["text"] = .string(current.format())
-            blocks.append(node)
+        while let block = acceptContentBlock() {
+            blocks.append(block)
         }
         
-        // Read sections.
-        //
-        // Each section begins with a heading which becomes the section's title.
-        // If we encounter a heading with equal or a higher level, then we
-        // are done with this section.
-        // If we encounter a heading with a lesser level, then we descend
-        // to a sub-section
-        //
-        while !atEnd {
-            if let heading = current as? Heading {
-                if heading.level > level {
-                    // Higher heading level menas that we are about to read
-                    // a subsection
-                    //
-                    let subtitle = heading.format()
-                    let subsection = readSection(level: heading.level, title: subtitle)
-                    subsections.append(subsection)
-                }
-                else {
-                    // Equal or higher heading level means that this section
-                    // is finished.
-                    //
-                    break
-                }
-            }
-            else {
-                // This should not happen as all non-headings are eaten
-                // at the beginning of each (sub-)section
-                fatalError("Unexpected non-heading while reading a section")
-            }
+        while let subsection = acceptSection(0) {
+            subsections.append(subsection)
         }
         
-        let section = MarkdownSectionSource(level: level,
-                                            title: title,
-                                            blocks: blocks,
-                                            subsections: subsections)
+        if blocks.isEmpty && subsections.isEmpty {
+            /// There are no blocks in the document
+            return nil
+        }
+        
+        let section = MarkdownSection(level: 0,
+                                      title: nil,
+                                      blocks: blocks,
+                                      subsections: subsections)
                 
         return section
+    }
+    
+    /// Accepts a markdown section that begins with a heading. The heading
+    /// will be section's title.
+    ///
+    /// Section can contain blocks or sub-sections. Blocks directly follow the
+    /// section heading. Sub-sections either directly follow the heading or
+    /// they follow blocks.
+    ///
+    /// Reader reads up until another section on the same or a higher level.
+    /// Note that the level order is reversed: 0 is the highest level.
+    ///
+    /// - Returns: `MarkdownSection` if a valid markdown section was present,
+    /// otherwise returns `nil`.
+    ///
+    public func acceptSection(_ parentLevel: Int) -> MarkdownSection? {
+        var blocks: [BlockMarkup] = []
+        var subsections: [MarkdownSection] = []
+
+        guard !atEnd else {
+            return nil
+        }
+        
+        guard let heading = current as? Heading else {
+            // Section must begin with a heading.
+            return nil
+        }
+        
+        guard heading.level > parentLevel else {
+            return nil
+        }
+        
+        accept()
+        
+        // 2. Read section content blocks
+        
+        // We read blocks up until the next heading. All section blocks
+        // come before sub-sections. Text is a tree structure without markers
+        // to go one level up. Therefore each sub-section will contain
+        // all the blocks that follow its heading.
+        
+        while let block = acceptContentBlock() {
+            blocks.append(block)
+        }
+        
+        // Read sub-sections.
+        //
+        while let subsection = acceptSection(heading.level) {
+            subsections.append(subsection)
+        }
+        
+        let section = MarkdownSection(level: heading.level,
+                                      title: heading.plainText,
+                                      blocks: blocks,
+                                      subsections: subsections)
+                
+        return section
+    }
+    
+    /// Accepts a markdown block that represents a regular content which is not
+    /// a heading.
+    ///
+    /// - Returns: a Node create from the markdown block.
+    ///
+    public func acceptContentBlock() -> BlockMarkup? {
+        guard (current as? Heading) == nil else {
+            return nil
+        }
+        guard !atEnd else {
+            return nil
+        }
+        
+        guard let block = current! as? BlockMarkup else {
+            fatalError("Something is wrong here")
+        }
+        accept()
+        return block
     }
 }
