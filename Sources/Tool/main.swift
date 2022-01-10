@@ -99,13 +99,30 @@ extension Tarot {
 
         @OptionGroup var options: Options
         
+        @Option(name: [.long, .customShort("n")],
+                help: "Name of the graph in the output file")
+        var name = "output"
+
         @Option(name: [.long, .customShort("o")],
                 help: "Path to a DOT file where the output will be written.")
-        var output = "tarot.dot"
+        var output = "output.dot"
 
+        @Option(name: [.long, .customShort("l")],
+                help: "Node attribute that will be used as node label")
+        var labelAttribute = "id"
+
+
+        
         mutating func run() {
             let space = makeSpace(options: options)
-            space.memory.writeDot(path: output, name: "cards")
+            
+            let exporter = DotExporter(path: output,
+                                       name: name,
+                                       labelAttribute: labelAttribute)
+
+            // TODO: Allow export of a selection
+            exporter.export(nodes: Array(space.memory.nodes),
+                            links: Array(space.memory.links))
         }
     }
 }

@@ -56,6 +56,9 @@ guessed.
             else if sourceURL.pathExtension == "md" {
                 format = "markdown"
             }
+            else if sourceURL.pathExtension == "markdown" {
+                format = "markdown"
+            }
             else if sourceURL.pathExtension == "txt" {
                 format = "markdown"
             }
@@ -80,8 +83,7 @@ guessed.
         case "package":
             loader = RelationalPackageLoader(space: space)
         case "markdown":
-            loader = DummyLoader(space: space)
-            // loader = MarkdownLoader(space: space)
+            loader = MarkdownLoader(space: space)
         default:
             fatalError("Unknown input format: \(format)")
         }

@@ -120,7 +120,7 @@ public class MarkdownLoader: Loader {
                 "order": .int(index),
                 "text": .string(block.format())
             ]
-            let blockNode = Node(attributes: attributes)
+            let blockNode = Node(attributes: blockAttributes)
             space.memory.add(blockNode)
 
             space.memory.connect(from: sectionNode,
