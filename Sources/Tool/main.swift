@@ -20,6 +20,7 @@ struct Tarot: ParsableCommand {
             Create.self,
             Import.self,
             List.self,
+            Export.self,
             Print.self,
             WriteDOT.self,
         ],
@@ -28,7 +29,7 @@ struct Tarot: ParsableCommand {
 
 struct Options: ParsableArguments {
     @Option(name: [.long, .customShort("d")], help: "Path to a Tarot database")
-    var database = "Data.tarot"
+    var database: String?
 }
 
 extension Tarot {
@@ -39,30 +40,13 @@ extension Tarot {
         @OptionGroup var options: Options
 
         mutating func run() {
-            let url = URL(fileURLWithPath: options.database, isDirectory: true)
+            let url = databaseURL(options: options)
 
             do {
                 try FilePackageStore.initialize(url: url)
             }
             catch {
                 fatalError("Unable to create a file storage: \(error)")
-            }
-        }
-    }
-}
-
-extension Tarot {
-    struct List: ParsableCommand {
-        static var configuration
-            = CommandConfiguration(abstract: "List nodes.")
-
-        @OptionGroup var options: Options
-
-        mutating func run() {
-            let space = makeSpace(options: options)
-            for node in space.memory.nodes {
-                let traitName = node.trait?.name ?? "no trait"
-                print("\(node.id!)(\(traitName))")
             }
         }
     }
@@ -79,7 +63,7 @@ extension Tarot {
         var reference: Int
 
         mutating func run() {
-            let space = makeSpace(options: options)
+            let space = openSpace(options: options)
 
             print("Node: \(reference)")
             
@@ -114,7 +98,7 @@ extension Tarot {
 
         
         mutating func run() {
-            let space = makeSpace(options: options)
+            let space = openSpace(options: options)
             
             let exporter = DotExporter(path: output,
                                        name: name,

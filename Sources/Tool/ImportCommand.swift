@@ -31,7 +31,7 @@ guessed.
     var source: String
 
     mutating func run() throws {
-        let space = makeSpace(options: options)
+        let space = openSpace(options: options)
         guard let testURL = URL(string: source) else {
             fatalError("Invalid resource reference: \(source)")
         }
