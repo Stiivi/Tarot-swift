@@ -75,7 +75,7 @@ public class Collection: NodeProjection {
     ///
     // TODO: Move this to OrderedCollection
     // REASON: `items` is returning non-ordered collection of items
-    var linkOrderAttribute: String {
+    public var linkOrderAttribute: String {
         representedNode["linkOrderAttribute"]?.stringValue() ?? "order"
     }
     
@@ -89,16 +89,16 @@ public class Collection: NodeProjection {
     
     /// List of collection items.
     ///
-    var items: [Node] {
+    public var items: [Node] {
         return itemLinks.map { $0.target }
     }
     
     /// List of links that point to the collection items.
     ///
-    var itemLinks: [Link] {
+    public var itemLinks: [Link] {
         let outgoing = representedNode.outgoing
 
-        var links: [Link] = outgoing.filter { link in
+        let links: [Link] = outgoing.filter { link in
             link[itemLinkLabelAttribute]?.stringValue() == itemLinkValue
             }
         
@@ -110,12 +110,12 @@ public class Collection: NodeProjection {
         return itemLinks.count
     }
 
-    enum EmptyOrder {
+    public enum EmptyOrder {
         case first
         case last
     }
 
-    func orderedItemLinks(orderBy: String?=nil, empty: EmptyOrder = .first) -> [Link] {
+    public func orderedItemLinks(orderBy: String?=nil, empty: EmptyOrder = .first) -> [Link] {
         var links = itemLinks
         let orderByAttribute = orderBy ?? linkOrderAttribute
         
@@ -137,7 +137,7 @@ public class Collection: NodeProjection {
     /// Add a node to the collection.
     ///
     // TODO: This belongs to UnorderedCollection
-    func add(node item: Node, attributes: [String:Value] = [:]) {
+    public func add(node item: Node, attributes: [String:Value] = [:]) {
         var linkAttributes = attributes
         
         linkAttributes[itemLinkLabelAttribute] = .string(itemLinkValue)

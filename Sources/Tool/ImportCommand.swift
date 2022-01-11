@@ -24,8 +24,11 @@ guessed.
 
     @Option(name: [.long, .customShort("f")],
             help: "Format of the resource.")
-    
     var format = "auto"
+    
+    @Option(name: [.long, .customShort("n")],
+            help: "Name of import's represented object in the catalog.")
+    var name = "last_import"
     
     @Argument(help: "Resource path or URL")
     var source: String
@@ -93,7 +96,19 @@ guessed.
         // reader.close()
         
         
-        try loader.load(from: sourceURL)
+        if let importedNode = try loader.load(from: sourceURL) {
+            if let catalog = space.catalog {
+                catalog.setKey(name, for: importedNode)
+                print("Import finished. Imported object name: \(name)")
+            }
+            else {
+                print("Import finished. Database has no catalog, import node name was ignored.")
+            }
+        }
+        else {
+            print("Import finished. No represented object created by import, import node name was ignored.")
+        }
+        
         try finalizeSpace(space: space, options: options)
     }
 }

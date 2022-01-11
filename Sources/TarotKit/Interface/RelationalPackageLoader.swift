@@ -228,7 +228,7 @@ public class RelationalPackageLoader: Loader {
     ///
     /// For more information see: `class:Package`
     ///
-    public func load(from source: URL) throws {
+    public func load(from source: URL) throws -> Node? {
         // Load the package info from `info.json`
         //
         guard let package = RelationalPackage(url: source) else {
@@ -247,7 +247,7 @@ public class RelationalPackageLoader: Loader {
         // Load the data
         // ---------------------------------------------------------------
 
-        try load(package: package)
+        return try load(package: package)
     }
 
     
@@ -267,7 +267,7 @@ public class RelationalPackageLoader: Loader {
     ///
     /// - Throws: ``LoaderError``
     ///
-    public func load(package: RelationalPackage) throws {
+    public func load(package: RelationalPackage) throws -> Node? {
         let options = package.readingOptions ?? CSVReadingOptions()
         
         // 1. Load all the nodes and register all the keys
@@ -317,6 +317,8 @@ public class RelationalPackageLoader: Loader {
                            targetRelation: desc.targetRelation,
                            attributes: attributes)
         }
+        
+        return nil
     }
     
     /// Loads nodes from a record set.

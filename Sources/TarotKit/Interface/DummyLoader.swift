@@ -16,8 +16,9 @@ public class DummyLoader: Loader {
         // Do nothing
     }
     
-    public func load(from: URL) throws {
+    public func load(from: URL) throws -> Node? {
         print("Dummy loader pretends loading, in fact it does nothing.")
+        return nil
         // Do nothing
     }
     

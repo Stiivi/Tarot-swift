@@ -18,9 +18,11 @@ public protocol Loader {
     // TODO: Remove this requirement
     init(space: Space)
     
-    /// Load graph from `source` into the associated space.
+    /// Load graph from `source` into the associated space. Returns a node
+    /// that represents the loaded batch. Returns `nil` if there is no
+    /// represented node for the batch.
     ///
-    func load(from source: URL) throws
+    func load(from source: URL) throws -> Node?
 }
 
 /// Errors raised by the Importer

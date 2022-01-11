@@ -46,16 +46,16 @@ public class MarkdownLoader: Loader {
         self.space = space
     }
     
-    public func load(from source: URL) throws {
+    public func load(from source: URL) throws -> Node? {
         let document = try Markdown.Document(parsing: source)
 
-        if let node = load(document: document) {
-            node["source"] = .string(source.absoluteString)
-        }
-        else {
+        guard let node = load(document: document) else {
             // FIXME: How to handle this situation? This should not be an error
             fatalError("Loading an empty markdown document. We do not know what to do.")
         }
+
+        node["source"] = .string(source.absoluteString)
+        return node
     }
 
     /// Loads a markdown document to the graph.

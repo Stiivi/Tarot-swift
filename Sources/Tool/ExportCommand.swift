@@ -31,7 +31,7 @@ Available formats: markdown.
         var output: String?
 
         @Argument(help: "Named collection to be exported")
-        var collection: String
+        var collectionName: String
         
         // Design notes:
         //
@@ -39,9 +39,22 @@ Available formats: markdown.
         //
         mutating func run() {
             let space = openSpace(options: options)
+            guard let catalog = space.catalog else {
+                fatalError("Space has no catalog.")
+            }
 
-            let nodes: [Node]
-            print("Hello from export")
+            guard let collectionNode = catalog.item(key: collectionName) else {
+                fatalError("No collection: \(collectionName)")
+            }
+            print("Exporting collection: \(collectionName)")
+            print("Nodes:")
+            
+            let collection = Collection(collectionNode)
+
+            for node in collection.items {
+                print("- \(node)")
+            }
+            
 //            if let traitName = traitName {
 //                nodes = space.memory.filter(traitName: traitName)
 //            }

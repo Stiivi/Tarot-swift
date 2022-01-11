@@ -17,7 +17,17 @@ public class Dictionary: Collection {
     /// `key`.
     ///
     var keyLinkAttribute: String  { representedNode["keyLinkAttribute"]?.stringValue() ?? "key"}
-
+    
+    /// List of keys in the dictionary
+    public var keys: [String] {
+        let keys = itemLinks.compactMap {
+            $0[keyLinkAttribute]?.stringValue()
+        }
+        
+        return keys
+    }
+    
+    
     /// Get a node named `name` in the dictionary.
     ///
     public func item(key: String) -> Node? {
