@@ -8,12 +8,14 @@
 import Foundation
 import Records
 
-// TODO: Status: Experimental
 /// Protocol for objects that load graphs from a source into a graph memory.
+///
+/// - Status: Experimental
 ///
 public protocol Loader {
     /// Create a loader and associate it with a space.
     ///
+    // TODO: Remove this requirement
     init(space: Space)
     
     /// Load graph from `source` into the associated space.
@@ -38,3 +40,4 @@ public enum LoaderError: Error, Equatable {
     /// A node with given key can not be find.
     case unknownNode(Value, String)
 }
+

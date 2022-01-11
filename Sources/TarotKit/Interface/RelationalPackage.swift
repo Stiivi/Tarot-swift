@@ -144,8 +144,8 @@ public class RelationalPackageInfo: Decodable {
 ///
 /// - `info.json`: information about the package (required)
 /// - `model.json`: model of the package (optional)
-/// - resource files containing nodes
-/// - resource files containing links
+/// - files in CSV format containing nodes
+/// - files in CSV format containing links
 ///
 /// Currently only tabular data files (CSV) are supported as resource files.
 ///

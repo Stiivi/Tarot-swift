@@ -6,7 +6,7 @@ Here are few notes about the development of the TarotKit.
 
 Design principle:
 
-- Every entity that represents the content knowledge must be represented by the
+- Every entity that represents the content knowledge is represented by the
   graph
 - Graph structures should be as simple as possible
 - Purity of abstraction has its practical limits

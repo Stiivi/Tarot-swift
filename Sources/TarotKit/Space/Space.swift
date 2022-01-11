@@ -8,9 +8,16 @@
 
 /*
 
- Design notes:
+ STATUS: Experimental
+ ISSUES:
  
- Space
+ - weirdly coupled functionality
+
+ NOTES:
+ 
+ - application facing object, something like a controller
+ - maybe should be called GraphController or GraphManager?
+ 
  - memory
  - model
  

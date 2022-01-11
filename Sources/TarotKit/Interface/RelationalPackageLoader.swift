@@ -18,6 +18,10 @@ import Records
 /// collection of links. Links can calso be represented by references between
 /// records.
 ///
+/// The data is stored in a directory package. Relations are stored in CSV
+/// files. See ``RelationalPackage`` for more information.
+///
+///
 /// ## Nodes
 ///
 /// The loader will create a node for each record in the relation. The fields
@@ -152,6 +156,12 @@ import Records
 /// See also: ``NodeRelation``.
 ///
 ///
+/// # Future Plans
+///
+/// In the future this class might be abstracted and broken into smaller parts:
+/// `RelationalLoader` - loader of any relational data, `RelationalDataProvider`
+/// - an abstract class for providing relational data, either from a file or
+/// from a database.
 ///
 public class RelationalPackageLoader: Loader {
     let space: Space
