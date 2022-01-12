@@ -49,7 +49,7 @@ public class TextDocument: BaseNodeProjection {
 
     public var sections: IndexedCollection {
         return IndexedCollection(representedNode,
-                                 linkType:LabelledLinkType(label: "section"),
+                                 linkType:LabelledLinkType(label: "subsection"),
                                  indexAttribute: "order")
     }
 

@@ -8,10 +8,32 @@
 import Foundation
 import Markdown
 
-public class MarkdownExporter {
+// TODO: This is a combined class of Exporter and Writer, it should be split
+/*
+    Exporter: exports into some object
+    Writer: writes into an external store at URL
+ 
+ */
+
+public protocol Exporter {
+    func export(node: Node, into output: URL) throws
+}
+
+public class MarkdownExporter: Exporter {
     public init() {
         
     }
+    
+    public func export(node: Node, into outputURL: URL) throws {
+        let document = export(textDocument: node)
+        let text = document.format()
+       
+        try text.write(to: outputURL,
+                       atomically: false,
+                       encoding: String.Encoding.utf8)
+        
+    }
+    
     /// Export a node that can be projected as a textDocument
     ///
     public func export(textDocument: Node) -> Document {

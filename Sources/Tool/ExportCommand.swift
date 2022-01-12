@@ -28,32 +28,50 @@ Available formats: markdown.
 
         @Option(name: [.long, .customShort("o")],
                 help: "Output path or URL")
-        var output: String?
+        var output: String
 
-        @Argument(help: "Named collection to be exported")
-        var collectionName: String
+        @Argument(help: "Named node to be exported")
+        var nodeName: String
         
         // Design notes:
         //
         // tarot extract Card
         //
-        mutating func run() {
+        mutating func run() throws {
             let space = openSpace(options: options)
             guard let catalog = space.catalog else {
                 fatalError("Space has no catalog.")
             }
 
-            guard let collectionNode = catalog.item(key: collectionName) else {
-                fatalError("No collection: \(collectionName)")
+            guard let testURL = URL(string: output) else {
+                fatalError("Invalid resource reference: \(output)")
             }
-            print("Exporting collection: \(collectionName)")
-            print("Nodes:")
-            
-            let collection = Collection(collectionNode)
+            let outputURL: URL
 
-            for node in collection.items {
-                print("- \(node)")
+            if testURL.scheme == nil {
+                outputURL = URL(fileURLWithPath: output)
             }
+            else {
+                outputURL = testURL
+            }
+
+            guard let node = catalog.item(key: nodeName) else {
+                fatalError("No named node: \(nodeName)")
+            }
+            print("Exporting node named: \(nodeName)")
+
+            let exporter: Exporter
+            
+            switch format {
+            case "md":
+                exporter = MarkdownExporter()
+            case "markdown":
+                exporter = MarkdownExporter()
+            default:
+                fatalError("Unknown input format: \(format)")
+            }
+
+            try exporter.export(node: node, into: outputURL)
             
 //            if let traitName = traitName {
 //                nodes = space.memory.filter(traitName: traitName)

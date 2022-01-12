@@ -41,24 +41,24 @@ public class Tree: NodeProjection {
     
     /// List of collection items.
     ///
-    var children: [Tree] {
-        let children = itemLinks.map {
-            Tree($0.target)
-        }
-        return children
-    }
-    
-    /// List of all children nodes.
-    var allChildren: [Tree] {
-        return children.flatMap { $0.allChildren }
-    }
-    
-    var depth: Int {
-        if let parent = parent {
-            return parent.depth + 1
-        }
-        else {
-            return 0
-        }
-    }
+//    var children: [Tree] {
+//        let children = nodes.map {
+//            Tree($0.target)
+//        }
+//        return children
+//    }
+//    
+//    /// List of all children nodes.
+//    var allChildren: [Tree] {
+//        return children.flatMap { $0.allChildren }
+//    }
+//    
+//    var depth: Int {
+//        if let parent = parent {
+//            return parent.depth + 1
+//        }
+//        else {
+//            return 0
+//        }
+//    }
 }
