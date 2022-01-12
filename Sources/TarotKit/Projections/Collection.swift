@@ -5,6 +5,8 @@
 //  Created by Stefan Urbanek on 26/12/2021.
 //
 
+// TODO: Status: Reconsider this. Replaced by TypedNeighbourhood
+
 import Records
 
 /// Projection of a node representing a collection of nodes.
@@ -61,13 +63,14 @@ public class Collection: NodeProjection {
     /// members. Typically it would be `name`.
     ///
     public var itemLinkLabelAttribute: String  {
-        representedNode["itemLinkAttribute"]?.stringValue() ?? "label"
+        defaultLinkLabelAttribute ?? "label"
     }
     
     /// Value of the item forming link property. Typically it would be `item`
     ///
-    public var itemLinkValue: String {
-        representedNode["itemLinkValue"]?.stringValue() ?? "item"
+    // TODO: Change into a let itemLinkLabel + add to init(itemLinkLabel: )
+    public var itemLinkLabel: String {
+        representedNode["item_link_label"]?.stringValue() ?? "item"
     }
     
     /// Attribute that specifies default order of items when ordered items are
@@ -99,7 +102,7 @@ public class Collection: NodeProjection {
         let outgoing = representedNode.outgoing
 
         let links: [Link] = outgoing.filter { link in
-            link[itemLinkLabelAttribute]?.stringValue() == itemLinkValue
+            link[itemLinkLabelAttribute]?.stringValue() == itemLinkLabel
             }
         
         return links
@@ -140,7 +143,7 @@ public class Collection: NodeProjection {
     public func add(node item: Node, attributes: [String:Value] = [:]) {
         var linkAttributes = attributes
         
-        linkAttributes[itemLinkLabelAttribute] = .string(itemLinkValue)
+        linkAttributes[itemLinkLabelAttribute] = .string(itemLinkLabel)
 
         representedNode.connect(to: item, attributes: linkAttributes)
     }

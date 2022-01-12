@@ -5,8 +5,8 @@ import XCTest
 final class GraphMemoryTests: XCTestCase {
     func testAdd() throws {
         let graph = GraphMemory()
-        let a = Thing("Node A")
-        let b = Thing("Node B")
+        let a = Node()
+        let b = Node()
 
         graph.add(a)
         XCTAssertTrue(graph.contains(node: a))
@@ -18,10 +18,10 @@ final class GraphMemoryTests: XCTestCase {
     func testConnect() throws {
 
         let memory = GraphMemory()
-        let a = Thing("Node A")
+        let a = Node()
 
         memory.add(a)
-        let b = Thing("Node B")
+        let b = Node()
         memory.add(b)
 
         let link = memory.connect(from: a, to: b)
@@ -59,8 +59,8 @@ final class GraphMemoryTests: XCTestCase {
 //    }
     func testRemoveConnection() throws {
         let memory = GraphMemory()
-        let a = Thing("Node A")
-        let b = Thing("Node B")
+        let a = Node()
+        let b = Node()
         var link: Link
 
         memory.add(a)
@@ -74,7 +74,7 @@ final class GraphMemoryTests: XCTestCase {
 
     func testRemoveNode() throws {
         let memory = GraphMemory()
-        let a = Thing("Node A")
+        let a = Node()
         memory.add(a)
         memory.remove(a)
 
@@ -83,9 +83,9 @@ final class GraphMemoryTests: XCTestCase {
 
     func testOutgoingIncoming() throws {
         let memory = GraphMemory()
-        let a = Thing("Node A")
-        let b = Thing("Node B")
-        let c = Thing("Node C")
+        let a = Node()
+        let b = Node()
+        let c = Node()
         memory.add(a)
         memory.add(b)
         memory.add(c)
@@ -108,8 +108,8 @@ final class GraphMemoryTests: XCTestCase {
 
     func testRemoveConnected() throws {
         let memory = GraphMemory()
-        let a = Thing("Node A")
-        let b = Thing("Node B")
+        let a = Node()
+        let b = Node()
 
         memory.add(a)
         memory.add(b)

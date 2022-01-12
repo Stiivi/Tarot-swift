@@ -5,20 +5,10 @@
 //  Created by Stefan Urbanek on 2021/10/20.
 //
 
-// TODO: The Traits are not final, still under design and consideration.
 
 /// Object representing a node of a graph.
 ///
-// FIXME: make Final (same with link)
-open class Node: Object {
-    public var trait: Trait? = nil
-}
-
-
-/// Convenience methods that forward to the graph memory.
-///
-extension Node {
-    
+public final class Node: Object {
     public var outgoing: [Link] {
         return graph!.outgoing(self)
     }

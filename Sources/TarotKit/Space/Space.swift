@@ -88,9 +88,6 @@ public class Space {
     /// Graph memory containing objects within the space.
     public let memory: GraphMemory
     
-    /// Semantics of the graph memory.
-    public let model: Model
-    
     /// Node that represents the space's catalog - mapping of names to objects.
     /// Typically catalog items are collections.
     ///
@@ -98,16 +95,10 @@ public class Space {
     ///
     public var catalog: Dictionary? = nil
     
-    /// Create an empty space with a given model.
+    /// Create an empty space.
     ///
-    public init(model: Model? = nil) {
+    public init() {
         memory = GraphMemory()
-        if let model = model {
-            self.model = model
-        }
-        else {
-            self.model = Model(name: "__default", traits: [])
-        }
     }
     
     // Store reading and writing.
@@ -162,10 +153,6 @@ public class Space {
         // FIXME: Model is not preserved here
 
         memory = GraphMemory()
-        // Create an empty model for now
-        // FIXME: Load the model from the store
-        model = Model(name: "__default", traits: [])
-
         // Read nodes
         // ---------------------------------------------------------------
         // TODO: Document that we are using __id here

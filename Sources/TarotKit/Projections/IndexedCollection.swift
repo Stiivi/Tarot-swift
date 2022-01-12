@@ -7,34 +7,45 @@
 
 import Records
 
-/// Projection of a node that represents a collection of items that are ordered
-/// by index.
+/// Indexed collection is a neighbourhood where links are indexed by an index
+/// attribute.
 ///
-public class IndexedCollection: Collection {
-    public var linkIndexAttribute: String {
-        representedNode["linkIndexAttribute"]?.stringValue() ?? "index"
-    }
-    override public var linkOrderAttribute: String {
-        linkIndexAttribute
+public class IndexedCollection: TypedNeighbourhood {
+    public let linkIndexAttribute: String
+
+    /// Creates a projection for an indexed collection.
+    public init(_ node: Node, linkType: LabelledLinkType, indexAttribute: String = "index") {
+        self.linkIndexAttribute = indexAttribute
+        super.init(node, linkType: linkType)
     }
 
-    /// Get links ordered by index
-    public var linksByIndex: [Link] {
-        // TODO: What about corrupted ones with invalid or empty index?
-        orderedItemLinks(orderBy: linkIndexAttribute)
+    /// Get count of links in the collection.
+    ///
+    public var count: Int {
+        return links.count
     }
     
-    /// Get collection items ordered by index.
-    override public var items:[Node] {
-        return linksByIndex.map { $0.target }
+    /// Get links ordered by index.
+    ///
+    /// - Complexity: O(n log n), where n is number of links in the
+    /// neighbourhood.
+    ///
+    override public var links: [Link] {
+        var links = super.links
+        links.sort { left, right in
+            guard let lhs = left[linkIndexAttribute] else {
+                // TODO: This is arbitrary decision where we place invalid empty index
+                return false
+            }
+            guard let rhs = right[linkIndexAttribute] else {
+                // TODO: This is arbitrary decision where we place invalid empty index
+                return false
+            }
+            return lhs.isLessThan(other: rhs)
+        }
+        return links
     }
     
-    /// Get a link to the first node in the collection.
-    public var firstLink: Link? { linksByIndex.first }
-
-    /// Get a link to the last node in the collection.
-    public var lastLink: Link? { linksByIndex.last }
-
     /// End index of the collection. All indexes in the collection are lower
     /// than the end index. One can use it in iteration:
     ///
@@ -45,9 +56,13 @@ public class IndexedCollection: Collection {
     ///     let node = collection.node(at: index)
     ///     // do something with the node
     /// }
+    /// ```
+    ///
+    /// - Complexity: O(n log n), where n is number of links in the
+    /// neighbourhood.
     ///
     public var endIndex: Int {
-        if let link = lastLink {
+        if let link = links.last {
             // TODO: We might run into an integrity issue here
             // If a link exists but the index attribute is not convertible to int
             if let index = link[linkIndexAttribute]?.intValue() {
@@ -72,26 +87,37 @@ public class IndexedCollection: Collection {
     /// collection to the node. The function will set special projection
     /// attributes of the link such as label and index value.
     ///
+    /// - Complexity: O(n log n), where n is number of links in the
+    /// neighbourhood.
+    ///
     public func append(_ node: Node, attributes: [String:Value] = [:]) {
         let index = endIndex
         
         var linkAttributes = attributes
-        
-        linkAttributes[itemLinkLabelAttribute] = .string(itemLinkValue)
         linkAttributes[linkIndexAttribute] = .int(index)
 
-        representedNode.connect(to: node, attributes: linkAttributes)
+        self.add(node, attributes:linkAttributes)
     }
     
     /// Return a node at index `index` or `nil` when there is no node at that
     /// index. There might be no node at given index if the index is out of
     /// bounds or when the represented node has broken integrity.
     ///
+    /// - Complexity: O(n log n), where n is number of links in the
+    /// neighbourhood.
+    ///
     public func node(at index: Int) -> Node? {
-        let links = linksByIndex
+        let links = self.links
         guard index >= 0 && index < links.count else {
             return nil
         }
         return links[index].target
+    }
+}
+
+extension IndexedCollection: Sequence {
+    public typealias Iterator = Array<Node>.Iterator
+    public func makeIterator() -> Iterator {
+        return nodes.makeIterator()
     }
 }

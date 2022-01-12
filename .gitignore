@@ -1,3 +1,4 @@
+.swiftpm
 .DS_Store
 Package.resolved
 /out
@@ -7,4 +8,5 @@ Package.resolved
 xcuserdata/
 DerivedData/
 /Sandbox
+/Archive
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata

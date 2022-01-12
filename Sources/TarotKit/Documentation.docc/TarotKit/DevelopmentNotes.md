@@ -12,6 +12,8 @@ Design principle:
 - Purity of abstraction has its practical limits
 - Multple perspectives on structures exists and is more common than exception
 - Primarily porovide mechanisms, then provide convenience policies
+- Synthesis and mutability of structures is primary functionality, analysis
+  is secondary.
 
 ## Know Debt and Out of Scope
 

@@ -235,15 +235,6 @@ public class RelationalPackageLoader: Loader {
             fatalError("Unable to load package: \(source)")
         }
         
-        let model: Model
-        // Try to load the package model from `model.json`
-        //
-        let json = try Data(contentsOf: package.modelURL)
-        model = try JSONDecoder().decode(Model.self, from: json)
-        
-        // FIXME: Move model handling outside of this
-        space.model.merge(model)
-
         // Load the data
         // ---------------------------------------------------------------
 

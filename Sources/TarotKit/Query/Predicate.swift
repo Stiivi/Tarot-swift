@@ -7,6 +7,10 @@
 
 import Records
 
+
+// TODO: Nodes with attribute set: AttributeExistencePredicate?
+// TODO: Links with atrtibute set: AttributeExistencePredicate?
+
 /*
  
  # Design Notes
@@ -37,28 +41,6 @@ struct CompoundPredicate {
     
 }
 
-
-/// Predicate that matches objects with given trait
-///
-public struct TraitPredicate: ObjectPredicate {
-    public let traitName: String
-    
-    public init(traitName: String) {
-        self.traitName = traitName
-    }
-    
-    public func matches(_ object: Object) -> Bool {
-        guard let node = object as? Node else {
-            return false
-        }
-        
-        guard let trait = node.trait else {
-            return false
-        }
-        
-        return trait.name == traitName
-    }
-}
 
 /// Predicate that compares multiple parameters and their values for equality.
 ///
