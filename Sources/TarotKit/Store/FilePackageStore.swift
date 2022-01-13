@@ -29,7 +29,7 @@ public struct FilePackageStoreInfo: Codable {
     let version: Int
 }
 
-/// Store the object memory in a directory with one JSON file per graph object.
+/// Store the graph in a directory with one JSON file per graph object.
 ///
 /// ## File Structure
 ///
@@ -291,7 +291,7 @@ public class FilePackageStore: PersistentStore {
     }
     
     /// Fetch all objects from the store. The fetched objects have ID associated
-    /// but are not associated with a memory. It is up to the object memory
+    /// but are not associated with a graph. It is up to the graph
     /// to finalize the association.
     ///
     public func fetchAll(type: String) throws -> [StoreRecord] {

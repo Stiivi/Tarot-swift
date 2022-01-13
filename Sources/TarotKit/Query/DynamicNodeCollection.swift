@@ -18,7 +18,7 @@ public class DynamicNodeCollection: RandomAccessCollection {
     public typealias SubSequence = Array<Node>.SubSequence
     public typealias Indices = Array<Node>.Indices
     
-    public let graph: GraphMemory
+    public let graph: Graph
     public let predicate: ObjectPredicate
     public var _nodes: [Node]?
 
@@ -49,7 +49,7 @@ public class DynamicNodeCollection: RandomAccessCollection {
         _nodes = nodes
     }
     
-    public init(graph: GraphMemory, predicate: ObjectPredicate) {
+    public init(graph: Graph, predicate: ObjectPredicate) {
         self.graph = graph
         self.predicate = predicate
         

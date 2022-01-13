@@ -38,9 +38,9 @@ Available formats: markdown.
         // tarot extract Card
         //
         mutating func run() throws {
-            let space = openSpace(options: options)
-            guard let catalog = space.catalog else {
-                fatalError("Space has no catalog.")
+            let manager = createManager(options: options)
+            guard let catalog = manager.catalog else {
+                fatalError("No catalog found in the store.")
             }
 
             guard let testURL = URL(string: output) else {
@@ -74,10 +74,10 @@ Available formats: markdown.
             try exporter.export(node: node, into: outputURL)
             
 //            if let traitName = traitName {
-//                nodes = space.memory.filter(traitName: traitName)
+//                nodes = manager.graph.filter(traitName: traitName)
 //            }
 //            else {
-//                nodes = Array(space.memory.nodes)
+//                nodes = Array(manager.graph.nodes)
 //            }
 //
 //            let encoder = JSONEncoder()

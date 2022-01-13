@@ -13,13 +13,12 @@ extension Tarot {
     struct List: ParsableCommand {
         static var configuration
             = CommandConfiguration(abstract: "List named nodes")
-
         @OptionGroup var options: Options
 
         mutating func run() {
-            let space = openSpace(options: options)
+            let manager = createManager(options: options)
             
-            guard let catalog = space.catalog else {
+            guard let catalog = manager.catalog else {
                 fatalError("Database has no catalog.")
             }
             

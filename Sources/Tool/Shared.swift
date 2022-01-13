@@ -41,10 +41,10 @@ func databaseURL(options: Options) -> URL {
     }
 }
 
-/// Opens a space from a package specified in the options.
+/// Opens a graph from a package specified in the options.
 ///
-func openSpace(options: Options) -> Space {
-    let space: Space
+func createManager(options: Options) -> GraphManager {
+    let manager: GraphManager
     let dataURL = databaseURL(options: options)
     let store: FilePackageStore
 
@@ -56,18 +56,18 @@ func openSpace(options: Options) -> Space {
     }
     
     do {
-        space = try Space(store: store)
+        manager = try GraphManager(store: store)
     }
     catch {
-        fatalError("Unable to initialize space: \(error)")
+        fatalError("Unable to initialize manager: \(error)")
     }
     
-    return space
+    return manager
 }
 
-/// Finalize operations on space and save the space to its store.
+/// Finalize operations on graph and save the graph to its store.
 ///
-func finalizeSpace(space: Space, options: Options) throws {
+func finalizeManager(manager: GraphManager, options: Options) throws {
     let dataURL = databaseURL(options: options)
     let store: FilePackageStore
 
@@ -78,5 +78,5 @@ func finalizeSpace(space: Space, options: Options) throws {
         fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
     }
 
-    try space.save(to: store)
+    try manager.save(to: store)
 }

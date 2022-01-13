@@ -12,9 +12,6 @@ import Markdown
 
 
 final class MarkdownReaderTests: XCTestCase {
-    var graph: GraphMemory! = nil
-    var space: Space! = nil
-    
     func testAcceptEmptyContentBlock() throws {
         let document = Markdown.Document(parsing: "")
         let reader = MarkdownReader(document: document)

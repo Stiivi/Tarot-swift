@@ -5,7 +5,7 @@
 //  Created by Stefan Urbanek on 30/12/2021.
 //
 
-extension GraphMemory {
+extension Graph {
     /// Filters nodes based on the predicate
     ///
     public func filterNodes(predicate: ObjectPredicate) -> [Node] {

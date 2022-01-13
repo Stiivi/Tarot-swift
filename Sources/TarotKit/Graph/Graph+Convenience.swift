@@ -7,7 +7,7 @@
 
 import Records
 
-extension GraphMemory {
+extension Graph {
     @discardableResult
     public func connect(from origins: [Node], to target: Node, attributes: [String:Value]=[:]) -> [Link] {
         let links: [Link]

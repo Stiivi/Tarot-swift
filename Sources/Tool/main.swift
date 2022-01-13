@@ -44,11 +44,11 @@ extension Tarot {
         var reference: Int
 
         mutating func run() {
-            let space = openSpace(options: options)
+            let manager = createManager(options: options)
 
             print("Node: \(reference)")
             
-            guard let object: Object = space.memory.node(reference) ?? space.memory.link(reference) else {
+            guard let object: Object = manager.graph.node(reference) ?? manager.graph.link(reference) else {
                 fatalError("Unknown object: \(reference)")
             }
 
@@ -79,15 +79,15 @@ extension Tarot {
 
         
         mutating func run() {
-            let space = openSpace(options: options)
+            let manager = createManager(options: options)
             
             let exporter = DotExporter(path: output,
                                        name: name,
                                        labelAttribute: labelAttribute)
 
             // TODO: Allow export of a selection
-            exporter.export(nodes: Array(space.memory.nodes),
-                            links: Array(space.memory.links))
+            exporter.export(nodes: Array(manager.graph.nodes),
+                            links: Array(manager.graph.links))
         }
     }
 }

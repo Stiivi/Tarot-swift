@@ -1,22 +1,22 @@
-# Graph Memory
+# Graph 
 
 ## Overview
 
-Graph memory is an object that represents and manipulates an oriented labelled
-graph. It is composed of nodes and links between the nodes. Graph memory and
-associated structures are the core of TarotKit.
+Graph is an object that represents a mutable structure of a graph – a structure
+composed of nodes and links between the nodes. ``Graph``, ``Link`` and ``Node``
+are the core of TarotKit.
 
 
 ## Topics
 
 ### The Graph
 
-- ``GraphMemory``
+- ``Graph``
 - ``Node``
 - ``Link``
 - ``Object``
 
-- ``GraphMemoryDelegate``
+- ``GraphDelegate``
 
 ### Associated Types
 

@@ -1,5 +1,5 @@
 //
-//  GraphMemory.swift
+//  Graph.swift
 //
 //
 //  Created by Stefan Urbanek on 2021/10/5.
@@ -9,7 +9,7 @@
 // IMPORTANT: This is the core structure of this framework. Be very considerate
 //            when adding new functionality. If functionality can be achieved
 //            by using existing functionality, then add it to an extension
-//            (file GraphMemory+Convenience or similar). Optimisation is not
+//            (file Graph+Convenience or similar). Optimisation is not
 //            a reason to add functionality here at this moment.
 // -------------------------------------------------------------------------
 
@@ -19,11 +19,11 @@
 // TODO: Move Value functionality from Records to this module
 import Records
 
-/// Protocol for a basic graph memory implementation. This protocol is
+/// Protocol for a basic graph implementation. This protocol is
 /// a scaffolding for development - it helps to separate interface from the
 /// implementaiton.
 ///
-public protocol GraphMemoryProtocol {
+public protocol GraphProtocol {
     // TODO: There is add(Node) but no add(Link)
     // TODO: There is connect(...) as a creation method but not add(Link)
     // TODO: There is connect(...) as a creation method but not createNode(...)
@@ -39,9 +39,9 @@ public protocol GraphMemoryProtocol {
     /// outgoing from the node.
     func remove(_ node: Node)
     
-    /// Create a link in the memory.
+    /// Create a link in the graph.
     func connect(from origin:Node, to target:Node, attributes:[AttributeKey:AttributeValue]) -> Link
-    /// Remove a link from the memory
+    /// Remove a link from the graph
     func disconnect(link: Link)
     
 //    /// Set attribute of a node. Return previous attribute value.
@@ -59,25 +59,28 @@ public protocol GraphMemoryProtocol {
 }
 
 
-/// Graph Memory is a mutable graph container. It contains nodes and links and
-/// provides functionality for modifying the graph.
+/// Graph is a mutable structure representing a directed labelled multi-graph.
+/// The graph is composed of nodes (vertices) and links (edges between
+/// vertices).
 ///
+/// The main functionality of the graph structure is to mutate the graph:
+/// ``Graph.add(node:)``, ``Graph.connect(...)``.
 ///
 /// # Example
 ///
 /// ```swift
-/// let memory = GraphMemory()
+/// let graph = Graph()
 ///
 /// let parent = Node()
-/// memory.add(parent)
+/// graph.add(parent)
 ///
 /// let leftChild = Node()
-/// memory.add(leftChild)
-/// memory.connect(from: parent, to: leftChild, at: "left")
+/// graph.add(leftChild)
+/// graph.connect(from: parent, to: leftChild, at: "left")
 ///
 /// let rightChild = Node()
-/// memory.add(rightChild)
-/// memory.connect(from: parent, to: leftChild, at: "right")
+/// graph.add(rightChild)
+/// graph.connect(from: parent, to: leftChild, at: "right")
 /// ```
 ///
 /// - Remark: For engineers out there: This is a "domain specific problem environment object", or a
@@ -85,7 +88,7 @@ public protocol GraphMemoryProtocol {
 /// for general purpose use. It does not mean it might not change in the future.
 ///
 // NOTE: Status: Stable
-public class GraphMemory {
+public class Graph {
     /// Mapping between node IDs and node objects.
     private var nodeIndex: [OID:Node] = [:]
     
@@ -98,9 +101,9 @@ public class GraphMemory {
     
     /// An object that will receive notifications on changes in the graph.
     ///
-    public var delegate: GraphMemoryDelegate? = nil
+    public var delegate: GraphDelegate? = nil
     
-    /// Create an empty graph memory.
+    /// Create an empty graph.
     ///
     /// - Parameters:
     ///   - idGenerator: Generator of unique IDs. Default is ``SequenceIDGenerator``.
@@ -168,12 +171,13 @@ public class GraphMemory {
         delegate?.graph(self, didAdd: node)
     }
     
-    /// Removes node from the space and removes all incoming and outgoing links
+    /// Removes node from the graph and removes all incoming and outgoing links
     /// for that node.
     ///
+    // TODO: This should be more atomic and shuold not remove a node if there are any links
     public func remove(_ node: Node) {
         guard node.graph === self else {
-            fatalError("Trying to dissociate a node from another memory")
+            fatalError("Trying to dissociate a node from another graph")
         }
         guard let oid = node.id else {
             fatalError("Trying to dissociate a node without id")
@@ -404,11 +408,11 @@ public class GraphMemory {
         }
         return links.contains { $0.origin === node || $0.target === node }
     }
-    
 }
 
-extension GraphMemory: CustomStringConvertible {
+
+extension Graph: CustomStringConvertible {
     public var description: String {
-        "GraphMemory(nodes: \(nodes.count), links: \(links.count))"
+        "Graph(nodes: \(nodes.count), links: \(links.count))"
     }
 }

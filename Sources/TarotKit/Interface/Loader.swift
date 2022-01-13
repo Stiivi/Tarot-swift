@@ -8,17 +8,17 @@
 import Foundation
 import Records
 
-/// Protocol for objects that load graphs from a source into a graph memory.
+/// Protocol for objects that load graphs from a source into a graph.
 ///
 /// - Status: Experimental
 ///
 public protocol Loader {
-    /// Create a loader and associate it with a space.
+    /// Create a loader and associate it with a graph manager
     ///
     // TODO: Remove this requirement
-    init(space: Space)
+    init(manager: GraphManager)
     
-    /// Load graph from `source` into the associated space. Returns a node
+    /// Load graph from `source` into a graph. Returns a node
     /// that represents the loaded batch. Returns `nil` if there is no
     /// represented node for the batch.
     ///

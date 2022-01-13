@@ -18,9 +18,6 @@
  - application facing object, something like a controller
  - maybe should be called GraphController or GraphManager?
  
- - memory
- - model
- 
  - collections
     - custom created collections of nodes of assorted type
  - perspectives
@@ -37,68 +34,66 @@ import Records
 // TODO: Add semantics to connections, such as "name"
 // TODO: Add removal of multiple nodes
 
-/// Space is an object that provides working context to the graph memory.
-/// A Space represents a problem or a project. Space associates a graph memory
-/// with its semantic model.
+/// GraphManager is an object that provides working context to the graph.
+/// It also manages special nodes in the graph such as Catalog.
 ///
 /// ## Catalog
 ///
-/// Space also provides a catalog of named nodes in the graph, usually
-/// collections. Catalog is used to refer to objects of interest directly
-/// without need of search for them.
+/// Catalog is a special node that allows looking up nodes by their names.
 ///
 /// To set names for objects in the catalog:
 ///
 /// ```swift
-/// let space: Space
+/// let manager: GraphManager
 /// let chapter: Node
 ///
-/// space.catalog["Chapter 1"] = chapter
+/// manager.catalog["Chapter 1"] = chapter
 /// ```
 ///
 /// To retrieve a named object from the catalog:
 ///
 /// ```swift
-/// let space: Space
-/// let chapter = space.catalog["Chapter 1"]
+/// let manager: GraphManager
+/// let chapter = manager.catalog["Chapter 1"]
 ///
 /// ```
 ///
 ///
 /// ## Persistence
 ///
-/// Space can be persisted into a store and later loaded from the store. For
-/// example to initialize a space from a file store:
+/// Graph can be persisted into a store and later loaded from the store. For
+/// example to initialize a graph from a file store:
 ///
 /// ```swift
 /// let dataURL = URL(fileURLWithPath: "Cards.tarot", isDirectory: true)
 /// let store = try FilePackageStore(url: dataURL)
-/// let space = try Space(store: store)
+/// let manager = try GraphManager(store: store)
 /// ```
 ///
-/// Later we can persist the space into the store:
+/// Later we can persist the graph into the store:
 ///
 /// ```swift
-/// try space.save(to: store)
+/// try manager.save(to: store)
 ///```
 ///
 /// For further reading about stores read <doc:Persistence>
 ///
-public class Space {
-    /// Graph memory containing objects within the space.
-    public let memory: GraphMemory
+public class GraphManager {
+    /// Graph that the manager manages.
+    ///
+    public let graph: Graph
     
-    /// Node that represents the space's catalog - mapping of names to objects.
+    /// Node that represents the graph's catalog - mapping of names to objects.
     /// Typically catalog items are collections.
     ///
     /// Catalog is a collection node.
     ///
     public var catalog: Dictionary? = nil
     
-    /// Create an empty space.
+    /// Create a manager with an empty graph.
     ///
     public init() {
-        memory = GraphMemory()
+        graph = Graph()
     }
     
     // Store reading and writing.
@@ -111,14 +106,14 @@ public class Space {
     /// It is intentionally longer to not to conflic with potential user keys.
     static let targetRecordKey = "__link_target"
 
-    /// Write the whole space in a store.
+    /// Write the whole graph and associated structures in a store.
     public func save(to store: PersistentStore) throws {
         // TODO: This is prone to corruption
         try store.deleteAll()
         
         // Write nodes
         // ---------------------------------------------------------------
-        for node in memory.nodes {
+        for node in graph.nodes {
             let id = String(node.id!)
             let record = StoreRecord(type: "node",  id: id, values: node.attributes)
             try store.save(record: record)
@@ -126,12 +121,12 @@ public class Space {
         
         // Write links
         // ---------------------------------------------------------------
-        for link in memory.links {
+        for link in graph.links {
             let id = String(link.id!)
             let record = StoreRecord(type: "link", id: id, values: link.attributes)
 
-            record[Space.originRecordKey] = .int(link.origin.id!)
-            record[Space.targetRecordKey] = .int(link.target.id!)
+            record[GraphManager.originRecordKey] = .int(link.origin.id!)
+            record[GraphManager.targetRecordKey] = .int(link.target.id!)
             try store.save(record: record)
         }
         
@@ -145,14 +140,13 @@ public class Space {
 
     }
     
-    /// Read the whole space from a store.
-    /// Create a space from a storage.
+    /// Read the graph from a store.
     ///
 
     public init(store: PersistentStore) throws {
         // FIXME: Model is not preserved here
 
-        memory = GraphMemory()
+        graph = Graph()
         // Read nodes
         // ---------------------------------------------------------------
         // TODO: Document that we are using __id here
@@ -165,7 +159,7 @@ public class Space {
             }
             
             let node = Node(id: id, attributes: attributes)
-            memory.add(node)
+            graph.add(node)
         }
         
         // Read links
@@ -177,8 +171,8 @@ public class Space {
             let originID = OID(record[Self.originRecordKey]!.intValue()!)
             let targetID = OID(record[Self.targetRecordKey]!.intValue()!)
 
-            let origin = memory.node(originID)!
-            let target = memory.node(targetID)!
+            let origin = graph.node(originID)!
+            let target = graph.node(targetID)!
             
             var attributes: [String:Value] = [:]
             for key in record.keys {
@@ -187,13 +181,13 @@ public class Space {
                 }
             }
             
-            memory.connect(from: origin, to: target, attributes: attributes, id: id)
+            graph.connect(from: origin, to: target, attributes: attributes, id: id)
         }
     
         // FIXME: Handle errors here
         if let record = try store.fetch(id: "catalog") {
             let catalogNodeID = OID(record["node"]!.intValue()!)
-            let node = memory.node(catalogNodeID)!
+            let node = graph.node(catalogNodeID)!
             catalog = Dictionary(node)
         }
         else {

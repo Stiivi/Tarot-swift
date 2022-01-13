@@ -34,7 +34,7 @@ guessed.
     var source: String
 
     mutating func run() throws {
-        let space = openSpace(options: options)
+        let manager = createManager(options: options)
         guard let testURL = URL(string: source) else {
             fatalError("Invalid resource reference: \(source)")
         }
@@ -84,9 +84,9 @@ guessed.
         
         switch format {
         case "package":
-            loader = RelationalPackageLoader(space: space)
+            loader = RelationalPackageLoader(manager: manager)
         case "markdown":
-            loader = MarkdownLoader(space: space)
+            loader = MarkdownLoader(manager: manager)
         default:
             fatalError("Unknown input format: \(format)")
         }
@@ -97,7 +97,7 @@ guessed.
         
         
         if let importedNode = try loader.load(from: sourceURL) {
-            if let catalog = space.catalog {
+            if let catalog = manager.catalog {
                 catalog.setKey(name, for: importedNode)
                 print("Import finished. Imported object name: \(name)")
             }
@@ -109,7 +109,7 @@ guessed.
             print("Import finished. No represented object created by import, import node name was ignored.")
         }
         
-        try finalizeSpace(space: space, options: options)
+        try finalizeManager(manager: manager, options: options)
     }
 }
 

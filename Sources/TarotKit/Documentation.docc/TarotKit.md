@@ -4,28 +4,28 @@ An intertangled knowledge caputre system with multiple perspectives.
 
 Tarot is a graph based knowledge codification system. It means that the
 bits of knowledge are preserved in a non-linear inter-connected form. The core
-structure is a ``GraphMemory`` that represents a directed labelled multi-graph.
+structure is a ``Graph`` that represents a directed labelled multi-graph.
 That means that the structure is composed of nodes and links between the nodes
 and that both the nodes and links can have information associated with them.
-Graph memory stores a dictionary of scalar attributes of few basic types.
+Graph stores a dictionary of scalar attributes of few basic types.
 
 See also: <doc:DevelopmentNotes>
 
 
 ## Topics
 
-### Graph Memory
+### Graph
 
-Graph memory is an object that represents and manipulates an oriented labelled
-graph. It is composed of nodes and links between the nodes. Graph memory and
+Graph is an object that represents a mutable oriented labelled graph structure.
+It is composed of nodes and links between the nodes. Graph and
 associated structures are the core of TarotKit.
 
 - <doc:Graph>
 
-### Space
+### Graph Manager
 
 
-- ``Space``
+- ``GraphManager``
 
 
 ### Projections

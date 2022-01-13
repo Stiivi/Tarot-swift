@@ -9,9 +9,9 @@ import XCTest
 @testable import TarotKit
 
 final class QueryTests: XCTestCase {
-    var graph: GraphMemory?
+    var graph: Graph?
     override func setUp() {
-        graph = GraphMemory()
+        graph = Graph()
         let nodes = [
             Node(attributes: ["name":"one", "number": "10"]),
             Node(attributes: ["name":"two", "number": "20"]),

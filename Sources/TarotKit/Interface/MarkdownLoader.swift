@@ -40,10 +40,10 @@ public class MarkdownLoader: Loader {
     public var currentHeading: Heading?
     public var currentNode: Node?
     
-    let space: Space
+    let manager: GraphManager
     
-    required public init(space: Space) {
-        self.space = space
+    required public init(manager: GraphManager) {
+        self.manager = manager
     }
     
     public func load(from source: URL) throws -> Node? {
@@ -98,7 +98,7 @@ public class MarkdownLoader: Loader {
         }
         attributes["level"] = .int(section.level)
         let sectionNode = Node(attributes: attributes)
-        space.memory.add(sectionNode)
+        manager.graph.add(sectionNode)
 
         // 1. Load subsections
         for (index, subsection) in section.subsections.enumerated() {
@@ -107,7 +107,7 @@ public class MarkdownLoader: Loader {
                 "label": "subsection",
                 "order": .int(index),
             ]
-            space.memory.connect(from: sectionNode,
+            manager.graph.connect(from: sectionNode,
                                  to: node,
                                  attributes: attributes)
         }
@@ -121,9 +121,9 @@ public class MarkdownLoader: Loader {
                 "text": .string(block.format())
             ]
             let blockNode = Node(attributes: blockAttributes)
-            space.memory.add(blockNode)
+            manager.graph.add(blockNode)
 
-            space.memory.connect(from: sectionNode,
+            manager.graph.connect(from: sectionNode,
                                  to: blockNode,
                                  attributes: blockAttributes)
         }

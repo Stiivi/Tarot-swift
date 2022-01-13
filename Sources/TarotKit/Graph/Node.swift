@@ -23,14 +23,14 @@ public final class Node: Object {
     }
     
     /// Flag whether the node has no outgoing links.
-    /// See ``GraphMemory/isSink(_:)`` for more information.
+    /// See ``Graph/isSink(_:)`` for more information.
     public var isSink: Bool  { graph!.isSink(self) }
 
     /// Flag whether the node has no incoming links.
-    /// See ``GraphMemory/isSource(_:)`` for more information.
+    /// See ``Graph/isSource(_:)`` for more information.
     public var isSource: Bool  { graph!.isSource(self) }
 
     /// Flag whether the node has no links associated with it.
-    /// See ``GraphMemory/isOrphan(_:)`` for more information.
+    /// See ``Graph/isOrphan(_:)`` for more information.
     public var isOrphan: Bool  { graph!.isOrphan(self) }
 }

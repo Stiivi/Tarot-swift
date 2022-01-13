@@ -22,7 +22,7 @@ public typealias AttributeValue = Value
 /// Type for a dictionary of graph object attributes.
 public typealias AttributeDictionary = [AttributeKey:AttributeValue]
 
-/// An abstract class representing all objects in a graph memory. Concrete
+/// An abstract class representing all objects in a graph. Concrete
 /// kinds of graph objects are ``Node`` and ``Link``. Graph objects can store
 /// information in form of attributes and their values.
 ///
@@ -30,9 +30,9 @@ public typealias AttributeDictionary = [AttributeKey:AttributeValue]
 /// constraints or validations for the attributes of graph objects.
 ///
 open class Object: Identifiable {
-    /// Graph memory that the object is associated with.
+    /// Graph the object is associated with.
     ///
-    public internal(set) var graph: GraphMemory?
+    public internal(set) var graph: Graph?
     
     
     /// A dictionary of object's attributes.
@@ -45,14 +45,14 @@ open class Object: Identifiable {
         return Array(attributes.keys)
     }
 
-    /// Identifier of the object that is unique within the owning memory.
-    /// The attribute is populated when the object is associated with a memory.
-    /// When the object is disassociate from a memory, the identifier is set to
+    /// Identifier of the object that is unique within the owning graph.
+    /// The attribute is populated when the object is associated with a graph.
+    /// When the object is disassociate from a graph, the identifier is set to
     /// `nil`.
     ///
     public internal(set) var id: OID?
     
-    /// Create an empty object. The object needs to be associated with a memory.
+    /// Create an empty object. The object needs to be associated with a graph.
     ///
     public init(id: OID?=nil, attributes: [AttributeKey:AttributeValue]=[:]) {
         self.id = id
@@ -64,7 +64,7 @@ open class Object: Identifiable {
             return attributes[key]
         }
         set(value) {
-            // #FIXME: Notify memory delegate
+            // #FIXME: Notify graph delegate
             attributes[key] = value
         }
     }

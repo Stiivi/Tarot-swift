@@ -11,11 +11,11 @@ import XCTest
 
 final class DictionaryTests: XCTestCase {
     var nodes: [Node]! = nil
-    var graph: GraphMemory! = nil
+    var graph: Graph! = nil
     var collectionNode: Node! = nil
     
     override func setUp() {
-        graph = GraphMemory()
+        graph = Graph()
         
         nodes = [
             Node(attributes: ["name":"one", "number": "10"]),

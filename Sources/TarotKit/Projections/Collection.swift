@@ -29,11 +29,10 @@ import Records
 /// Then the chapter would be a collection node and paragraphs would be
 /// collection's items.
 ///
-/// Because the system does not enforce any specific link labelling, we follow
-/// the labelling we have created for our space. Say we label the links under
-/// link's attribute `label`. Then our collection's ``itemLinkLabelAttribute`` would
-/// be `label` and ``itemLinkValue`` woul be `item`. Example of such link would
-/// be:
+/// The system does not enforce any specific link labelling. Say we label the
+/// links under link's attribute `label`. Then our collection's
+/// ``itemLinkLabelAttribute`` would be `label` and ``itemLinkValue`` woul be
+/// `item`. Example of such link would be:
 ///
 /// ```swift
 /// graph.connect(from: chapter,

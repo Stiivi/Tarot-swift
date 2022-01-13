@@ -137,7 +137,7 @@ public class RelationalPackageInfo: Decodable {
 
 /// Relational data package.
 ///
-/// This class describes a collection of resources and metadata about a graph memory
+/// This class describes a collection of resources and metadata about a graph
 /// stored in files.
 ///
 /// Package is a directory. The content of the directory is:

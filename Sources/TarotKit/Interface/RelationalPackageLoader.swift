@@ -164,7 +164,7 @@ import Records
 /// from a database.
 ///
 public class RelationalPackageLoader: Loader {
-    let space: Space
+    let manager: GraphManager
 
     /// A nested dictionary of mapping of primary keys to nodes. The top level
     /// dictionary keys are relation names, values are dictionaries of keys. The
@@ -191,8 +191,8 @@ public class RelationalPackageLoader: Loader {
     ///
     var foreignKeyLinkDescriptions: [ForeignKeyLinkDescription] = []
 
-    public required init(space: Space) {
-        self.space = space
+    public required init(manager: GraphManager) {
+        self.manager = manager
     }
     
     /// Registers a key for a node within a relation. If a key already exists
@@ -224,7 +224,7 @@ public class RelationalPackageLoader: Loader {
         return keyNodeMaps[name]?[key]
     }
 
-    /// Load graph contained in the package into the associated space.
+    /// Load graph contained in the package into the associated graph.
     ///
     /// For more information see: `class:Package`
     ///
@@ -242,7 +242,7 @@ public class RelationalPackageLoader: Loader {
     }
 
     
-    /// Loads a relational package into the space.
+    /// Loads a relational package into a graph.
     ///
     ///
     /// ## Loading Process
@@ -380,7 +380,7 @@ public class RelationalPackageLoader: Loader {
             node[field] = value
         }
         
-        space.memory.add(node)
+        manager.graph.add(node)
         return node
     }
     
@@ -445,7 +445,7 @@ public class RelationalPackageLoader: Loader {
             attributes[field] = record[field]
         }
         
-        let link = space.memory.connect(from: origin, to: target, attributes: attributes)
+        let link = manager.graph.connect(from: origin, to: target, attributes: attributes)
         return link
     }
     
@@ -465,7 +465,7 @@ public class RelationalPackageLoader: Loader {
         guard let target = node(forKey: targetKey, relation: targetRelation) else {
             throw LoaderError.unknownNode(targetKey, targetRelation)
         }
-        let link = space.memory.connect(from: origin, to: target, attributes: attributes)
+        let link = manager.graph.connect(from: origin, to: target, attributes: attributes)
         return link
     }
     

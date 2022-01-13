@@ -4,7 +4,7 @@ import XCTest
 
 final class GraphMemoryTests: XCTestCase {
     func testAdd() throws {
-        let graph = GraphMemory()
+        let graph = Graph()
         let a = Node()
         let b = Node()
 
@@ -17,7 +17,7 @@ final class GraphMemoryTests: XCTestCase {
     }
     func testConnect() throws {
 
-        let memory = GraphMemory()
+        let memory = Graph()
         let a = Node()
 
         memory.add(a)
@@ -58,7 +58,7 @@ final class GraphMemoryTests: XCTestCase {
 //        XCTAssertEqual(memory.links.count, 0)
 //    }
     func testRemoveConnection() throws {
-        let memory = GraphMemory()
+        let memory = Graph()
         let a = Node()
         let b = Node()
         var link: Link
@@ -73,7 +73,7 @@ final class GraphMemoryTests: XCTestCase {
     }
 
     func testRemoveNode() throws {
-        let memory = GraphMemory()
+        let memory = Graph()
         let a = Node()
         memory.add(a)
         memory.remove(a)
@@ -82,7 +82,7 @@ final class GraphMemoryTests: XCTestCase {
     }
 
     func testOutgoingIncoming() throws {
-        let memory = GraphMemory()
+        let memory = Graph()
         let a = Node()
         let b = Node()
         let c = Node()
@@ -107,7 +107,7 @@ final class GraphMemoryTests: XCTestCase {
     }
 
     func testRemoveConnected() throws {
-        let memory = GraphMemory()
+        let memory = Graph()
         let a = Node()
         let b = Node()
 

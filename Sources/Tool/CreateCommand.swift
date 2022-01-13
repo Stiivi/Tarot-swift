@@ -26,13 +26,13 @@ extension Tarot {
                 fatalError("Unable to create a file storage: \(error)")
             }
 
-            let space = openSpace(options: options)
+            let manager = createManager(options: options)
             
             let catalog = Node()
-            space.memory.add(catalog)
-            space.catalog = Dictionary(catalog)
+            manager.graph.add(catalog)
+            manager.catalog = Dictionary(catalog)
 
-            try finalizeSpace(space: space, options: options)
+            try finalizeManager(manager: manager, options: options)
         }
     }
 }
@@ -45,19 +45,19 @@ extension Tarot {
         @OptionGroup var options: Options
 
         mutating func run() throws {
-            let space = openSpace(options: options)
+            let manager = createManager(options: options)
             
-            guard space.catalog == nil else {
+            guard manager.catalog == nil else {
                 print("Catalog already exists. Not creating.")
                 CreateCatalog.exit()
             }
             
             let catalog = Node()
-            space.memory.add(catalog)
-            space.catalog = Dictionary(catalog)
+            manager.graph.add(catalog)
+            manager.catalog = Dictionary(catalog)
 
             print("Catalog created.")
-            try finalizeSpace(space: space, options: options)
+            try finalizeManager(manager: manager, options: options)
         }
     }
 }

@@ -11,7 +11,7 @@ import Foundation
 /// A loader that loads nothing. Development placeholder.
 ///
 public class DummyLoader: Loader {
-    public required init(space: Space) {
+    public required init(manager: GraphManager) {
         print("Dummy loader created.")
         // Do nothing
     }
