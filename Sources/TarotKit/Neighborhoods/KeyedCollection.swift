@@ -13,7 +13,7 @@ import Records
 /// unique for the dictionary.
 ///
 // TODO: Rename to KeyedNeighbourhood
-public class KeyedCollection: TypedNeighbourhood {
+public class KeyedCollection: LabelledNeighbourhood {
     /// Name of an attribute that belongs to a link refering to a dictionary
     /// node. The value of the attribute is a key that is used to lookup the
     /// node. Default is `key`.
@@ -25,9 +25,9 @@ public class KeyedCollection: TypedNeighbourhood {
     
     /// Creates a projection for a dictionary.
     ///
-    public init(_ node: Node, linkType: LinkSelector, keyAttribute: String = "key") {
+    public init(_ node: Node, selector: LinkSelector, keyAttribute: String = "key") {
         self.linkKeyAttribute = keyAttribute
-        super.init(node, linkType: linkType)
+        super.init(node, selector: selector)
     }
 
     /// List of keys in the dictionary.

@@ -33,7 +33,7 @@ final class IndexedCollectionTests: XCTestCase {
     }
     func testAppend() throws {
         let collection = IndexedCollection(collectionNode,
-                                           linkType:LinkSelector("item"),
+                                           selector:LinkSelector("item"),
                                            indexAttribute: "index")
 
         XCTAssertEqual(collection.count, 0)
@@ -61,7 +61,7 @@ final class IndexedCollectionTests: XCTestCase {
     
     func testNodeAt() throws {
         let collection = IndexedCollection(collectionNode,
-                                           linkType:LinkSelector("item"),
+                                           selector:LinkSelector("item"),
                                            indexAttribute: "index")
         collection.append(nodes[0])
         collection.append(nodes[1])

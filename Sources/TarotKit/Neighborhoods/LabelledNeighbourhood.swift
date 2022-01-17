@@ -7,25 +7,23 @@
 
 import Records
 
-/// Projection of a neighbourhood of a node where the links are of a specific
-/// type.
+/// Projection of a neighbourhood of a node where the links are matching a given
+/// link selector.
 ///
-// TODO: This should be rather named LinkProjection
-// TODO: Or this might be rather LabelledNeighbourhood
-public class TypedNeighbourhood: BaseNodeProjection {
+public class LabelledNeighbourhood: BaseNodeProjection {
     /// Type of a link that is considered to be part of the neighbourhood.
-    let linkType: LinkSelector
+    let selector: LinkSelector
 
-    /// Creates a neighbourhood with a specific link type.
+    /// Creates a neighbourhood with a specific link selector.
     ///
-    public init(_ node: Node, linkType: LinkSelector) {
-        self.linkType = linkType
+    public init(_ node: Node, selector: LinkSelector) {
+        self.selector = selector
         super.init(node)
     }
     
     /// Links in the neighbourhood of the represented node. The neghborhood
     /// links are all links where the represented node is an origin or a target
-    /// (depends on the link type) and which match the link type pattern.
+    /// (depends on the link selector) and which match the link selector pattern.
     ///
     /// Order of the links is unspecified. More concrete types of neighbourhood
     /// can return links in an order that is related to that neighbourhood.
@@ -37,14 +35,14 @@ public class TypedNeighbourhood: BaseNodeProjection {
 
         let links: [Link]
 
-        switch linkType.direction {
+        switch selector.direction {
         case .incoming:
             links = graph.incoming(representedNode).filter {
-                $0[linkType.labelAttribute] == linkType.label
+                $0[selector.labelAttribute] == selector.label
             }
         case .outgoing:
             links = graph.outgoing(representedNode).filter {
-                $0[linkType.labelAttribute] == linkType.label
+                $0[selector.labelAttribute] == selector.label
             }
         }
         
@@ -58,7 +56,7 @@ public class TypedNeighbourhood: BaseNodeProjection {
     }
 
     /// Nodes in the neighbourhood of the represented node. The neghborhood
-    /// nodes are all adjacent nodes where the link matches the link type
+    /// nodes are all adjacent nodes where the link matches the link selector
     /// pattern.
     ///
     /// Order of the nodes is unspecified. More concrete types of neighbourhood
@@ -71,7 +69,7 @@ public class TypedNeighbourhood: BaseNodeProjection {
     public var nodes: [Node] {
         let nodes: [Node]
         
-        switch linkType.direction {
+        switch selector.direction {
         case .incoming: nodes = links.map { $0.origin }
         case .outgoing: nodes = links.map { $0.target }
         }
@@ -87,14 +85,27 @@ public class TypedNeighbourhood: BaseNodeProjection {
     /// node.
     ///
     /// - Attention: Do not call this method directly. Subclasses can call this
-    ///  method to create a correct link type.
+    ///  method to create a correct link selector.
     ///
     public func add(_ node: Node, attributes: [String:Value]=[:]) {
         var linkAttributes = attributes
-        linkAttributes[linkType.labelAttribute] = linkType.label
-        switch linkType.direction {
+        linkAttributes[selector.labelAttribute] = selector.label
+        switch selector.direction {
         case .incoming: node.connect(to: representedNode, attributes: linkAttributes)
         case .outgoing: representedNode.connect(to: node, attributes: linkAttributes)
+        }
+    }
+
+    /// Remove all links from the neighbourhood.
+    ///
+    public func removeAll() {
+        guard let graph = self.graph else {
+            // Nothing to disconnect here
+            return
+        }
+        
+        for link in links {
+            graph.disconnect(link: link)
         }
     }
 }

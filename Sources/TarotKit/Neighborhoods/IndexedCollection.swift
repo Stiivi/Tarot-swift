@@ -11,13 +11,13 @@ import Records
 /// attribute.
 ///
 // TODO: Rename to IndexedNeighbourhood
-public class IndexedCollection: TypedNeighbourhood {
+public class IndexedCollection: LabelledNeighbourhood {
     public let linkIndexAttribute: String
 
     /// Creates a projection for an indexed collection.
-    public init(_ node: Node, linkType: LinkSelector, indexAttribute: String = "index") {
+    public init(_ node: Node, selector: LinkSelector, indexAttribute: String = "index") {
         self.linkIndexAttribute = indexAttribute
-        super.init(node, linkType: linkType)
+        super.init(node, selector: selector)
     }
 
     /// Get links ordered by index.

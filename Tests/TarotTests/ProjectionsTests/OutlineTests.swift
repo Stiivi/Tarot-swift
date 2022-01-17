@@ -10,7 +10,7 @@ import XCTest
 @testable import TarotKit
 
 final class OutlineTests: XCTestCase {
-    var nodes: [Node]!
+    var nodes: [Int:Node]!
     var outlineNode: Node!
     var graph: Graph!
     
@@ -37,11 +37,11 @@ final class OutlineTests: XCTestCase {
         outlineNode = Node()
         graph.add(outlineNode)
 
-        graph.connect(from: outlineNode, to: nodes[0]!,
-                      attributes: ["label":"child", "index": 0])
         graph.connect(from: outlineNode, to: nodes[1]!,
-                      attributes: ["label":"child", "index": 1])
+                      attributes: ["label":"child", "index": 0])
         graph.connect(from: outlineNode, to: nodes[2]!,
+                      attributes: ["label":"child", "index": 1])
+        graph.connect(from: outlineNode, to: nodes[3]!,
                       attributes: ["label":"child", "index": 2])
 
         // Connect the 1-10-100 hierarchy
@@ -58,10 +58,24 @@ final class OutlineTests: XCTestCase {
         // Connect the 2-20 hierarchy
         graph.connect(from: nodes[2]!, to: nodes[20]!,
                       attributes: ["label":"child", "index": 0])
+        
+        self.nodes = nodes
 
     }
 
-    func testBasic() {
-//        let outline =
+    func testEmpty() {
+        let node = Node()
+        graph.add(node)
+        let outline = OutlineCell(node)
+        
+        XCTAssertEqual(outline.children.count, 0)
+        XCTAssertNil(outline.parent)
+    }
+
+    func testChildren() {
+        let outline = OutlineCell(outlineNode)
+        
+        XCTAssertEqual(outline.children.count, 3)
+        XCTAssertEqual(outline.children.nodes, [nodes[1]!, nodes[2]!, nodes[3]!])
     }
 }

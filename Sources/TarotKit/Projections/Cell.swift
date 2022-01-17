@@ -20,6 +20,7 @@
 /// analogous to an intermediate relation for a many-to-many relationship.
 ///
 public class Cell: BaseNodeProjection {
+    let hood: LabelledNeighbourhood
     
     /// Selector for the link to the content node.
     let selector: LinkSelector
@@ -30,6 +31,7 @@ public class Cell: BaseNodeProjection {
     ///
     public init(_ node: Node, selector: LinkSelector = LinkSelector("content")) {
         self.selector = selector
+        self.hood = LabelledNeighbourhood(node, selector: selector)
         super.init(node)
     }
     
@@ -42,16 +44,10 @@ public class Cell: BaseNodeProjection {
     /// they were created outside of this cell.
     ///
     public func content() -> Node? {
-        guard let graph = self.graph else {
-            return nil
-        }
-        
-        let first = graph.outgoing(representedNode).first {
-            $0[selector.labelAttribute] == selector.label
-        }
-
-        // TODO: Does it make sense to consider endpoint?
-        return first.map { selector.endpoint($0) }
+        // Get the first node from the neighbourhood nodes, which is arbitrary
+        // since the nodes are not ordered.
+        //
+        return hood.nodes.first
     }
 
     /// Set a content node for the cell.
@@ -60,6 +56,17 @@ public class Cell: BaseNodeProjection {
     /// the cell node that match the link selector. Then it creates a new
     /// connection with a new content.
     ///
-    public func setContent(_ node: Node) {
+    public func setContent(_ node: Node, attributes: AttributeDictionary = [:]) {
+        // Remove all nodes from the neighborhood
+        hood.removeAll()
+        hood.add(node, attributes: attributes)
     }
+
+    /// Remove any content from the cell. If the cell has errorneously associated
+    /// multiple content nodes, then all links to them are removed.
+    ///
+    public func removeContent() {
+        hood.removeAll()
+    }
+
 }

@@ -34,18 +34,21 @@ public protocol NodeProjection {
     // TODO: Implement: neighbours(name: String) -> [Node]
     var representedNode: Node { get }
     
-//    /// Attribute of a link that contains the link label. There are links that
-//    /// have their own semantics which can be derived from the link label.
-//    ///
-//    /// Default link label attribute is `label`.
-//    ///
-//    var defaultLinkLabelAttribute: String  { get }
-
-    /// Return outgoing links that match the link selector `selector`.
-    func outgoing(selector: LinkSelector) -> [Link]
-
-    /// Return incoming links that match the link selector `selector`.
-    func incoming(selector: LinkSelector) -> [Link]
+    /// Return a labelled neighbourhood with given selector.
+    /// 
+    func neighbourhood(selector: LinkSelector) -> LabelledNeighbourhood
+    
+    /// Connect the represented node with a node `node` in a way that the
+    /// connection follows the selector specification. Optional attributes
+    /// can be set on the connection.
+    ///
+    /// For example if the selector specifies that the connection must have a
+    /// label attribute `label` and value `item` where the direction is
+    /// outgoing then a connection from the represented node to the given node
+    /// is created. Attributes are copied and then value `item` is set for
+    /// a key `label`.
+    ///
+    func connect(with node: Node, selector: LinkSelector, attributes: AttributeDictionary)
 
 }
 
@@ -54,24 +57,19 @@ extension NodeProjection {
         return representedNode.graph
     }
 
-//    public var defaultLinkLabelAttribute: String  {
-//        representedNode["default_link_label_attribute"]?.stringValue() ?? "label"
-//    }
-
-    public func outgoing(selector: LinkSelector) -> [Link] {
-        let links: [Link]
-        links = representedNode.outgoing.filter { link in
-            link[selector.labelAttribute] == selector.label
-        }
-        return links
+    public func neighbourhood(selector: LinkSelector) -> LabelledNeighbourhood {
+        return LabelledNeighbourhood(representedNode, selector: selector)
     }
+    
+    // TODO: This is the same as LabelledNeighbourhood.add(), probably remove this
+    public func connect(with node: Node, selector: LinkSelector, attributes: AttributeDictionary = [:]) {
+        var linkAttributes = attributes
 
-    public func incoming(selector: LinkSelector) -> [Link] {
-        let links: [Link]
-        links = representedNode.incoming.filter { link in
-            link[selector.labelAttribute] == selector.label
+        linkAttributes[selector.labelAttribute] = selector.label
+        switch selector.direction {
+        case .incoming: node.connect(to: representedNode, attributes: linkAttributes)
+        case .outgoing: representedNode.connect(to: node, attributes: linkAttributes)
         }
-        return links
     }
 }
 

@@ -17,13 +17,13 @@ public class TextDocumentSection: BaseNodeProjection {
     // TODO: Use IndexedCollection
     public var subsections: IndexedCollection {
         return IndexedCollection(representedNode,
-                                 linkType:LinkSelector("subsection"),
+                                 selector:LinkSelector("subsection"),
                                  indexAttribute: "order")
     }
 
     public var blocks: IndexedCollection {
         return IndexedCollection(representedNode,
-                                 linkType:LinkSelector("block"),
+                                 selector:LinkSelector("block"),
                                  indexAttribute: "order")
     }
 }
@@ -49,7 +49,7 @@ public class TextDocument: BaseNodeProjection {
 
     public var sections: IndexedCollection {
         return IndexedCollection(representedNode,
-                                 linkType:LinkSelector("subsection"),
+                                 selector:LinkSelector("subsection"),
                                  indexAttribute: "order")
     }
 
