@@ -50,6 +50,10 @@ public protocol NodeProjection {
 }
 
 extension NodeProjection {
+    public var graph: Graph? {
+        return representedNode.graph
+    }
+
     public var defaultLinkLabelAttribute: String  {
         representedNode["default_link_label_attribute"]?.stringValue() ?? "label"
     }

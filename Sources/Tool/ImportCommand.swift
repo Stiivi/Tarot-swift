@@ -98,7 +98,7 @@ guessed.
         
         if let importedNode = try loader.load(from: sourceURL) {
             if let catalog = manager.catalog {
-                catalog.setKey(name, for: importedNode)
+                catalog.setNode(importedNode, forKey: .string(name))
                 print("Import finished. Imported object name: \(name)")
             }
             else {

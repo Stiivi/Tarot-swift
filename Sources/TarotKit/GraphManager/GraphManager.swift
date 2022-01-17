@@ -88,7 +88,7 @@ public class GraphManager {
     ///
     /// Catalog is a collection node.
     ///
-    public var catalog: Dictionary? = nil
+    public var catalog: KeyedCollection? = nil
     
     /// Create a manager with an empty graph.
     ///
@@ -188,7 +188,7 @@ public class GraphManager {
         if let record = try store.fetch(id: "catalog") {
             let catalogNodeID = OID(record["node"]!.intValue()!)
             let node = graph.node(catalogNodeID)!
-            catalog = Dictionary(node)
+            catalog = KeyedCollection(node, linkType: LabelledLinkType(label: "item"))
         }
         else {
             catalog = nil

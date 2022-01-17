@@ -55,7 +55,7 @@ Available formats: markdown.
                 outputURL = testURL
             }
 
-            guard let node = catalog.item(key: nodeName) else {
+            guard let node = catalog.node(forKey: .string(nodeName)) else {
                 fatalError("No named node: \(nodeName)")
             }
             print("Exporting node named: \(nodeName)")

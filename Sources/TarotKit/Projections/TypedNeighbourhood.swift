@@ -88,7 +88,13 @@ public class TypedNeighbourhood: BaseNodeProjection {
         
         return links
     }
-    
+   
+    /// Get count of links in the neigbourhood.
+    ///
+    public var count: Int {
+        return links.count
+    }
+
     /// Nodes in the neighbourhood of the represented node. The neghborhood
     /// nodes are all adjacent nodes where the link matches the link type
     /// pattern.
@@ -121,7 +127,7 @@ public class TypedNeighbourhood: BaseNodeProjection {
     /// - Attention: Do not call this method directly. Subclasses can call this
     ///  method to create a correct link type.
     ///
-    func add(_ node: Node, attributes: [String:Value]=[:]) {
+    public func add(_ node: Node, attributes: [String:Value]=[:]) {
         var linkAttributes = attributes
         linkAttributes[linkType.labelAttribute] = linkType.label
         switch linkType.direction {

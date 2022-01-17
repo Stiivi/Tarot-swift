@@ -38,46 +38,46 @@ final class DictionaryTests: XCTestCase {
                       attributes: ["label":"item", "key":"k3", "name": "tri"])
     }
     func testDefaultLookup() throws {
-        let dict = Dictionary(collectionNode)
+        let dict = KeyedCollection(collectionNode, linkType: LabelledLinkType(label: "item"))
         
-        XCTAssertEqual(dict.item(key: "k1"), nodes[0])
-        XCTAssertEqual(dict.item(key: "k2"), nodes[1])
-        XCTAssertEqual(dict.item(key: "k3"), nodes[2])
+        XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
+        XCTAssertEqual(dict.node(forKey: "k2"), nodes[1])
+        XCTAssertEqual(dict.node(forKey: "k3"), nodes[2])
 
     }
 
     func testCustomKeyLookup() throws {
-        let dict = Dictionary(collectionNode)
-        collectionNode["keyLinkAttribute"] = "name"
-        
-        XCTAssertEqual(dict.item(key: "jedna"), nodes[0])
-        XCTAssertEqual(dict.item(key: "dva"), nodes[1])
-        XCTAssertEqual(dict.item(key: "tri"), nodes[2])
+        let dict = KeyedCollection(collectionNode,
+                                   linkType: LabelledLinkType(label: "item"),
+                                   keyAttribute: "name")
+        XCTAssertEqual(dict.node(forKey: "jedna"), nodes[0])
+        XCTAssertEqual(dict.node(forKey: "dva"), nodes[1])
+        XCTAssertEqual(dict.node(forKey: "tri"), nodes[2])
 
     }
     
     func testRemoveKey() throws {
-        let dict = Dictionary(collectionNode)
-        
-        XCTAssertEqual(dict.item(key: "k1"), nodes[0])
-        dict.removeKey("k1")
-        XCTAssertNil(dict.item(key: "k1"))
+        let dict = KeyedCollection(collectionNode, linkType: LabelledLinkType(label: "item"))
+
+        XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
+        dict.removeNode(forKey: "k1")
+        XCTAssertNil(dict.node(forKey: "k1"))
 
     }
     func testSetKey() throws {
-        let dict = Dictionary(collectionNode)
+        let dict = KeyedCollection(collectionNode, linkType: LabelledLinkType(label: "item"))
         let node = Node()
 
         graph.add(node)
-        XCTAssertNil(dict.item(key: "new"))
-        dict.setKey("new", for: node)
-        XCTAssertIdentical(dict.item(key:"new"), node)
+        XCTAssertNil(dict.node(forKey: "new"))
+        dict.setNode(node, forKey:"new")
+        XCTAssertIdentical(dict.node(forKey:"new"), node)
     }
     func testLookupAfterObjectRemoval() throws {
-        let dict = Dictionary(collectionNode)
-        
-        XCTAssertEqual(dict.item(key: "k1"), nodes[0])
+        let dict = KeyedCollection(collectionNode, linkType: LabelledLinkType(label: "item"))
+
+        XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
         graph.remove(nodes[0])
-        XCTAssertNil(dict.item(key: "k1"))
+        XCTAssertNil(dict.node(forKey: "k1"))
     }
 }

@@ -14,6 +14,9 @@ Design principle:
 - Primarily porovide mechanisms, then provide convenience policies
 - Synthesis and mutability of structures is primary functionality, analysis
   is secondary.
+- Every structure should be considered as presentable in an user interface,
+  unless deemed internal
+- Avoid recursive structures, they are not easy to work with in user interfaces
 
 ## Know Debt and Out of Scope
 

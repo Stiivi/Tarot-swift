@@ -19,12 +19,6 @@ public class IndexedCollection: TypedNeighbourhood {
         super.init(node, linkType: linkType)
     }
 
-    /// Get count of links in the collection.
-    ///
-    public var count: Int {
-        return links.count
-    }
-    
     /// Get links ordered by index.
     ///
     /// - Complexity: O(n log n), where n is number of links in the
