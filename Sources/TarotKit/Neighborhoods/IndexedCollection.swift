@@ -10,11 +10,12 @@ import Records
 /// Indexed collection is a neighbourhood where links are indexed by an index
 /// attribute.
 ///
+// TODO: Rename to IndexedNeighbourhood
 public class IndexedCollection: TypedNeighbourhood {
     public let linkIndexAttribute: String
 
     /// Creates a projection for an indexed collection.
-    public init(_ node: Node, linkType: LabelledLinkType, indexAttribute: String = "index") {
+    public init(_ node: Node, linkType: LinkSelector, indexAttribute: String = "index") {
         self.linkIndexAttribute = indexAttribute
         super.init(node, linkType: linkType)
     }

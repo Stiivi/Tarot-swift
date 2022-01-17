@@ -30,7 +30,7 @@ extension Tarot {
             
             let catalog = Node()
             manager.graph.add(catalog)
-            manager.catalog = KeyedCollection(catalog, linkType: LabelledLinkType(label: "item"))
+            manager.catalog = KeyedCollection(catalog, linkType: LinkSelector("item"))
 
             try finalizeManager(manager: manager, options: options)
         }
@@ -54,7 +54,7 @@ extension Tarot {
             
             let catalog = Node()
             manager.graph.add(catalog)
-            manager.catalog = KeyedCollection(catalog, linkType: LabelledLinkType(label: "item"))
+            manager.catalog = KeyedCollection(catalog, linkType: LinkSelector("item"))
 
             print("Catalog created.")
             try finalizeManager(manager: manager, options: options)

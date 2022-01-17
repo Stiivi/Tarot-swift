@@ -7,56 +7,18 @@
 
 import Records
 
-/// Designation of which direction of a link from a node projection perspective
-/// is to be considered.
-///
-public enum LinkDirection {
-    /// Direction that considers links where the node projection is the target.
-    case incoming
-    /// Direction that considers links where the node projection is the origin.
-    case outgoing
-}
-
-/// Describes links that have a label attribute.
-///
-public struct LabelledLinkType {
-    /// Label of a link. Links with this label are conforming to this link type.
-    public let label: Value
-    
-    /// Direction of a link.
-    public let direction: LinkDirection
-    
-    /// Attribute to be used to determine the label of a link. Default is
-    /// "label".
-    public let labelAttribute: String
-    
-    /// Create a labelled link type.
-    ///
-    /// - Properties:
-    ///     - label: Label of links that conform to this type
-    ///     - direction: Direction of links to be considered when relating
-    ///       to a projected node.
-    ///     - labelAttribute: Link attribute that contains the label. Default
-    ///       is `label`.
-    ///
-    public init(label: Value, direction: LinkDirection = .outgoing,
-                labelAttribute: String="label") {
-        self.label = label
-        self.direction = direction
-        self.labelAttribute = labelAttribute
-    }
-}
-
 /// Projection of a neighbourhood of a node where the links are of a specific
 /// type.
 ///
+// TODO: This should be rather named LinkProjection
+// TODO: Or this might be rather LabelledNeighbourhood
 public class TypedNeighbourhood: BaseNodeProjection {
     /// Type of a link that is considered to be part of the neighbourhood.
-    let linkType: LabelledLinkType
+    let linkType: LinkSelector
 
     /// Creates a neighbourhood with a specific link type.
     ///
-    public init(_ node: Node, linkType: LabelledLinkType) {
+    public init(_ node: Node, linkType: LinkSelector) {
         self.linkType = linkType
         super.init(node)
     }

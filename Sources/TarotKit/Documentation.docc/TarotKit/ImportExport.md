@@ -17,6 +17,10 @@ or as a table.
 
 ### Imporiting
 
+Import is performed by a loader. A loader loads a resource, converts entities
+and their properties at the source into nodes and/or links in the graph. Loaders
+can create additional artefacts that represent the loaded batch.
+
 - ``Loader``
 - ``MarkdownLoader``
 - ``RelationalPackageLoader``

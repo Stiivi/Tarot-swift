@@ -107,7 +107,7 @@ public class FilePackageStore: PersistentStore {
         self.rootURL = url
 
         let decoder = JSONDecoder()
-        let url = try rootURL.appendingPathComponent("info.json", isDirectory: false)
+        let url = rootURL.appendingPathComponent("info.json", isDirectory: false)
         let data = try Data(contentsOf: url)
         info = try decoder.decode(FilePackageStoreInfo.self, from: data)
 

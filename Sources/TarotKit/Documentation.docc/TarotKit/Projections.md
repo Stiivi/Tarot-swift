@@ -1,4 +1,4 @@
-# Projections
+# Projections and Neighbourhoods
 
 Projections are objects that provide a different view over a node and might 
 provide a more complex operations with the projected node.
@@ -12,9 +12,10 @@ provide a more complex operations with the projected node.
 ### Node Projection
 
 - ``NodeProjection``
+- ``BaseNodeProjection``
+- ``Cell``
 
-### Collections
+### Neigbourhoods
 
-- ``Collection``
 - ``IndexedCollection``
-- ``Dictionary``
+- ``KeyedCollection``

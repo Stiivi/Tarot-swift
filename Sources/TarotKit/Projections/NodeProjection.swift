@@ -34,18 +34,18 @@ public protocol NodeProjection {
     // TODO: Implement: neighbours(name: String) -> [Node]
     var representedNode: Node { get }
     
-    /// Attribute of a link that contains the link label. There are links that
-    /// have their own semantics which can be derived from the link label.
-    ///
-    /// Default link label attribute is `label`.
-    ///
-    var defaultLinkLabelAttribute: String  { get }
+//    /// Attribute of a link that contains the link label. There are links that
+//    /// have their own semantics which can be derived from the link label.
+//    ///
+//    /// Default link label attribute is `label`.
+//    ///
+//    var defaultLinkLabelAttribute: String  { get }
 
-    /// Return outgoing links with default label attribute equal to ``label``.
-    func outgoing(label: String) -> [Link]
+    /// Return outgoing links that match the link selector `selector`.
+    func outgoing(selector: LinkSelector) -> [Link]
 
-    /// Return incoming links with default label attribute equal to ``label``.
-    func incoming(label: String) -> [Link]
+    /// Return incoming links that match the link selector `selector`.
+    func incoming(selector: LinkSelector) -> [Link]
 
 }
 
@@ -54,22 +54,22 @@ extension NodeProjection {
         return representedNode.graph
     }
 
-    public var defaultLinkLabelAttribute: String  {
-        representedNode["default_link_label_attribute"]?.stringValue() ?? "label"
-    }
+//    public var defaultLinkLabelAttribute: String  {
+//        representedNode["default_link_label_attribute"]?.stringValue() ?? "label"
+//    }
 
-    public func outgoing(label: String) -> [Link] {
+    public func outgoing(selector: LinkSelector) -> [Link] {
         let links: [Link]
         links = representedNode.outgoing.filter { link in
-            link[defaultLinkLabelAttribute]?.stringValue() == label
+            link[selector.labelAttribute] == selector.label
         }
         return links
     }
 
-    public func incoming(label: String) -> [Link] {
+    public func incoming(selector: LinkSelector) -> [Link] {
         let links: [Link]
         links = representedNode.incoming.filter { link in
-            link[defaultLinkLabelAttribute]?.stringValue() == label
+            link[selector.labelAttribute] == selector.label
         }
         return links
     }

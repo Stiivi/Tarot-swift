@@ -188,7 +188,7 @@ public class GraphManager {
         if let record = try store.fetch(id: "catalog") {
             let catalogNodeID = OID(record["node"]!.intValue()!)
             let node = graph.node(catalogNodeID)!
-            catalog = KeyedCollection(node, linkType: LabelledLinkType(label: "item"))
+            catalog = KeyedCollection(node, linkType: LinkSelector("item"))
         }
         else {
             catalog = nil
