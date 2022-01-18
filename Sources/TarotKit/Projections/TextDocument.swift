@@ -14,7 +14,6 @@ public class TextDocumentSection: BaseNodeProjection {
     /// Depth level of the section. 0 is a top-level section.
     public var level: Int { representedNode["level"]?.intValue() ?? 0}
     
-    // TODO: Use IndexedCollection
     public var subsections: IndexedCollection {
         return IndexedCollection(representedNode,
                                  selector:LinkSelector("subsection"),
@@ -29,7 +28,10 @@ public class TextDocumentSection: BaseNodeProjection {
 }
 
 
-public class TextDocumentBlock: BaseNodeProjection {
+/// A projection of a node that represents a piece of a text. The text is
+/// stored in an attribute named `text` and is expected to be a string value.
+///
+public class TextBlock: BaseNodeProjection {
     /// Raw text of the section.
     public var text: String? { representedNode["text"]?.stringValue() }
 }

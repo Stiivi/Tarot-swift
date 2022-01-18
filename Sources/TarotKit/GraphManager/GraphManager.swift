@@ -188,11 +188,20 @@ public class GraphManager {
         if let record = try store.fetch(id: "catalog") {
             let catalogNodeID = OID(record["node"]!.intValue()!)
             let node = graph.node(catalogNodeID)!
-            catalog = KeyedCollection(node, selector: LinkSelector("item"))
+            setCatalog(node)
         }
         else {
+            print("WARNING: No catalog found in the store.")
             catalog = nil
         }
+    }
+    
+    /// Sets a new catalog node.
+    public func setCatalog(_ node: Node) {
+        guard node.graph === graph else {
+            fatalError("Trying to set a catalog with a node from a different graph")
+        }
+        catalog = KeyedCollection(node, selector: LinkSelector("item"))
     }
     
 }

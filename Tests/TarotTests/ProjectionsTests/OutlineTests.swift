@@ -76,6 +76,7 @@ final class OutlineTests: XCTestCase {
         let outline = OutlineCell(outlineNode)
         
         XCTAssertEqual(outline.children.count, 3)
-        XCTAssertEqual(outline.children.nodes, [nodes[1]!, nodes[2]!, nodes[3]!])
+        let childNodes = outline.children.map { $0.representedNode }
+        XCTAssertEqual(childNodes, [nodes[1]!, nodes[2]!, nodes[3]!])
     }
 }

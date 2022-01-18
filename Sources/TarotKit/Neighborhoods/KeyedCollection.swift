@@ -82,4 +82,16 @@ public class KeyedCollection: LabelledNeighbourhood {
         removeNode(forKey: key)
         self.add(node, attributes:linkAttributes)
     }
+    
+    public subscript(key: Value) -> Node? {
+        get { node(forKey: key) }
+        set(node) {
+            if let node = node {
+                setNode(node, forKey: key)
+            }
+            else {
+                removeNode(forKey: key)
+            }
+        }
+    }
 }

@@ -67,7 +67,7 @@ public class MarkdownExporter: Exporter {
         
         // Collect blocks
         for node in section.blocks {
-            let block = TextDocumentBlock(node)
+            let block = TextBlock(node)
             guard let text = block.text else {
                 // No text, we pass
                 continue
