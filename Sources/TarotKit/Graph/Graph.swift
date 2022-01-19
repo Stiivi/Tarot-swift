@@ -59,12 +59,13 @@ public protocol GraphProtocol {
 }
 
 
+// NOTE: Status: Stable
 /// Graph is a mutable structure representing a directed labelled multi-graph.
 /// The graph is composed of nodes (vertices) and links (edges between
 /// vertices).
 ///
 /// The main functionality of the graph structure is to mutate the graph:
-/// ``Graph.add(node:)``, ``Graph.connect(...)``.
+/// ``Graph/add(_:)``, ``Graph/connect(from:to:attributes:)-372gc``.
 ///
 /// # Example
 ///
@@ -83,11 +84,10 @@ public protocol GraphProtocol {
 /// graph.connect(from: parent, to: leftChild, at: "right")
 /// ```
 ///
-/// - Remark: For engineers out there: This is a "domain specific problem environment object", or a
+/// - Remark: This is a "domain specific problem environment object", or a
 /// "simulation environment". It is not made a generic as it is not intended
 /// for general purpose use. It does not mean it might not change in the future.
 ///
-// NOTE: Status: Stable
 public class Graph {
     /// Mapping between node IDs and node objects.
     private var nodeIndex: [OID:Node] = [:]
@@ -174,8 +174,8 @@ public class Graph {
     /// Removes node from the graph and removes all incoming and outgoing links
     /// for that node.
     ///
-    // TODO: This should be more atomic and shuold not remove a node if there are any links
     public func remove(_ node: Node) {
+        // TODO: This should be more atomic and shuold not remove a node if there are any links
         guard node.graph === self else {
             fatalError("Trying to dissociate a node from another graph")
         }

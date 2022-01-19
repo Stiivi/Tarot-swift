@@ -111,9 +111,10 @@ public struct LinkRelation: Codable {
 /// Relational entities are represented by `RecordSet` and it might contain
 /// list of nodes or list of links.
 ///
-// TODO: Add default `label` to foreignKeyLinkAttribute
-// TODO: Abstract it from file-system package centric
 public class RelationalPackageInfo: Decodable {
+    // TODO: Add default `label` to foreignKeyLinkAttribute
+    // TODO: Abstract it from file-system package centric
+
     /// List of sources containing nodes
     ///
     public let nodes: [NodeRelation]

@@ -42,10 +42,14 @@ public class MarkdownLoader: Loader {
     
     let manager: GraphManager
     
+    /// Creates a markdown loader that will load the input into using the
+    /// provided graph manager.
     required public init(manager: GraphManager) {
         self.manager = manager
     }
     
+    /// Loads a markdown from a source URL.
+    ///
     public func load(from source: URL) throws -> Node? {
         let document = try Markdown.Document(parsing: source)
 

@@ -6,20 +6,34 @@
 //
 
 
+/// A projection of a node that represents a section of a text tat can contain
+/// blocks and subsections.
+///
+/// Blocks and subsections are represented as indexed labelled neighbourhoods,
+/// see ``IndexedCollection`` for more information.
+///
 public class TextDocumentSection: BaseNodeProjection {
     /// Title of the section. Usually it will be rendered as a heading.
     ///
     public var title: String? { representedNode["title"]?.stringValue() }
     
-    /// Depth level of the section. 0 is a top-level section.
+    /// Depth level of the section. A top-level section has depth of 0 (zero).
     public var level: Int { representedNode["level"]?.intValue() ?? 0}
     
+    /// Labelled neighbourhood of text subsections. The links are labelled
+    /// as `subsection` and using the attribute `order` to determine the
+    /// subsection order within the section.
+    ///
     public var subsections: IndexedCollection {
         return IndexedCollection(representedNode,
                                  selector:LinkSelector("subsection"),
                                  indexAttribute: "order")
     }
 
+    /// Labelled neighbourhood of text blocks. The links are labelled
+    /// as `block` and using the attribute `order` to determine the
+    /// order of the blocks in the section.
+    ///
     public var blocks: IndexedCollection {
         return IndexedCollection(representedNode,
                                  selector:LinkSelector("block"),
@@ -43,12 +57,18 @@ public class TextBlock: BaseNodeProjection {
 ///
 public class TextDocument: BaseNodeProjection {
 
-    /// Source of the document. Usualy an URL
+    /// Source of the document. Usualy an URL. Projected from the attribute
+    /// `source`.
     public var source: String? { representedNode["source"]?.stringValue() }
 
-    /// Title of the document.
+    /// Title of the document. Projected from the attribute `title`
     public var title: String? { representedNode["title"]?.stringValue() }
 
+    /// Labelled neighbourhood of text sections. The links are labelled
+    /// as `subsection` and using the attribute `order` to determine the
+    /// subsection order within the section. See ``TextDocumentSection`` for
+    /// more information.
+    ///
     public var sections: IndexedCollection {
         return IndexedCollection(representedNode,
                                  selector:LinkSelector("subsection"),

@@ -8,11 +8,11 @@
 import Records
 
 
+// TODO: Rename to KeyedNeighbourhood
 /// View of a node that represents a dictionary. KeyedCollection is a collection
 /// node where items can be assigned a key. Key is a property of a link and is
 /// unique for the dictionary.
 ///
-// TODO: Rename to KeyedNeighbourhood
 public class KeyedCollection: LabelledNeighbourhood {
     /// Name of an attribute that belongs to a link refering to a dictionary
     /// node. The value of the attribute is a key that is used to lookup the
@@ -72,7 +72,7 @@ public class KeyedCollection: LabelledNeighbourhood {
     /// Add a node to the dictionary with a key `key`.
     ///
     /// This method removes all existing dictionary entries with the key before
-    /// creating a new link. See ``KeyedCollection/removeKey()`` for more
+    /// creating a new link. See ``KeyedCollection/removeNode(forKey:)`` for more
     /// information.
     ///
     public func setNode(_ node: Node, forKey key: Value,

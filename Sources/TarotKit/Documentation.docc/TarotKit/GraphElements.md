@@ -23,3 +23,9 @@ are the core of TarotKit.
 - ``OID``
 - ``AttributeKey``
 - ``AttributeValue``
+- ``AttributeDictionary``
+
+### Support Structures and Protocols
+
+- ``UniqueIDGenerator``
+- ``SequenceIDGenerator``

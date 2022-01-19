@@ -13,14 +13,14 @@ import Records
 /// A record in an external store.
 ///
 public class StoreRecord {
+    // TODO: Rename to typeName
     /// String that represents the type of the record. Interpretation of the
     /// string is let to the store.
     ///
-    // TODO: Rename to typeName
     public let type: String?
 
-    /// Record identifier
     // TODO: Make it an alias
+    /// Record identifier
     public let id: String
     
     /// Dictionary of record values.

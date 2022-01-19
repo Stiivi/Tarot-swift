@@ -412,8 +412,8 @@ public class RelationalPackageLoader: Loader {
     /// The rest of the record attributes are loaded as the link attributes. The
     /// origin and the target attributes are excluded.
     ///
-    /// If the fields are missing then a ``LoaderError.missingField`` error is
-    /// thrown. If referenced nodes are missing then ``LoaderError.unknownNode``
+    /// If the fields are missing then a ``LoaderError/missingField(_:_:)`` error is
+    /// thrown. If referenced nodes are missing then ``LoaderError/unknownNode(_:_:)``
     /// is thrown.
     ///
     /// - Throws: ``LoaderError``

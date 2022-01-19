@@ -13,9 +13,17 @@ provide a more complex operations with the projected node.
 
 - ``NodeProjection``
 - ``BaseNodeProjection``
-- ``Cell``
 
 ### Neigbourhoods
 
+- ``LinkSelector``
+- ``LabelledNeighbourhood``
 - ``IndexedCollection``
 - ``KeyedCollection``
+
+### Concrete Projections
+
+- ``TextDocument``
+- ``TextDocumentSection``
+- ``TextBlock``
+

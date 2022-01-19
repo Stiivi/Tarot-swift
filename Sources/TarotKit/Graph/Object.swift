@@ -59,10 +59,14 @@ open class Object: Identifiable {
         self.attributes = attributes
     }
 
+    
     public subscript(_ key:AttributeKey) -> AttributeValue? {
+        /// Gets attribute value for an attribute key `key`. If the attribute
+        /// is not set then it returns `nil`.
         get {
             return attributes[key]
         }
+        /// Sets attribute value for an attribute key `key`.
         set(value) {
             // #FIXME: Notify graph delegate
             attributes[key] = value

@@ -73,6 +73,7 @@ extension NodeProjection {
     }
 }
 
+/// Convenience base class for concrete implementations of a node projection.
 public class BaseNodeProjection: NodeProjection {
     public var representedNode: Node
     

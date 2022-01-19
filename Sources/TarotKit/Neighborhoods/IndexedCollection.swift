@@ -7,11 +7,18 @@
 
 import Records
 
+// TODO: Rename to IndexedNeighbourhood
 /// Indexed collection is a neighbourhood where links are indexed by an index
 /// attribute.
 ///
-// TODO: Rename to IndexedNeighbourhood
 public class IndexedCollection: LabelledNeighbourhood {
+    /// Attribute of the links in the neighbourhood that holds an index within
+    /// the collection. Default is `index`.
+    ///
+    /// When modifying the collection, for example by adding or remoing the
+    /// items, the neighbourhood projection manages the index attribute. The
+    /// attribute of the links will be rewritten.
+    ///
     public let linkIndexAttribute: String
 
     /// Creates a projection for an indexed collection.
@@ -84,6 +91,9 @@ public class IndexedCollection: LabelledNeighbourhood {
     ///
     /// - Complexity: O(n log n), where n is number of links in the
     /// neighbourhood.
+    ///
+    /// - Note: This function assumes that this neighbourhood is completely
+    ///         managed by it.
     ///
     public func append(_ node: Node, attributes: [String:Value] = [:]) {
         let index = endIndex

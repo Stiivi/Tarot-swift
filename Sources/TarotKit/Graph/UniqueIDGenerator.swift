@@ -11,7 +11,7 @@ import Foundation
 ///
 public protocol UniqueIDGenerator {
     
-    /// Returns a next unique ID.
+    /// Returns a next unique object ID.
     func next() -> OID
     
     /// Marks an ID to be already used. Prevents the generator from generating
@@ -32,15 +32,22 @@ extension UniqueIDGenerator {
 
 /// Generator of IDs as a sequence of numbers starting from 1.
 ///
-/// Subsequent sequential order is not guaranteed.
+/// Subsequent sequential order continuity is not guaranteed.
 ///
+/// - Note: This is very primitive and naive sequence number generator. If an ID
+///   is marked as used and the number is higher than current sequence, all
+///   numbers are just skipped and the next sequence would be the used +1.
+///   
 public class SequenceIDGenerator: UniqueIDGenerator {
+    /// ID as a sequence number.
     var sequence: Int
     
+    /// Creates a sequential ID generator and initializes the sequence to 1.
     public init() {
         sequence = 1
     }
     
+    /// Gets a next sequence id.
     public func next() -> OID {
         let id = sequence
         sequence += 1

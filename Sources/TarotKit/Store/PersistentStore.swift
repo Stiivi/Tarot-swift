@@ -29,9 +29,9 @@ public protocol PersistentStore {
     ///
     func delete(id: ID) throws
     
+    // FIXME: Do we still need this?
     /// Empties and resets the whole store
     ///
     /// Note: This operation is very destructive.
-    // FIXME: Do we still need this?
     func deleteAll() throws
 }

@@ -1,7 +1,8 @@
 # Skeleton
 
 Skeleton is a structure to hold knowledge elements together into a higher-order
-structures.
+structures. They are usually node projections with concrete, usually
+user-oriented semantic.
 
 ## Overview
 
@@ -11,4 +12,4 @@ structures.
 
 ### <!--@START_MENU_TOKEN@-->Group<!--@END_MENU_TOKEN@-->
 
-- <!--@START_MENU_TOKEN@-->``Symbol``<!--@END_MENU_TOKEN@-->
+- ``Cell``

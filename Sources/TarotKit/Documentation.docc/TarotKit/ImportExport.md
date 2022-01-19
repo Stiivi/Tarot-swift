@@ -26,7 +26,10 @@ can create additional artefacts that represent the loaded batch.
 - ``RelationalPackageLoader``
 - ``RelationalPackageInfo``
 - ``RelationalPackage``
+- ``NodeRelation``
+- ``LinkRelation``
 
 ### Exporting
 
 - ``DotExporter``
+- ``MarkdownExporter``
