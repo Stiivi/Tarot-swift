@@ -22,6 +22,7 @@ and their properties at the source into nodes and/or links in the graph. Loaders
 can create additional artefacts that represent the loaded batch.
 
 - ``Loader``
+- ``TarotFileLoader``
 - ``MarkdownLoader``
 - ``RelationalPackageLoader``
 - ``RelationalPackageInfo``
@@ -31,5 +32,7 @@ can create additional artefacts that represent the loaded batch.
 
 ### Exporting
 
+- ``GraphWriter``
+- ``TarotFileWriter``
 - ``DotExporter``
 - ``MarkdownExporter``

@@ -164,7 +164,7 @@ import Records
 /// from a database.
 ///
 public class RelationalPackageLoader: Loader {
-    let manager: GraphManager
+    let graph: Graph
 
     /// A nested dictionary of mapping of primary keys to nodes. The top level
     /// dictionary keys are relation names, values are dictionaries of keys. The
@@ -191,8 +191,8 @@ public class RelationalPackageLoader: Loader {
     ///
     var foreignKeyLinkDescriptions: [ForeignKeyLinkDescription] = []
 
-    public required init(manager: GraphManager) {
-        self.manager = manager
+    public required init(graph: Graph) {
+        self.graph = graph
     }
     
     /// Registers a key for a node within a relation. If a key already exists
@@ -228,7 +228,10 @@ public class RelationalPackageLoader: Loader {
     ///
     /// For more information see: `class:Package`
     ///
-    public func load(from source: URL) throws -> Node? {
+    public func load(from source: URL, preserveIdentity: Bool) throws -> [String : Node] {
+        guard preserveIdentity == true else {
+            throw LoaderError.preserveIdentityNotSupported
+        }
         // Load the package info from `info.json`
         //
         guard let package = RelationalPackage(url: source) else {
@@ -258,7 +261,7 @@ public class RelationalPackageLoader: Loader {
     ///
     /// - Throws: ``LoaderError``
     ///
-    public func load(package: RelationalPackage) throws -> Node? {
+    public func load(package: RelationalPackage) throws -> [String : Node] {
         let options = package.readingOptions ?? CSVReadingOptions()
         
         // 1. Load all the nodes and register all the keys
@@ -309,7 +312,7 @@ public class RelationalPackageLoader: Loader {
                            attributes: attributes)
         }
         
-        return nil
+        return [:]
     }
     
     /// Loads nodes from a record set.
@@ -346,10 +349,10 @@ public class RelationalPackageLoader: Loader {
     @discardableResult
     public func loadNode(_ record: Record, relation: NodeRelation) throws -> Node {
         guard let primaryKey = record[relation.primaryKey] else {
-            throw LoaderError.missingPrimaryKey(relation.primaryKey, relation.name)
+            throw LoaderError.missingSourceID(relation.name)
         }
         guard node(forKey: primaryKey, relation: relation.name) == nil else {
-            throw LoaderError.duplicateKey(primaryKey, relation.name)
+            throw LoaderError.duplicateSourceID(primaryKey, relation.name)
         }
         // Create the node
         let node = Node()
@@ -380,7 +383,7 @@ public class RelationalPackageLoader: Loader {
             node[field] = value
         }
         
-        manager.graph.add(node)
+        graph.add(node)
         return node
     }
     
@@ -421,11 +424,11 @@ public class RelationalPackageLoader: Loader {
     @discardableResult
     public func loadLink(_ record: Record, relation: LinkRelation) throws -> Link {
         guard let originKey = record[relation.originKey] else {
-            throw LoaderError.missingField(relation.originKey, relation.name)
+            throw LoaderError.missingAttribute(relation.originKey, relation.name)
         }
 
         guard let targetKey = record[relation.targetKey] else {
-            throw LoaderError.missingField(relation.targetKey, relation.name)
+            throw LoaderError.missingAttribute(relation.targetKey, relation.name)
         }
         guard let origin = node(forKey: originKey, relation: relation.originRelation) else {
             throw LoaderError.unknownNode(originKey, relation.originRelation)
@@ -445,7 +448,7 @@ public class RelationalPackageLoader: Loader {
             attributes[field] = record[field]
         }
         
-        let link = manager.graph.connect(from: origin, to: target, attributes: attributes)
+        let link = graph.connect(from: origin, to: target, attributes: attributes)
         return link
     }
     
@@ -465,7 +468,7 @@ public class RelationalPackageLoader: Loader {
         guard let target = node(forKey: targetKey, relation: targetRelation) else {
             throw LoaderError.unknownNode(targetKey, targetRelation)
         }
-        let link = manager.graph.connect(from: origin, to: target, attributes: attributes)
+        let link = graph.connect(from: origin, to: target, attributes: attributes)
         return link
     }
     

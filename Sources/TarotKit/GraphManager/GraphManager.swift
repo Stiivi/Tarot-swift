@@ -140,9 +140,38 @@ public class GraphManager {
 
     }
     
+    public func save(writer: GraphWriter) throws {
+        var names: [String:Node] = [:]
+
+        if let catalogNode = catalog?.representedNode {
+            names["catalog"] = catalogNode
+        }
+
+        try writer.write(graph: graph, names: names)
+    }
+
+    /// Creates a graph from a Tarot file.
+    ///
+    /// See ``TarotFileLoader`` for information about the loading process
+    /// and ``TarotFileWriter`` for information about the file format.
+    ///
+    public init(contentsOf url: URL) throws {
+        graph = Graph()
+        let loader = TarotFileLoader(graph: graph)
+        let names = try loader.load(from: url, preserveIdentity: true)
+        
+        if let node = names["catalog"] {
+            setCatalog(node)
+        }
+        else {
+            print("WARNING: No catalog found.")
+            catalog = nil
+        }
+    }
+    
+    // TODO: Deprecated
     /// Read the graph from a store.
     ///
-
     public init(store: PersistentStore) throws {
         // FIXME: Model is not preserved here
 

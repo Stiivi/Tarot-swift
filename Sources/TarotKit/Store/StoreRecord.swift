@@ -13,6 +13,8 @@ import Records
 /// A record in an external store.
 ///
 public class StoreRecord {
+    public typealias ID = String
+    
     // TODO: Rename to typeName
     /// String that represents the type of the record. Interpretation of the
     /// string is let to the store.
@@ -21,7 +23,7 @@ public class StoreRecord {
 
     // TODO: Make it an alias
     /// Record identifier
-    public let id: String
+    public let id: ID
     
     /// Dictionary of record values.
     ///

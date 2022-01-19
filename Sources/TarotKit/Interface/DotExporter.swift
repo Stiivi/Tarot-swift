@@ -5,8 +5,6 @@
 //  Created by Stefan Urbanek on 2021/10/21.
 //
 
-import DotWriter
-
 // NOTE: This is simple one-use exporter.
 // TODO: Make this export to a string and make it export by appending content.
 

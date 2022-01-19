@@ -40,22 +40,23 @@ associated structures are the core of TarotKit.
 
 - <doc:Skeleton>
 
-### Persistence
 
-- <doc:Persistence>
+### Interfaces: Import and Export
+
+Structures and functionality for interfacing with external environments: for
+importing or exporting content of the graph.
+
+- <doc:ImportExport>
+
 
 ### Query
 
 Structures and functionality to query the graph.
 
-- ``DynamicNodeCollection``
 - ``ObjectPredicate``
 - ``AttributeValuePredicate``
 
-### Interfaces
+### Persistence
 
-Structures and functionality for interfacing with external environments: for
-importing or exporting content of the graph.
+- <doc:Persistence>
 
-
-- <doc:ImportExport>

@@ -18,7 +18,6 @@ let package = Package(
             targets: ["Tool"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Stiivi/DotWriter.git", from: "0.1.0"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
         .package(url: "ssh://git@github.com/apple/swift-markdown.git", .branch("main")),
     ],
@@ -30,13 +29,13 @@ let package = Package(
             dependencies: []),
         .target(
             name: "TarotKit",
-            dependencies: ["Records", "DotWriter",
+            dependencies: ["Records",
                             .product(name: "Markdown", package: "swift-markdown"),
             ]),
         .executableTarget(
             name: "Tool",
             dependencies: [
-                "TarotKit", "DotWriter",
+                "TarotKit",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Markdown", package: "swift-markdown"),
             ],
@@ -47,7 +46,7 @@ let package = Package(
             dependencies: ["Records"]),
         .testTarget(
             name: "TarotTests",
-            dependencies: ["TarotKit", "Records", "DotWriter",
+            dependencies: ["TarotKit", "Records",
                            .product(name: "Markdown", package: "swift-markdown"),
 
                           ]),

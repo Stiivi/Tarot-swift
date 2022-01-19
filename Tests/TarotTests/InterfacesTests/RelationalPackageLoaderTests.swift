@@ -20,7 +20,7 @@ final class RelationalPackageLoaderTests: XCTestCase {
     }
     
     func testLoadRecordPrimaryKey() throws {
-        let loader = RelationalPackageLoader(manager: manager)
+        let loader = RelationalPackageLoader(graph: graph)
         let emptyRecord = Record([:])
         let validRecord = Record(["id":"1"])
         let customRecord = Record(["key":"1"])
@@ -38,17 +38,17 @@ final class RelationalPackageLoaderTests: XCTestCase {
         XCTAssertThrowsError(try loader.loadNode(emptyRecord,
                                              relation: defaultRelation),
                              "Should throw error on no primary key") {
-            XCTAssertEqual($0 as! LoaderError, LoaderError.missingPrimaryKey("id", "nodes"))
+            XCTAssertEqual($0 as! LoaderError, LoaderError.missingSourceID("nodes"))
         }
         XCTAssertThrowsError(try loader.loadNode(customRecord,
                                              relation: defaultRelation),
                              "Should throw error on no primary key") {
-            XCTAssertEqual($0 as! LoaderError, LoaderError.missingPrimaryKey("id", "nodes"))
+            XCTAssertEqual($0 as! LoaderError, LoaderError.missingSourceID("nodes"))
         }
 
     }
     func testDuplicateKey() throws {
-        let loader = RelationalPackageLoader(manager: manager)
+        let loader = RelationalPackageLoader(graph: graph)
         let record = Record(["id":"1"])
         let relation = NodeRelation(name: "nodes")
 
@@ -60,12 +60,12 @@ final class RelationalPackageLoaderTests: XCTestCase {
         // Load another node with the same key
         XCTAssertThrowsError(try loader.loadNode(record, relation: relation),
                              "Should throw error on duplicate key") {
-            XCTAssertEqual($0 as! LoaderError, LoaderError.duplicateKey("1", "nodes"))
+            XCTAssertEqual($0 as! LoaderError, LoaderError.duplicateSourceID("1", "nodes"))
         }
     }
     
     func testLoadRecord() throws {
-        let loader = RelationalPackageLoader(manager: manager)
+        let loader = RelationalPackageLoader(graph: graph)
         let record = Record(["id":"1", "name": "one"])
         let relation = NodeRelation(name: "nodes")
 
@@ -80,7 +80,7 @@ final class RelationalPackageLoaderTests: XCTestCase {
     }
     
     func testLoadLink() throws {
-        let loader = RelationalPackageLoader(manager: manager)
+        let loader = RelationalPackageLoader(graph: graph)
         let nodeRelation = NodeRelation(name: "nodes")
         let linkRelation = LinkRelation(name: "link", originRelation: "nodes")
         let originRecord = Record(["id":"1", "name": "one"])
@@ -103,7 +103,7 @@ final class RelationalPackageLoaderTests: XCTestCase {
     }
     
     func testLoadLinkDifferentRelation() throws {
-        let loader = RelationalPackageLoader(manager: manager)
+        let loader = RelationalPackageLoader(graph: graph)
         let originRelation = NodeRelation(name: "nodes")
         let originRecord = Record(["id":"1", "name": "one"])
 
@@ -127,7 +127,7 @@ final class RelationalPackageLoaderTests: XCTestCase {
     }
 
     func testLoadLinks() throws {
-        let loader = RelationalPackageLoader(manager: manager)
+        let loader = RelationalPackageLoader(graph: graph)
         let nodeRecords = RecordSet(
             schema: Schema(["id", "name"]),
             [

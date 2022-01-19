@@ -37,20 +37,25 @@ import Markdown
 ///         list item.
 ///
 public class MarkdownLoader: Loader {
+    
     public var currentHeading: Heading?
     public var currentNode: Node?
     
-    let manager: GraphManager
+    let graph: Graph
     
     /// Creates a markdown loader that will load the input into using the
     /// provided graph manager.
-    required public init(manager: GraphManager) {
-        self.manager = manager
+    required public init(graph: Graph) {
+        self.graph = graph
     }
     
     /// Loads a markdown from a source URL.
     ///
-    public func load(from source: URL) throws -> Node? {
+    public func load(from source: URL, preserveIdentity: Bool = false) throws -> [String:Node] {
+        guard preserveIdentity == true else {
+            throw LoaderError.preserveIdentityNotSupported
+        }
+        
         let document = try Markdown.Document(parsing: source)
 
         guard let node = load(document: document) else {
@@ -59,7 +64,8 @@ public class MarkdownLoader: Loader {
         }
 
         node["source"] = .string(source.absoluteString)
-        return node
+        
+        return ["main": node]
     }
 
     /// Loads a markdown document to the graph.
@@ -102,7 +108,7 @@ public class MarkdownLoader: Loader {
         }
         attributes["level"] = .int(section.level)
         let sectionNode = Node(attributes: attributes)
-        manager.graph.add(sectionNode)
+        graph.add(sectionNode)
 
         // 1. Load subsections
         for (index, subsection) in section.subsections.enumerated() {
@@ -111,7 +117,7 @@ public class MarkdownLoader: Loader {
                 "label": "subsection",
                 "order": .int(index),
             ]
-            manager.graph.connect(from: sectionNode,
+            graph.connect(from: sectionNode,
                                  to: node,
                                  attributes: attributes)
         }
@@ -125,9 +131,9 @@ public class MarkdownLoader: Loader {
                 "text": .string(block.format())
             ]
             let blockNode = Node(attributes: blockAttributes)
-            manager.graph.add(blockNode)
+            graph.add(blockNode)
 
-            manager.graph.connect(from: sectionNode,
+            graph.connect(from: sectionNode,
                                  to: blockNode,
                                  attributes: blockAttributes)
         }

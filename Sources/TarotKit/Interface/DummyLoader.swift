@@ -11,15 +11,15 @@ import Foundation
 /// A loader that loads nothing. Development placeholder.
 ///
 public class DummyLoader: Loader {
-    public required init(manager: GraphManager) {
+    public required init(graph: Graph) {
         print("Dummy loader created.")
         // Do nothing
     }
     
-    public func load(from: URL) throws -> Node? {
+    public func load(from source: URL, preserveIdentity: Bool) throws -> [String:Node] {
         print("Dummy loader pretends loading, in fact it does nothing.")
-        return nil
         // Do nothing
+        return [:]
     }
     
 }
