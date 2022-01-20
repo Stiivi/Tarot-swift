@@ -229,7 +229,7 @@ public class RelationalPackageLoader: Loader {
     /// For more information see: `class:Package`
     ///
     public func load(from source: URL, preserveIdentity: Bool) throws -> [String : Node] {
-        guard preserveIdentity == true else {
+        guard !preserveIdentity else {
             throw LoaderError.preserveIdentityNotSupported
         }
         // Load the package info from `info.json`

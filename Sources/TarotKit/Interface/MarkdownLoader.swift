@@ -52,7 +52,7 @@ public class MarkdownLoader: Loader {
     /// Loads a markdown from a source URL.
     ///
     public func load(from source: URL, preserveIdentity: Bool = false) throws -> [String:Node] {
-        guard preserveIdentity == true else {
+        guard !preserveIdentity else {
             throw LoaderError.preserveIdentityNotSupported
         }
         
@@ -65,7 +65,7 @@ public class MarkdownLoader: Loader {
 
         node["source"] = .string(source.absoluteString)
         
-        return ["main": node]
+        return ["batch": node]
     }
 
     /// Loads a markdown document to the graph.

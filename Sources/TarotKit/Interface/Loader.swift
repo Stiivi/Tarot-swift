@@ -29,8 +29,18 @@ public protocol Loader {
     ///   - preserveIdentity: Flag whether the loader sohuld preserve IDs from
     ///     the source and set the internal IDs to be the same.
     ///
-    /// - Tip: It is recommended that the loader returns at least one named node
-    /// that might represent the loaded batch. Suggested name is `main`.
+    /// It is up to the caller of this method how the linking of the named
+    /// nodes is performed after the loading. For example the command-line tool
+    /// uses a node named `batch` and links it with the catalog under the name
+    /// `last_import`. ``TarotFileLoader`` provides a name `catalog` which
+    /// points to a node representing a node catalog. This is used, for example,
+    /// when loading a new graph into the graph manager. Can be used for
+    /// merging two catalogs.
+    ///
+    /// - Tip: It is recommended that the loader returns at least one named
+    /// node. Returned node represents the loadeded batch, document or a
+    /// collection of items. Suggested name is `batch` to make it work
+    /// with the import command.
     ///
     /// Objects implementing the method should throw an
     /// ``LoaderError/preserveIdentityNotSupported`` error if they

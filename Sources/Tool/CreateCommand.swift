@@ -17,22 +17,21 @@ extension Tarot {
         @OptionGroup var options: Options
 
         mutating func run() throws {
-            let url = databaseURL(options: options)
+            let manager = GraphManager()
 
+            let catalogNode = Node()
+            manager.graph.add(catalogNode)
+            manager.setCatalog( catalogNode)
+
+            let url = databaseURL(options: options)
+            let writer = TarotFileWriter(url: url)
+            
             do {
-                try FilePackageStore.initialize(url: url)
+                try manager.save(using: writer)
             }
             catch {
-                fatalError("Unable to create a file storage: \(error)")
+                fatalError("Unable to create store: \(error)")
             }
-
-            let manager = createManager(options: options)
-            
-            let catalog = Node()
-            manager.graph.add(catalog)
-            manager.catalog = KeyedCollection(catalog, selector: LinkSelector("item"))
-
-            try finalizeManager(manager: manager, options: options)
         }
     }
 }

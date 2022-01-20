@@ -25,11 +25,11 @@ guessed.
     @Option(name: [.long, .customShort("f")],
             help: "Format of the resource.")
     var format = "auto"
-    
+
     @Option(name: [.long, .customShort("n")],
             help: "Name of import's represented object in the catalog.")
     var name = "last_import"
-    
+
     @Argument(help: "Resource path or URL")
     var source: String
 
@@ -84,33 +84,19 @@ guessed.
         
         switch format {
         case "package":
-            loader = RelationalPackageLoader(manager: manager)
+            loader = RelationalPackageLoader(graph: manager.graph)
         case "markdown":
-            loader = MarkdownLoader(manager: manager)
+            loader = MarkdownLoader(graph: manager.graph)
         default:
             fatalError("Unknown input format: \(format)")
         }
-        // FIXME: !!! THIS !!!
-        // reader = PackageReader()
-        // reader.open()
-        // reader.close()
         
-        
-        if let importedNode = try loader.load(from: sourceURL) {
-            if let catalog = manager.catalog {
-                catalog.setNode(importedNode, forKey: .string(name))
-                print("Import finished. Imported object name: \(name)")
-            }
-            else {
-                print("Import finished. Database has no catalog, import node name was ignored.")
-            }
+        let names = try loader.load(from: sourceURL, preserveIdentity: false)
+
+        /// Link the loaded batch
+        if let batch = names["batch"] {
+            manager.catalog?.setNode(batch, forKey: .string(name))
         }
-        else {
-            print("Import finished. No represented object created by import, import node name was ignored.")
-        }
-        
         try finalizeManager(manager: manager, options: options)
     }
 }
-
-

@@ -56,7 +56,3 @@ Structures and functionality to query the graph.
 - ``ObjectPredicate``
 - ``AttributeValuePredicate``
 
-### Persistence
-
-- <doc:Persistence>
-

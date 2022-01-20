@@ -21,6 +21,9 @@ Import is performed by a loader. A loader loads a resource, converts entities
 and their properties at the source into nodes and/or links in the graph. Loaders
 can create additional artefacts that represent the loaded batch.
 
+Loader returns a dictionary of named objects. The dictionary is used by the
+caller to perform additional linking of nodes of some special significance.
+
 - ``Loader``
 - ``TarotFileLoader``
 - ``MarkdownLoader``

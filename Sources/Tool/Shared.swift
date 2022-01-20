@@ -46,20 +46,12 @@ func databaseURL(options: Options) -> URL {
 func createManager(options: Options) -> GraphManager {
     let manager: GraphManager
     let dataURL = databaseURL(options: options)
-    let store: FilePackageStore
 
     do {
-        store = try FilePackageStore(url: dataURL)
+        manager = try GraphManager(contentsOf: dataURL)
     }
     catch {
-        fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
-    }
-    
-    do {
-        manager = try GraphManager(store: store)
-    }
-    catch {
-        fatalError("Unable to initialize manager: \(error)")
+        fatalError("Unable to open store at: \(dataURL). Reason: \(error)")
     }
     
     return manager
@@ -69,14 +61,7 @@ func createManager(options: Options) -> GraphManager {
 ///
 func finalizeManager(manager: GraphManager, options: Options) throws {
     let dataURL = databaseURL(options: options)
-    let store: FilePackageStore
+    let writer = TarotFileWriter(url: dataURL)
 
-    do {
-        store = try FilePackageStore(url: dataURL)
-    }
-    catch {
-        fatalError("Unable to open database at: \(dataURL). Reason: \(error)")
-    }
-
-    try manager.save(to: store)
+    try manager.save(using: writer)
 }

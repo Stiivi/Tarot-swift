@@ -72,21 +72,6 @@ Available formats: markdown.
             }
 
             try exporter.export(node: node, into: outputURL)
-            
-//            if let traitName = traitName {
-//                nodes = manager.graph.filter(traitName: traitName)
-//            }
-//            else {
-//                nodes = Array(manager.graph.nodes)
-//            }
-//
-//            let encoder = JSONEncoder()
-//            for node in nodes {
-//                // FIXME: Implement this
-//                fatalError("Not implemented")
-//                // let dict = node.asDictionary()
-//                // let data = try encoder.encode(dict)
-//            }
         }
     }
 }

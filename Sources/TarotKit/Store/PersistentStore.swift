@@ -35,3 +35,4 @@ public protocol PersistentStore {
     /// Note: This operation is very destructive.
     func deleteAll() throws
 }
+
