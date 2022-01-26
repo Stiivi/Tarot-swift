@@ -18,12 +18,14 @@
 // FIXME: We are importing Records only because of Value
 // TODO: Move Value functionality from Records to this module
 import Records
+import Combine
 
 /// Protocol for a basic graph implementation. This protocol is
 /// a scaffolding for development - it helps to separate interface from the
 /// implementaiton.
 ///
 public protocol GraphProtocol {
+    // TODO: Now unused, should be removed?
     // TODO: There is add(Node) but no add(Link)
     // TODO: There is connect(...) as a creation method but not add(Link)
     // TODO: There is connect(...) as a creation method but not createNode(...)
@@ -98,10 +100,15 @@ public class Graph {
     /// ID generator for graph objects created by the graph.
     private var idGenerator: UniqueIDGenerator
     
-    
-    /// An object that will receive notifications on changes in the graph.
-    ///
-    public var delegate: GraphDelegate? = nil
+    var _publisher: PassthroughSubject<GraphChange, Never>? = nil
+
+    /// Publisher for graph changes
+    var publisher: PassthroughSubject<GraphChange, Never> {
+        if _publisher == nil {
+            _publisher = PassthroughSubject<GraphChange, Never>()
+        }
+        return _publisher!
+    }
     
     /// Create an empty graph.
     ///
@@ -168,7 +175,8 @@ public class Graph {
 
         nodeIndex[node.id!] = node
         
-        delegate?.graph(self, didAdd: node)
+        let change = GraphChange.addNode(node)
+        didChange(change)
     }
     
     /// Removes node from the graph and removes all incoming and outgoing links
@@ -193,9 +201,9 @@ public class Graph {
         nodeIndex[oid] = nil
 
         node.graph = nil
-        node.id = nil
 
-        delegate?.graph(self, didRemove: node)
+        let change = GraphChange.removeNode(node)
+        didChange(change)
     }
     
     /// Tests whether the graph contains a node.
@@ -266,7 +274,9 @@ public class Graph {
             link[item.key] = item.value
         }
         
-        delegate?.graph(self, didConnect: link)
+        let change = GraphChange.connect(link)
+        didChange(change)
+
         return link
     }
     
@@ -311,7 +321,10 @@ public class Graph {
             fatalError("Trying to remove unknown link: \(link)")
         }
         self.linkIndex[id] = nil
-        delegate?.graph(self, didDisconnect: link)
+        link.graph = nil
+
+        let change = GraphChange.disconnect(link)
+        didChange(change)
     }
     
     /// Get a list of outgoing links from a node.
@@ -407,6 +420,11 @@ public class Graph {
             fatalError("Node is not associated with this graph.")
         }
         return links.contains { $0.origin === node || $0.target === node }
+    }
+    
+    /// Called when graph has changed.
+    func didChange(_ change: GraphChange) {
+        publisher.send(change)
     }
 }
 

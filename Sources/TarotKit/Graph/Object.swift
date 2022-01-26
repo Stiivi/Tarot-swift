@@ -68,8 +68,19 @@ open class Object: Identifiable {
         }
         /// Sets attribute value for an attribute key `key`.
         set(value) {
-            // #FIXME: Notify graph delegate
             attributes[key] = value
+
+            // Notify graph
+            guard let graph = self.graph else {
+                return
+            }
+
+            if let value = value {
+                graph.didChange(.setAttribute(self, key, value))
+            }
+            else {
+                graph.didChange(.unsetAttribute(self, key))
+            }
         }
     }
 }

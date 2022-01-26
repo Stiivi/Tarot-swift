@@ -98,7 +98,7 @@ public class LabelledNeighbourhood: BaseNodeProjection {
 
     /// Remove all links from the neighbourhood.
     ///
-    public func removeAll() {
+    public func disconnectAll() {
         guard let graph = self.graph else {
             // Nothing to disconnect here
             return

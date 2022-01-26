@@ -58,7 +58,7 @@ public class Cell: BaseNodeProjection {
     ///
     public func setContent(_ node: Node, attributes: AttributeDictionary = [:]) {
         // Remove all nodes from the neighborhood
-        hood.removeAll()
+        hood.disconnectAll()
         hood.add(node, attributes: attributes)
     }
 
@@ -66,7 +66,7 @@ public class Cell: BaseNodeProjection {
     /// multiple content nodes, then all links to them are removed.
     ///
     public func removeContent() {
-        hood.removeAll()
+        hood.disconnectAll()
     }
 
 }

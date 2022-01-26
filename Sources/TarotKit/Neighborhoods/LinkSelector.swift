@@ -17,6 +17,20 @@ public enum LinkDirection {
     case outgoing
 }
 
+/*
+
+ String representation
+ 
+ labelAttribute:label
+ 
+ examples:
+ 
+ - "label:item"
+ - "label:thing"
+ - "!label:thing" -> reversed
+
+ */
+
 /// Describes links that have a label attribute.
 ///
 public struct LinkSelector {

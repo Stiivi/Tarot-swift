@@ -16,8 +16,6 @@ are the core of TarotKit.
 - ``Link``
 - ``Object``
 
-- ``GraphDelegate``
-
 ### Associated Types
 
 - ``OID``
