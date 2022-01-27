@@ -33,10 +33,6 @@ Available formats: markdown.
         @Argument(help: "Named node to be exported")
         var nodeName: String
         
-        // Design notes:
-        //
-        // tarot extract Card
-        //
         mutating func run() throws {
             let manager = createManager(options: options)
             guard let catalog = manager.catalog else {

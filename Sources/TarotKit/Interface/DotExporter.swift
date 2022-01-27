@@ -5,6 +5,8 @@
 //  Created by Stefan Urbanek on 2021/10/21.
 //
 
+import Foundation
+
 // NOTE: This is simple one-use exporter.
 // TODO: Make this export to a string and make it export by appending content.
 
@@ -12,7 +14,7 @@
 /// dot language file.
 public class DotExporter {
     /// Path of the file to be exported to.
-    let path: String
+    let url: URL
 
     /// Name of the graph in the output file.
     let name: String
@@ -31,15 +33,18 @@ public class DotExporter {
     ///     as a label of nodes in the output. If not set then node ID will be
     ///     used.
     ///
-    public init(path: String, name: String, labelAttribute: String? = nil) {
-        self.path = path
+    public init(url: URL, name: String, labelAttribute: String? = nil) {
+        self.url = url
         self.name = name
         self.labelAttribute = labelAttribute
     }
     
     /// Export nodes and links into the output.
-    public func export(nodes: [Node], links: [Link]) {
-        let writer = DotWriter(path: path, name: name, type: .directed)
+    public func export(nodes: [Node], links: [Link]) throws {
+        var output: String = ""
+        let formatter = DotFormatter(name: name, type: .directed)
+
+        output = formatter.header()
         
         for node in nodes {
             let label: String
@@ -55,15 +60,19 @@ public class DotExporter {
             let attributes: [String:String] = [
                 "label": label
             ]
-            
+
             let id = "\(node.id ?? 0)"
-            writer.writeNode(id, attributes: attributes)
+            output += formatter.node(id, attributes: attributes)
         }
-        
+
         for link in links {
-            writer.writeEdge(from:"\(link.origin.id ?? 0)",
-                             to:"\(link.target.id ?? 0)")
+            output += formatter.edge(from:"\(link.origin.id ?? 0)",
+                                     to:"\(link.target.id ?? 0)")
         }
-        writer.close()
+
+        output += formatter.footer()
+        
+        try output.write(to: url, atomically: true, encoding: .utf8)
     }
 }
+

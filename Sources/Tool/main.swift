@@ -75,19 +75,31 @@ extension Tarot {
         @Option(name: [.long, .customShort("l")],
                 help: "Node attribute that will be used as node label")
         var labelAttribute = "id"
-
-
         
-        mutating func run() {
+        mutating func run() throws {
             let manager = createManager(options: options)
-            
-            let exporter = DotExporter(path: output,
+           
+            // This is the same validation as in Tarot.Export command
+            guard let testURL = URL(string: output) else {
+                fatalError("Invalid resource reference: \(output)")
+            }
+            let outputURL: URL
+
+            if testURL.scheme == nil {
+                outputURL = URL(fileURLWithPath: output)
+            }
+            else {
+                outputURL = testURL
+            }
+            // ^^ --- up until here (from TarotExport)
+
+            let exporter = DotExporter(url: outputURL,
                                        name: name,
                                        labelAttribute: labelAttribute)
 
             // TODO: Allow export of a selection
-            exporter.export(nodes: Array(manager.graph.nodes),
-                            links: Array(manager.graph.links))
+            try exporter.export(nodes: Array(manager.graph.nodes),
+                                links: Array(manager.graph.links))
         }
     }
 }
