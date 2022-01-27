@@ -11,6 +11,7 @@ import Combine
 
 /// Publisher for graph changes
 public typealias GraphChangePublisher = AnyPublisher<GraphChange, Never>
+public typealias GraphObserver = Cancellable
 
 extension Graph {
     /// Returns a publisher that publishes any changes made within the graph.
@@ -18,6 +19,7 @@ extension Graph {
     public func observe() -> GraphChangePublisher {
         return AnyPublisher(self.publisher)
     }
+    
     /// Returns a publisher that publishes structural changes to the graph.
     /// A structural change is a change that involves nodes and links: adding
     /// and removing a node, creating and disconnecting a link. Change of
