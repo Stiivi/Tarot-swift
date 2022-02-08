@@ -56,7 +56,7 @@ public class SequenceIDGenerator: UniqueIDGenerator {
 
     public func markUsed(_ id: OID) {
         // This is a very primitive
-        if id > sequence {
+        if id >= sequence {
             sequence = id + 1
         }
     }

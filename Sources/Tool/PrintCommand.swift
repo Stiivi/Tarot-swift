@@ -12,7 +12,7 @@ import ArgumentParser
 extension Tarot {
     struct Print: ParsableCommand {
         static var configuration
-            = CommandConfiguration(abstract: "List named nodes")
+            = CommandConfiguration(abstract: "Print nodes and their attributes")
         @OptionGroup var options: Options
 
         @Flag(name: [.customLong("incoming")],

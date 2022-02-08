@@ -10,9 +10,12 @@ import TarotKit
 import ArgumentParser
 
 extension Tarot {
-    struct Create: ParsableCommand {
+    struct CreateDB: ParsableCommand {
         static var configuration
-            = CommandConfiguration(abstract: "Create an empty Tarot database.")
+            = CommandConfiguration(
+                commandName: "create-db",
+                abstract: "Create an empty Tarot database."
+            )
 
         @OptionGroup var options: Options
 

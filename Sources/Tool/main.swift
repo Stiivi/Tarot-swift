@@ -15,15 +15,20 @@ import ArgumentParser
 
 struct Tarot: ParsableCommand {
     static var configuration = CommandConfiguration(
-        abstract: "Tarot utility.",
+        abstract: "Tarot graph utility.",
         subcommands: [
-            Create.self,
-            Import.self,
-            List.self,
-            Export.self,
-            Print.self,
-            WriteDOT.self,
+            CreateDB.self,
             CreateCatalog.self,
+            CreateNode.self,
+            Remove.self,
+            SetAttribute.self,
+            Connect.self,
+            List.self,
+            Catalog.self,
+            Print.self,
+            Import.self,
+            Export.self,
+            WriteDOT.self,
         ],
         defaultSubcommand: List.self)
 }
