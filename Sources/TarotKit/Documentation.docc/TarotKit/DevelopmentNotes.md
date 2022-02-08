@@ -5,15 +5,14 @@ Here are few notes about the development of the TarotKit.
 ## Overview
 
 This is an experiment, a toy, an idea playground for discovering the knoweledge 
-capture and knowledge codification system itself.
+capture and knowledge codification system.
 
-Think of it as a "knowledge aided design and simulation" system.
+Think of it as a "knowledge aided design" system.
 
 Design principle:
 
-- Every entity that represents the content knowledge is represented by the
-  graph
-- Graph structures should be as simple as possible
+- Every entity that represents a knowledge is represented in a graph.
+- Graph structures should be as simple as possible.
 - Multple perspectives on structures exists and is more common than exception.
   One has to be able to express them.
 - Primarily porovide mechanisms, then provide convenience policies

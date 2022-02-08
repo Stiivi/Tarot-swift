@@ -74,10 +74,10 @@ extension NodeProjection {
 }
 
 /// Convenience base class for concrete implementations of a node projection.
-public class BaseNodeProjection: NodeProjection {
+open class BaseNodeProjection: NodeProjection {
     public var representedNode: Node
     
-    init(_ node: Node) {
+    public init(_ node: Node) {
         self.representedNode = node
     }
 }

@@ -25,6 +25,10 @@ public enum GraphChange: Equatable {
     /// - Note: Node's `graph` property is set to `nil`, since the node
     /// no longer belongs to the graph.
     ///
+    /// - Important: It is advised that an observer of this change will not
+    /// change the removed node properties. Some applications might retain
+    /// the node to perform undo cations.
+    ///
     case removeNode(Node)
 
     /// Denotes a change to a graph when a link was created.
@@ -37,6 +41,10 @@ public enum GraphChange: Equatable {
     /// no longer belongs to the graph. The link still points to valid
     /// origin and target nodes, but they are not guaranteed to have `graph`
     /// property set either.
+    ///
+    /// - Important: It is advised that an observer of this change will not
+    /// change the removed link properties. Some applications might retain
+    /// the link to perform undo cations.
     ///
     case disconnect(Link)
     

@@ -182,6 +182,7 @@ public class Graph {
     /// Removes node from the graph and removes all incoming and outgoing links
     /// for that node.
     ///
+    // TODO: We need to distinguish between removing the nodes and unlinking the nodes
     public func remove(_ node: Node) {
         // TODO: This should be more atomic and shuold not remove a node if there are any links
         guard node.graph === self else {
