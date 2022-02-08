@@ -12,7 +12,7 @@ import ArgumentParser
 extension Tarot {
     struct List: ParsableCommand {
         static var configuration
-            = CommandConfiguration(abstract: "List named nodes")
+            = CommandConfiguration(abstract: "List named nodes from the catalog and their IDs")
         @OptionGroup var options: Options
 
         mutating func run() {
@@ -23,7 +23,8 @@ extension Tarot {
             }
             
             for key in catalog.keys {
-                print(key)
+                let object = catalog[key]!
+                print("\(key)\t\(object.id!)")
             }
         }
     }

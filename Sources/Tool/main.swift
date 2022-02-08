@@ -34,30 +34,6 @@ struct Options: ParsableArguments {
 }
 
 extension Tarot {
-    struct Print: ParsableCommand {
-        static var configuration
-            = CommandConfiguration(abstract: "Print an object by reference.")
-
-        @OptionGroup var options: Options
-
-        @Argument(help: "Object identifier")
-        var reference: Int
-
-        mutating func run() {
-            let manager = createManager(options: options)
-
-            print("Node: \(reference)")
-            
-            guard let object: Object = manager.graph.node(reference) ?? manager.graph.link(reference) else {
-                fatalError("Unknown object: \(reference)")
-            }
-
-            print("Object: \(object)")
-        }
-    }
-}
-
-extension Tarot {
     struct WriteDOT: ParsableCommand {
         static var configuration
             = CommandConfiguration(abstract: "Write a Graphviz DOT file.")
