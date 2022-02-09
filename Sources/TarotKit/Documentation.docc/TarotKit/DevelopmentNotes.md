@@ -79,11 +79,13 @@ status, if it is relevant to be pointed out. The possible status is:
 
 ## On Generics
 
-The goal of the project is to provide a concrete, opinionated model for
-knowledge representation and design. The goal is not to provide a graph and
-related structures for generic usage.
+### Concrete Graph Model
 
-Not providing genenerics allows us:
+The goal of the project is to provide a concrete, opinionated model for
+knowledge representation and design. The goal is not to provide an abstract
+graph structure.
+
+Not making the graph (and some other objects) as a genenerics allows us:
 
 - reduce cognitive load during the development process of the framework
 - reduce visual noise of the source code (and therefore another reduction of 
@@ -97,6 +99,15 @@ Not providing genenerics allows us:
     - reduce the amount of metadata that might be required to be exposed or 
       consumed when interacting with the outside world
 - make the framework more friendly to beginners
+
+
+### Exploration of Requirements
+
+During the development I want to understand the model first, what is required
+and what is not. I want to observe repeated interface patterns and how they
+interact with each other. I want to understand what is required for implementing
+the model in some other programming language that might not provide generics
+natively, for example Python.
 
 ## Analogies
 

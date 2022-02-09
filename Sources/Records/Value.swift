@@ -9,7 +9,7 @@ import Foundation
 
 /// ValueType specifies a data type of a value that is used in interfaces.
 ///
-public enum ValueType: String, Equatable, Codable {
+public enum ValueType: String, Equatable, Codable, CustomStringConvertible {
     case bool
     case int
     case float
@@ -47,7 +47,15 @@ public enum ValueType: String, Equatable, Codable {
         case (.string, .int):    return true
         case (.string, .float): return true
         }
-        
+    }
+    
+    public var description: String {
+        switch self {
+        case .bool: return "bool"
+        case .int: return "int"
+        case .float: return "float"
+        case .string: return "string"
+        }
     }
 }
 
