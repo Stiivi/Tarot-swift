@@ -103,6 +103,25 @@ public class IndexedCollection: LabelledNeighbourhood {
 
         self.add(node, attributes:linkAttributes)
     }
+   
+    /// Remove all links to the node. Reindex the links after the removed node.
+    ///
+    public func remove(_ node: Node) {
+        var index = 0
+        
+        for link in links {
+            if link.target === node {
+                graph?.disconnect(link: link)
+            }
+            else {
+                if link[linkIndexAttribute] != .int(index) {
+                    link[linkIndexAttribute] = .int(index)
+                    index += 1
+                }
+            }
+        }
+    }
+
     
     /// Return a node at index `index` or `nil` when there is no node at that
     /// index. There might be no node at given index if the index is out of
