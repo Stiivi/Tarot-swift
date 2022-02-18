@@ -41,7 +41,7 @@ open class Object: Identifiable {
     
     /// List of all keys of object's attributes that are set to some value.
     ///
-    var attributeKeys: [AttributeKey] {
+    public var attributeKeys: [AttributeKey] {
         return Array(attributes.keys)
     }
 

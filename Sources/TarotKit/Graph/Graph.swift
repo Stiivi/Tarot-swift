@@ -281,6 +281,42 @@ public class Graph {
         return link
     }
     
+    /// Adds a custom-created link to the graph.
+    ///
+    /// This method can be also used to associate previously associated link
+    /// with the graph. Typical use-case would be an undo command.
+    /// 
+    /// - Note: A link object belongs to one graph only. It can not be shared
+    /// once added to a graph.
+    ///
+    /// - Parameters:
+    ///
+    ///     - link: Link to be added to the graph.
+    ///
+    public func add(_ link: Link) {
+        guard link.graph == nil else {
+            fatalError("Trying to associate already associated link: \(link)")
+        }
+        if let id = link.id {
+            guard linkIndex[id] == nil else {
+                fatalError("Trying to associate a link with id that already exists: \(id)")
+            }
+            idGenerator.markUsed(id)
+        }
+        else {
+            link.id = idGenerator.next()
+        }
+        
+        // Register the object
+        link.graph = self
+
+        linkIndex[link.id!] = link
+        
+        let change = GraphChange.connect(link)
+        didChange(change)
+    }
+
+    
 //    Note: We can not disconnect all of links between two nodes as it is
 //          not a simple operation that can have an easy reversal.
 //

@@ -26,7 +26,7 @@ public final class Node: Object {
     public var incoming: [Link] {
         return graph!.incoming(self)
     }
-
+    
     /// Connects the node to a `target` with optional attributes to be set
     /// on the newly created link.
     ///

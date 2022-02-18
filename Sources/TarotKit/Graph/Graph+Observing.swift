@@ -17,7 +17,7 @@ extension Graph {
     /// Returns a publisher that publishes any changes made within the graph.
     ///
     public func observe() -> GraphChangePublisher {
-        return AnyPublisher(self.publisher)
+        return GraphChangePublisher(self.publisher)
     }
     
     /// Returns a publisher that publishes structural changes to the graph.
@@ -39,7 +39,7 @@ extension Graph {
             case .unsetAttribute: return false
             }
         }
-        return AnyPublisher(publisher)
+        return GraphChangePublisher(publisher)
     }
 
     /// Returns a publisher for observing changes to attributes of a node or a
@@ -54,7 +54,7 @@ extension Graph {
             default: return false
             }
         }
-        return AnyPublisher(publisher)
+        return GraphChangePublisher(publisher)
     }
     
     /// Returns a publisher that observes changes to a neigbourhood of a node.
@@ -70,7 +70,7 @@ extension Graph {
             default: return false
             }
         }
-        return AnyPublisher(publisher)
+        return GraphChangePublisher(publisher)
     }
 
 }

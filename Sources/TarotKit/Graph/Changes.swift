@@ -90,3 +90,19 @@ enum GraphChangeType: String {
     case setAttribute
     case unsetAttribute
 }
+
+// TODO: Unify this with GraphChange
+// Note: We have it separate for now because it does not fit to the semantics
+// of the GraphChange entity
+//
+public struct GraphAttributeChange {
+    public let object: Object
+    public let key: AttributeKey
+    public let value: Value?
+    
+    public init(object: Object, key: AttributeKey, value: Value?) {
+        self.object = object
+        self.key = key
+        self.value = value
+    }
+}
