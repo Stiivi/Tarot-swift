@@ -57,7 +57,7 @@ extension Graph {
         return GraphChangePublisher(publisher)
     }
     
-    /// Returns a publisher that observes changes to a neigbourhood of a node.
+    /// Returns a publisher that observes changes to a neighbourhood of a node.
     /// Observed changes are creation or disconnection of a link where
     /// the node is either an origin or a target.
     ///
@@ -73,4 +73,18 @@ extension Graph {
         return GraphChangePublisher(publisher)
     }
 
+    /// Returns a publisher that observes removal of a node.
+    /// Observed changes are creation or disconnection of a link where
+    /// the node is either an origin or a target.
+    ///
+    public func observeRemoval(node: Node) -> GraphChangePublisher {
+        let publisher = self.publisher.filter {
+            change in
+            switch change {
+            case .removeNode(let removedNode): return node === removedNode
+            default: return false
+            }
+        }
+        return GraphChangePublisher(publisher)
+    }
 }
