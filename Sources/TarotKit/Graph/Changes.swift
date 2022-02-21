@@ -123,3 +123,15 @@ public struct GraphAttributeChange {
         self.value = value
     }
 }
+
+public struct GraphAttributeRename {
+    public let object: Object
+    public let oldKey: AttributeKey
+    public let newKey: AttributeKey
+    
+    public init(object: Object, oldKey: AttributeKey, newKey: AttributeKey) {
+        self.object = object
+        self.oldKey = oldKey
+        self.newKey = newKey
+    }
+}
