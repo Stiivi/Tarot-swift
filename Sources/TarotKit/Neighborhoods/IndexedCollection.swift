@@ -95,13 +95,16 @@ public class IndexedCollection: LabelledNeighbourhood {
     /// - Note: This function assumes that this neighbourhood is completely
     ///         managed by it.
     ///
-    public func append(_ node: Node, attributes: [String:Value] = [:]) {
+    /// - Returns: A link that connects the node that has been added to the
+    ///   neighbourhood.
+    ///
+    public func append(_ node: Node, attributes: [String:Value] = [:]) -> Link {
         let index = endIndex
         
         var linkAttributes = attributes
         linkAttributes[linkIndexAttribute] = .int(index)
 
-        self.add(node, attributes:linkAttributes)
+        return self.add(node, attributes:linkAttributes)
     }
    
     /// Remove all links to the node. Reindex the links after the removed node.

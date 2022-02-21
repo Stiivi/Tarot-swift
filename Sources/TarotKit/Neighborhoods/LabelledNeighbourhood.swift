@@ -87,13 +87,19 @@ public class LabelledNeighbourhood: BaseNodeProjection {
     /// - Attention: Do not call this method directly. Subclasses can call this
     ///  method to create a correct link selector.
     ///
-    public func add(_ node: Node, attributes: [String:Value]=[:]) {
+    /// - Returns: A link that connects the node that has been added to the
+    ///   neighbourhood.
+    ///
+    @discardableResult
+    public func add(_ node: Node, attributes: [String:Value]=[:]) -> Link {
         var linkAttributes = attributes
         linkAttributes[selector.labelAttribute] = selector.label
+        let link: Link
         switch selector.direction {
-        case .incoming: node.connect(to: representedNode, attributes: linkAttributes)
-        case .outgoing: representedNode.connect(to: node, attributes: linkAttributes)
+        case .incoming: link = node.connect(to: representedNode, attributes: linkAttributes)
+        case .outgoing: link = representedNode.connect(to: node, attributes: linkAttributes)
         }
+        return link
     }
 
     /// Remove all links from the neighbourhood.

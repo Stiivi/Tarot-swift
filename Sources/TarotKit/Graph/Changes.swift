@@ -58,6 +58,23 @@ public enum GraphChange: Equatable {
     ///
     case unsetAttribute(Object, AttributeKey)
     
+    /// Returns `true` if the change is related to given object. For node
+    /// removal, node addition and attribute changes the object is related
+    /// is the only objects of the change. For connection and disconnection
+    /// changes the object is related if the object is the link, origin or
+    /// a target of the link.
+    ///
+    public func isRelated(_ object: Object) -> Bool {
+        switch self {
+        case let .addNode(node): return node === object
+        case let .removeNode(node): return node === object
+        case let .connect(link): return link === object || link.origin === object || link.target === object
+        case let .disconnect(link): return link === object || link.origin === object || link.target === object
+        case let .setAttribute(another, _, _): return another === object
+        case let .unsetAttribute(another, _): return another === object
+        }
+    }
+    
     /// Compare two changes. Two graph changes are equal if they are of the same
     /// type, when the graph objects are identical and when the rest of
     /// compared change attributes are equal.
