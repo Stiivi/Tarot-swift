@@ -1,17 +1,16 @@
 # ``TarotKit``
 
-An intertangled knowledge caputre system with multiple perspectives. An
-experiment.
+Graph world sculpting library. TarotKit is a library and set of tools for
+creating mental worlds represented as a graph with focus on the creation
+process over graph analysis.
 
-This is an experiment, a toy, not (yet) a serious project.
+This toolkit itself is an experiment, a toy, an idea playground and a space
+to discover itself.
 
-Tarot is a graph based knowledge codification system. It means that the
-bits of knowledge are preserved in a non-linear inter-connected form. The core
-structure is a ``Graph`` that represents a directed labelled multi-graph.
-That means that the structure is composed of nodes and links between the nodes
-and that both the nodes and links can have information associated with them.
-Links and nodes can have a dictionary of scalar attributes of few basic types
-associated with them.
+Tarot is a labelled-property graph system. The core structure is a ``Graph``,
+which is a directed graph where graph objects – links and nodes – can have a
+set of attributes associated with them.
+
 
 See also: <doc:DevelopmentNotes>
 
