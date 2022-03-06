@@ -15,6 +15,11 @@ public final class Node: Object {
     ///
     /// It is empty when the node is not associated with a graph.
     ///
+    /// - Note: If you want to get both outgoing and incoming links of a node
+    ///   then use ``neighbours``. Using ``outgoing`` + ``incoming`` might
+    ///   result in duplicates for links that are loops to and from the same
+    ///   node.
+    ///
     public var outgoing: [Link] {
         return graph!.outgoing(self)
     }
@@ -23,8 +28,21 @@ public final class Node: Object {
     ///
     /// It is empty when the node is not associated with a graph.
     ///
+    /// - Note: If you want to get both outgoing and incoming links of a node
+    ///   then use ``neighbours``. Using ``outgoing`` + ``incoming`` might
+    ///   result in duplicates for links that are loops to and from the same
+    ///   node.
+    ///
     public var incoming: [Link] {
         return graph!.incoming(self)
+    }
+    
+    /// All the links that are associated somewhat with the node.
+    ///
+    /// It is empty when the node is not associated with a graph.
+    ///
+    public var neighbours: [Link] {
+        return graph!.neighbours(self)
     }
     
     /// Connects the node to a `target` with optional attributes to be set

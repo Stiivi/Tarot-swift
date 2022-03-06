@@ -14,19 +14,21 @@ public typealias GraphChangePublisher = AnyPublisher<GraphChange, Never>
 public typealias GraphObserver = Cancellable
 
 extension Graph {
-    /// Returns a publisher that publishes any changes made within the graph.
+    /// Returns a publisher that publishes any changes that happened in the
+    /// graph.
     ///
     public func observe() -> GraphChangePublisher {
-        return GraphChangePublisher(self.publisher)
+        return GraphChangePublisher(self.graphDidChange)
     }
     
-    /// Returns a publisher that publishes structural changes to the graph.
+    /// Returns a publisher that publishes structural changes that happened.
+    ///
     /// A structural change is a change that involves nodes and links: adding
     /// and removing a node, creating and disconnecting a link. Change of
     /// attributes is not a structural change.
     ///
     public func observeStructure() -> GraphChangePublisher {
-        let publisher = self.publisher.filter {
+        let publisher = self.graphDidChange.filter {
             change in
             switch change {
             // Observed changes
@@ -43,10 +45,11 @@ extension Graph {
     }
 
     /// Returns a publisher for observing changes to attributes of a node or a
-    /// link.
+    /// link. The publisher publishes the changes before they are applied to
+    /// the graph.
     ///
     public func observeAttributes(object observed: Object) -> GraphChangePublisher {
-        let publisher = self.publisher.filter {
+        let publisher = self.graphDidChange.filter {
             change in
             switch change {
             case .setAttribute(let obj, _, _): return obj === observed
@@ -60,9 +63,9 @@ extension Graph {
     /// Returns a publisher that observes changes to a neighbourhood of a node.
     /// Observed changes are creation or disconnection of a link where
     /// the node is either an origin or a target.
-    ///
+    /// The publisher publishes the changes before they are applied to the graph.
     public func observeNeighbourhood(node: Node) -> GraphChangePublisher {
-        let publisher = self.publisher.filter {
+        let publisher = self.graphDidChange.filter {
             change in
             switch change {
             case .connect(let link): return link.origin === node || link.target === node
@@ -77,8 +80,9 @@ extension Graph {
     /// Observed changes are creation or disconnection of a link where
     /// the node is either an origin or a target.
     ///
+    /// The publisher publishes the changes before they are applied to the graph.
     public func observeRemoval(node: Node) -> GraphChangePublisher {
-        let publisher = self.publisher.filter {
+        let publisher = self.graphDidChange.filter {
             change in
             switch change {
             case .removeNode(let removedNode): return node === removedNode

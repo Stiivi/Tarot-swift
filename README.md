@@ -15,6 +15,9 @@ Design principle:
 
 - Synthesis and mutability of structures is primary functionality. As a
   consequence: analysis and graph traversal is secondary.
+- Changes to the structure can be reverted to some extent. There must be
+  a possibility to have a reasonable undo-redo buffer, not just a single
+  transaction that can be rolled-back.
 - Library structures should be as simple as possible
 - Provide multiple perspectives on the graph structures (sub-graphs) instead
   of creating different types of graph objects.

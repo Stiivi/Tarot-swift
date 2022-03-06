@@ -20,10 +20,10 @@ public class Link: Object {
     ///
     public let target: Node
     
-    init(id: OID, origin: Node, target: Node) {
+    init(id: OID, origin: Node, target: Node, attributes: AttributeDictionary=[:]) {
         self.origin = origin
         self.target = target
-        super.init(id: id)
+        super.init(id: id, attributes: attributes)
     }
 }
 

@@ -100,16 +100,16 @@ public class Graph {
     /// ID generator for graph objects created by the graph.
     private var idGenerator: UniqueIDGenerator
     
-    var _publisher: PassthroughSubject<GraphChange, Never>? = nil
-
-    /// Publisher for graph changes
-    var publisher: PassthroughSubject<GraphChange, Never> {
-        if _publisher == nil {
-            _publisher = PassthroughSubject<GraphChange, Never>()
-        }
-        return _publisher!
-    }
+    /// Publisher of graph changes before they are applied. The associated
+    /// graph object and the graph are in their original state.
+    ///
+    public var graphWillChange = PassthroughSubject<GraphChange, Never>()
     
+    /// Publisher of graph changes after they are applied. The associated graph
+    /// object and the graph are in their changed state.
+    ///
+    public var graphDidChange = PassthroughSubject<GraphChange, Never>()
+
     /// Create an empty graph.
     ///
     /// - Parameters:
@@ -170,21 +170,26 @@ public class Graph {
             node.id = idGenerator.next()
         }
         
+        let change = GraphChange.addNode(node)
+        willChange(change)
+        
         // Register the object
         node.graph = self
 
         nodeIndex[node.id!] = node
         
-        let change = GraphChange.addNode(node)
         didChange(change)
     }
     
     /// Removes node from the graph and removes all incoming and outgoing links
     /// for that node.
     ///
-    // TODO: We need to distinguish between removing the nodes and unlinking the nodes
-    public func remove(_ node: Node) {
-        // TODO: This should be more atomic and shuold not remove a node if there are any links
+    /// - Returns: List of links that have been disconnected.
+    ///
+    @discardableResult
+    public func remove(_ node: Node) -> [Link] {
+        // TODO: We need to distinguish between removing the nodes and unlinking the nodes
+        // TODO: This should be more atomic and should not remove a node if there are any links
         guard node.graph === self else {
             fatalError("Trying to dissociate a node from another graph")
         }
@@ -192,19 +197,34 @@ public class Graph {
             fatalError("Trying to dissociate a node without id")
         }
         
-        // First we remove all the conections
+        let change = GraphChange.removeNode(node)
+        willChange(change)
+        
+        var disconnected: [Link] = []
+        
+        // First we remove all the connections
         for link in links {
             if link.origin === node || link.target === node {
-                disconnect(link: link)
+                // TODO: Do we need to do some sanity checks here?
+                // If the ID is not valid or if we do not have the link, then
+                // we have a bigger problem - the graph is getting corrupted
+                // somewhere.
+                //
+                // Note: We do not call "disconnect" here, because that would
+                // send change notification. We do not want to do that, as
+                // we have an agreement that node removal removes the
+                // associated links with it as well.
+                //
+                disconnected.append(link)
+                rawDisconnect(link)
             }
         }
-        // FIXME: Check for in/out links
+        
         nodeIndex[oid] = nil
-
         node.graph = nil
 
-        let change = GraphChange.removeNode(node)
         didChange(change)
+        return disconnected
     }
     
     /// Tests whether the graph contains a node.
@@ -268,16 +288,18 @@ public class Graph {
         }
         
         let link = Link(id: linkID, origin: origin, target: target)
+        
+        let change = GraphChange.connect(link)
+        willChange(change)
+
         link.graph = self
         self.linkIndex[linkID] = link
         
         for item in attributes {
             link[item.key] = item.value
         }
-        
-        let change = GraphChange.connect(link)
         didChange(change)
-
+        
         return link
     }
     
@@ -307,12 +329,13 @@ public class Graph {
             link.id = idGenerator.next()
         }
         
+        let change = GraphChange.connect(link)
+        willChange(change)
+        
         // Register the object
         link.graph = self
-
         linkIndex[link.id!] = link
-        
-        let change = GraphChange.connect(link)
+
         didChange(change)
     }
 
@@ -339,6 +362,20 @@ public class Graph {
 //            remove(link: link)
 //        }
 //    }
+   
+    /// Removes a specific link from the graph. This method is shared for
+    /// consistency between remove(node:) and disconnect(link:).
+    ///
+    /// - Parameters:
+    ///
+    ///     - link: Link to be removed.
+    ///
+    func rawDisconnect(_ link: Link) {
+        self.linkIndex[link.id!] = nil
+        link.graph = nil
+    }
+    
+
     
     /// Removes a specific link from the graph. Link must exist in the graph.
     ///
@@ -357,10 +394,9 @@ public class Graph {
         guard linkIndex[id] != nil else {
             fatalError("Trying to remove unknown link: \(link)")
         }
-        self.linkIndex[id] = nil
-        link.graph = nil
-
         let change = GraphChange.disconnect(link)
+        willChange(change)
+        rawDisconnect(link)
         didChange(change)
     }
     
@@ -373,6 +409,11 @@ public class Graph {
     /// - Returns: List of links.
     ///
     /// - Complexity: O(n). All links are traversed.
+    ///
+    /// - Note: If you want to get both outgoing and incoming links of a node
+    ///   then use ``neighbours``. Using ``outgoing`` + ``incoming`` might
+    ///   result in duplicates for links that are loops to and from the same
+    ///   node.
     ///
     public func outgoing(_ origin: Node) -> [Link] {
         let result: [Link]
@@ -393,6 +434,11 @@ public class Graph {
     ///
     /// - Complexity: O(n). All links are traversed.
     ///
+    /// - Note: If you want to get both outgoing and incoming links of a node
+    ///   then use ``neighbours``. Using ``outgoing`` + ``incoming`` might
+    ///   result in duplicates for links that are loops to and from the same
+    ///   node.
+    ///
     public func incoming(_ target: Node) -> [Link] {
         let result: [Link]
         
@@ -403,14 +449,14 @@ public class Graph {
         return result
     }
     
-    /// Get a list of links that are related to the neighbors of the node. That
+    /// Get a list of links that are related to the neighbours of the node. That
     /// is, list of links where the node is either an origin or a target.
     ///
     /// - Returns: List of links.
     ///
     /// - Complexity: O(n). All links are traversed.
     ///
-    public func neighbors(_ node: Node) -> [Link] {
+    public func neighbours(_ node: Node) -> [Link] {
         let result: [Link]
         
         result = self.linkIndex.values.filter {
@@ -459,9 +505,14 @@ public class Graph {
         return links.contains { $0.origin === node || $0.target === node }
     }
     
+    /// Called when graph is about to be changed.
+    func willChange(_ change: GraphChange) {
+        graphWillChange.send(change)
+    }
+    
     /// Called when graph has changed.
     func didChange(_ change: GraphChange) {
-        publisher.send(change)
+        graphDidChange.send(change)
     }
 }
 

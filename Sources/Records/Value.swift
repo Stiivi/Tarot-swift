@@ -67,11 +67,11 @@ public enum ValueType: String, Equatable, Codable, CustomStringConvertible {
 /// - `float` – a floating point number
 /// - `string` – a string representing a valid identifier
 ///
-public enum Value: Equatable, Hashable {
+public enum Value: Equatable, Hashable, Codable {
     /// A string value representation
     case string(String)
     
-    /// A bollean value representation
+    /// A boolean value representation
     case bool(Bool)
     
     /// An integer value representation
@@ -80,7 +80,7 @@ public enum Value: Equatable, Hashable {
     /// A floating point number value representation
     case float(Float)
     
-    /// Initialize value from any object and match type according to the
+    /// Initialise value from any object and match type according to the
     /// argument type. If no type can be matched, then returns nil.
     ///
     /// Matches to types:
@@ -182,7 +182,7 @@ public enum Value: Equatable, Hashable {
     }
 
     /// `true` if the value is considered empty empty.
-    /// String value is considered empty if the lenght of
+    /// String value is considered empty if the length of
     /// a string is zero, numeric value is considered empty if the value is
     /// equal to zero. Boolean value is not considered empty.
 
@@ -191,7 +191,7 @@ public enum Value: Equatable, Hashable {
     }
     
     /// Converts value to a value of another type, if possible. Caller is
-    /// advised to call ``ValueType.isConertible()`` to prevent potential
+    /// advised to call ``ValueType.isConvertible()`` to prevent potential
     /// convention errors.
     public func convert(to otherType:ValueType) -> Value? {
         switch (otherType) {
@@ -248,4 +248,3 @@ extension Value: ExpressibleByFloatLiteral {
         self = .float(Float(floatLiteral))
     }
 }
-

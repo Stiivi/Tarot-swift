@@ -58,7 +58,7 @@ open class Object: Identifiable {
         self.id = id
         self.attributes = attributes
     }
-
+    
     
     public subscript(_ key:AttributeKey) -> AttributeValue? {
         /// Gets attribute value for an attribute key `key`. If the attribute
@@ -68,19 +68,19 @@ open class Object: Identifiable {
         }
         /// Sets attribute value for an attribute key `key`.
         set(value) {
-            attributes[key] = value
-
-            // Notify graph
-            guard let graph = self.graph else {
-                return
-            }
-
+            let change: GraphChange
             if let value = value {
-                graph.didChange(.setAttribute(self, key, value))
+                change = .setAttribute(self, key, value)
             }
             else {
-                graph.didChange(.unsetAttribute(self, key))
+                change = .unsetAttribute(self, key)
             }
+
+            self.graph?.willChange(change)
+
+            attributes[key] = value
+
+            self.graph?.didChange(change)
         }
     }
 }

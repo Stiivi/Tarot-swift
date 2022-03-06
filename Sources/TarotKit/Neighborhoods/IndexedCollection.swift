@@ -98,6 +98,7 @@ public class IndexedCollection: LabelledNeighbourhood {
     /// - Returns: A link that connects the node that has been added to the
     ///   neighbourhood.
     ///
+    @discardableResult
     public func append(_ node: Node, attributes: [String:Value] = [:]) -> Link {
         let index = endIndex
         
@@ -111,7 +112,9 @@ public class IndexedCollection: LabelledNeighbourhood {
     ///
     public func remove(_ node: Node) {
         var index = 0
-        
+       
+        // Rebuild the collection
+        //
         for link in links {
             if link.target === node {
                 graph?.disconnect(link: link)
