@@ -107,8 +107,7 @@ public class MarkdownLoader: Loader {
             attributes["title"] = .string(title)
         }
         attributes["level"] = .int(section.level)
-        let sectionNode = Node(attributes: attributes)
-        graph.add(sectionNode)
+        let sectionNode = graph.create(attributes: attributes)
 
         // 1. Load subsections
         for (index, subsection) in section.subsections.enumerated() {

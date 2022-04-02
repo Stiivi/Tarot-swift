@@ -355,7 +355,7 @@ public class RelationalPackageLoader: Loader {
             throw LoaderError.duplicateSourceID(primaryKey, relation.name)
         }
         // Create the node
-        let node = Node()
+        let node = graph.create()
         
         // Register the node key
         setKey(primaryKey, for: node, relation: relation.name)
@@ -383,7 +383,6 @@ public class RelationalPackageLoader: Loader {
             node[field] = value
         }
         
-        graph.add(node)
         return node
     }
     

@@ -18,19 +18,21 @@ final class IndexedCollectionTests: XCTestCase {
     override func setUp() {
         graph = Graph()
         
-        nodes = [
-            Node(attributes: ["name":"one", "number": "10"]),
-            Node(attributes: ["name":"two", "number": "20"]),
-            Node(attributes: ["name":"three", "number": "30"]),
+        let nodeAttributes:[AttributeDictionary] = [
+            ["name":"one", "number": "10"],
+            ["name":"two", "number": "20"],
+            ["name":"three", "number": "30"],
             ]
         
-        for node in nodes {
-            graph.add(node)
+        nodes = []
+        
+        for attributes in nodeAttributes {
+            nodes.append(graph.create(attributes:attributes))
         }
 
-        collectionNode = Node()
-        graph.add(collectionNode)
+        collectionNode = graph.create()
     }
+    
     func testAppend() throws {
         let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),

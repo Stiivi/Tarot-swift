@@ -17,18 +17,19 @@ final class DictionaryTests: XCTestCase {
     override func setUp() {
         graph = Graph()
         
-        nodes = [
-            Node(attributes: ["name":"one", "number": "10"]),
-            Node(attributes: ["name":"two", "number": "20"]),
-            Node(attributes: ["name":"three", "number": "30"]),
-            ]
+        let nodeAttributes: [AttributeDictionary] = [
+            ["name":"one", "number": "10"],
+            ["name":"two", "number": "20"],
+            ["name":"three", "number": "30"],
+        ]
         
-        for node in nodes {
-            graph.add(node)
+        nodes = []
+        for attributes in nodeAttributes {
+            let node = graph.create(attributes:attributes)
+            nodes.append(node)
         }
 
-        collectionNode = Node()
-        graph.add(collectionNode)
+        collectionNode = graph.create()
 
         graph.connect(from: collectionNode, to: nodes[0],
                       attributes: ["label":"item", "key":"k1", "name": "jedna"])
@@ -66,9 +67,8 @@ final class DictionaryTests: XCTestCase {
     }
     func testSetKey() throws {
         let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
-        let node = Node()
+        let node = graph.create()
 
-        graph.add(node)
         XCTAssertNil(dict.node(forKey: "new"))
         dict.setNode(node, forKey:"new")
         XCTAssertIdentical(dict.node(forKey:"new"), node)

@@ -22,9 +22,8 @@ extension Tarot {
         mutating func run() throws {
             let manager = GraphManager()
 
-            let catalogNode = Node()
-            manager.graph.add(catalogNode)
-            manager.setCatalog( catalogNode)
+            let catalogNode = manager.graph.create()
+            manager.setCatalog(catalogNode)
 
             let url = databaseURL(options: options)
             let writer = TarotFileWriter(url: url)
@@ -54,8 +53,7 @@ extension Tarot {
                 CreateCatalog.exit()
             }
             
-            let catalog = Node()
-            manager.graph.add(catalog)
+            let catalog = manager.graph.create()
             manager.setCatalog(catalog)
 
             print("Catalog created.")

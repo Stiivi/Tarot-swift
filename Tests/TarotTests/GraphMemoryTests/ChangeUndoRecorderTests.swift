@@ -18,11 +18,11 @@ final class ChangeUndoRecorderTests: XCTestCase {
     }
     
     func testAddNode() {
-        let node = Node()
+        var node: Node!
         let recorder = ReversibleChangeRecorder(graph: graph)
 
         let changes = recorder.record {
-            graph.add(node)
+            node = graph.create()
         }
         
         XCTAssertEqual(changes.count, 1)
@@ -30,10 +30,9 @@ final class ChangeUndoRecorderTests: XCTestCase {
     }
     
     func testRemoveNode() {
-        let node = Node()
+        let node = graph.create()
         let recorder = ReversibleChangeRecorder(graph: graph)
         
-        graph.add(node)
         let link = graph.connect(from: node, to: node)
         
         let changes = recorder.record {
@@ -46,11 +45,11 @@ final class ChangeUndoRecorderTests: XCTestCase {
     }
     
     func testAddAndChange() {
-        let node = Node()
+        var node: Node!
         let recorder = ReversibleChangeRecorder(graph: graph)
         
         let changes = recorder.record {
-            graph.add(node)
+            node = graph.create()
             node["text"] = .string("test")
         }
         
@@ -60,15 +59,12 @@ final class ChangeUndoRecorderTests: XCTestCase {
     }
 
     func testIndexedCollectionAppend() {
-        let collectionNode = Node()
+        let collectionNode = graph.create()
         let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),
                                            indexAttribute: "index")
-        let node = Node()
+        let node = graph.create()
         
-        graph.add(collectionNode)
-        graph.add(node)
-
         let recorder = ReversibleChangeRecorder(graph: graph)
         let changes = recorder.record {
             collection.append(node)
@@ -85,14 +81,11 @@ final class ChangeUndoRecorderTests: XCTestCase {
     }
     
     func testIndexedCollectionRemoveCorrupted() {
-        let collectionNode = Node()
+        let collectionNode = graph.create()
         let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),
                                            indexAttribute: "index")
-        let node = Node()
-
-        graph.add(collectionNode)
-        graph.add(node)
+        let node = graph.create()
 
         let recorder = ReversibleChangeRecorder(graph: graph)
 

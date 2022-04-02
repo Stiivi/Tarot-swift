@@ -20,10 +20,8 @@ final class ObjectSelectionTests: XCTestCase {
     func testSetSelectionObjects() {
         let selection = ObjectSelection(graph: graph)
         
-        let node = Node()
+        let node = graph.create()
         var observed = false
-        
-        graph.add(node)
         
         let observer = selection.observe().sink {
             observed = true
@@ -38,11 +36,9 @@ final class ObjectSelectionTests: XCTestCase {
     func testAttributeChange() {
         let selection = ObjectSelection(graph: graph)
         
-        let node = Node()
+        let node = graph.create()
         var key: String? = nil
         var value: Value? = nil
-        
-        graph.add(node)
         
         let observer = selection.observeAttributes().sink {
             switch $0 {
@@ -64,8 +60,7 @@ final class ObjectSelectionTests: XCTestCase {
         XCTAssertEqual(key, "text")
         XCTAssertEqual(value, .string("test"))
         
-        let node2 = Node()
-        graph.add(node2)
+        let node2 = graph.create()
 
         // Just sanity check
         node2["ignore"] = .string("yes")

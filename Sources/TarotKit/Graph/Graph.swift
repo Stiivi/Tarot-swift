@@ -160,7 +160,7 @@ public class Graph {
     /// - Parameters:
     ///
     ///     - attributes: an attribute dictionary of the newly created node
-    ///     - id: an optional object ID of the newlo created node
+    ///     - id: an optional object ID of the newly created node
     ///
     public func create(attributes:AttributeDictionary=[:], id: OID?=nil) -> Node {
         let newID: OID
@@ -176,22 +176,15 @@ public class Graph {
         }
 
         let node = Node(id: newID, attributes: attributes)
-        
-        let change = GraphChange.addNode(node)
-        willChange(change)
-        
-        // Register the object
-        node.graph = self
-
-        nodeIndex[node.id!] = node
-        
-        didChange(change)
-        
+        add(node)
         return node
     }
     
-    // FIXME: Deprecated. Use: create()
-    /// Adds a node to the graph.
+    /// Adds a node to the graph. This method is used to add a newly created
+    /// node or to re-associate a node that has been removed. Node ID must be
+    /// valid.
+    ///
+    /// For internal use only.
     ///
     /// - Note: A node belongs to one graph only. It can not be shared once
     /// added to a graph.
@@ -200,28 +193,23 @@ public class Graph {
     ///
     ///     - node: Node to be added to the graph.
     ///
-    @available(*, deprecated, message: "Use create() instead")
-    public func add(_ node: Node) {
+    func add(_ node: Node) {
         guard node.graph == nil else {
             fatalError("Trying to associate already associated node: \(node)")
         }
-        if let id = node.id {
-            guard nodeIndex[id] == nil else {
-                fatalError("Trying to associate a node with id that already exists: \(id)")
-            }
-            idGenerator.markUsed(id)
+        guard let id = node.id else {
+            fatalError("Trying to associate a node without ID")
         }
-        else {
-            node.id = idGenerator.next()
+        guard nodeIndex[id] == nil else {
+            fatalError("Trying to associate a node with id that already exists: \(id)")
         }
         
         let change = GraphChange.addNode(node)
         willChange(change)
         
-        // Register the object
+        // Associate the node
         node.graph = self
-
-        nodeIndex[node.id!] = node
+        nodeIndex[id] = node
         
         didChange(change)
     }

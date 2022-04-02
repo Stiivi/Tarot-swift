@@ -74,8 +74,7 @@ extension Tarot {
         mutating func run() throws {
             let manager = createManager(options: options)
 
-            let node = Node()
-            manager.graph.add(node)
+            let node = manager.graph.create()
             print(node.id!)
             
             try finalizeManager(manager: manager, options: options)

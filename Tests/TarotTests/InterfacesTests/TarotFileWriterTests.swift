@@ -20,11 +20,16 @@ final class TarotFileWriterTests: XCTestCase {
 
     override func setUp() {
         self.graph = Graph()
-        self.nodes = [
-            1: Node(attributes: ["name": "one"]),
-            2: Node(attributes: ["name": "two"]),
-            3: Node(attributes: ["name": "three"]),
+        let nodeAttributes: [Int:AttributeDictionary] = [
+            1: ["name": "one"],
+            2: ["name": "two"],
+            3: ["name": "three"],
         ]
+        
+        nodes = [:]
+        for item in nodeAttributes {
+            nodes[item.key] = graph.create(attributes: item.value)
+        }
     }
 
     /**
@@ -63,9 +68,10 @@ final class TarotFileWriterTests: XCTestCase {
     func testEmpty() throws {
         let url = temporaryFileURL()
         let writer = TarotFileWriter(url: url)
+        let emptyGraph = Graph()
         let newGraph = Graph()
         let loader = TarotFileLoader(graph: newGraph)
-        try writer.write(graph: graph)
+        try writer.write(graph: emptyGraph)
 
         let _ = try loader.load(from: url, preserveIdentity: true)
         XCTAssertEqual(newGraph.nodes.count, 0)
@@ -77,10 +83,6 @@ final class TarotFileWriterTests: XCTestCase {
         let writer = TarotFileWriter(url: url)
         let newGraph = Graph()
         let loader = TarotFileLoader(graph: newGraph)
-        
-        for (_, node) in nodes {
-            graph.add(node)
-        }
         
         let names = [
             "one": nodes[1]!,
@@ -112,10 +114,6 @@ final class TarotFileWriterTests: XCTestCase {
         let writer = TarotFileWriter(url: url)
         let newGraph = Graph()
         let loader = TarotFileLoader(graph: newGraph)
-        
-        for (_, node) in nodes {
-            graph.add(node)
-        }
         
         graph.connect(from: nodes[1]!, to: nodes[2]!, attributes: ["label": "next"])
         graph.connect(from: nodes[2]!, to: nodes[3]!, attributes: ["label": "last"])

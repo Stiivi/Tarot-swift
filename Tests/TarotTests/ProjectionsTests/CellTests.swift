@@ -17,11 +17,8 @@ final class CellTests: XCTestCase {
     }
     
     func testBasic() {
-        let contentNode = Node()
-        let cellNode = Node()
-
-        graph.add(contentNode)
-        graph.add(cellNode)
+        let contentNode = graph.create()
+        let cellNode = graph.create()
         
         let cell = Cell(cellNode)
         XCTAssertNil(cell.content())
@@ -35,14 +32,10 @@ final class CellTests: XCTestCase {
     }
     
     func testSetContent() {
-        let contentNode = Node()
-        let newNode = Node()
-        let cellNode = Node()
+        let contentNode = graph.create()
+        let newNode = graph.create()
+        let cellNode = graph.create()
 
-        graph.add(contentNode)
-        graph.add(newNode)
-        graph.add(cellNode)
-        
         let cell = Cell(cellNode)
 
         cell.setContent(contentNode)
@@ -56,12 +49,9 @@ final class CellTests: XCTestCase {
     }
     
     func testRemoveContent() {
-        let contentNode = Node()
-        let cellNode = Node()
+        let contentNode = graph.create()
+        let cellNode = graph.create()
 
-        graph.add(contentNode)
-        graph.add(cellNode)
-        
         let cell = Cell(cellNode)
         cell.setContent(contentNode)
         cell.removeContent()
@@ -70,13 +60,9 @@ final class CellTests: XCTestCase {
     }
 
     func testSetContentDeletesExisting() {
-        let dummy = Node()
-        let contentNode = Node()
-        let cellNode = Node()
-
-        graph.add(dummy)
-        graph.add(contentNode)
-        graph.add(cellNode)
+        let dummy = graph.create()
+        let contentNode = graph.create()
+        let cellNode = graph.create()
 
         graph.connect(from: cellNode,
                       to: dummy,

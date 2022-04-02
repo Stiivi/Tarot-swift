@@ -16,26 +16,25 @@ final class OutlineTests: XCTestCase {
     
     override func setUp() {
         graph = Graph()
-        let nodes = [
-            1: Node(attributes: ["name":"one", "number": "1"]),
-            2: Node(attributes: ["name":"two", "number": "2"]),
-            3: Node(attributes: ["name":"three", "number": "3"]),
+        let data: [Int:AttributeDictionary] = [
+            1: ["name":"one", "number": "1"],
+            2: ["name":"two", "number": "2"],
+            3: ["name":"three", "number": "3"],
 
-            10: Node(attributes: ["name":"ten", "number": "10"]),
-            11: Node(attributes: ["name":"eleven", "number": "11"]),
-            20: Node(attributes: ["name":"twenty", "number": "20"]),
+            10: ["name":"ten", "number": "10"],
+            11: ["name":"eleven", "number": "11"],
+            20: ["name":"twenty", "number": "20"],
 
-            100: Node(attributes: ["name":"hundred", "number": "100"]),
-            101: Node(attributes: ["name":"hundredone", "number": "101"]),
+            100: ["name":"hundred", "number": "100"],
+            101: ["name":"hundredone", "number": "101"],
         ]
 
-        
-        for item in nodes {
-            graph.add(item.value)
+        nodes = [:]
+        for item in data {
+            nodes[item.key] = graph.create(attributes: item.value)
         }
 
-        outlineNode = Node()
-        graph.add(outlineNode)
+        outlineNode = graph.create()
 
         graph.connect(from: outlineNode, to: nodes[1]!,
                       attributes: ["label":"child", "index": 0])
@@ -58,14 +57,10 @@ final class OutlineTests: XCTestCase {
         // Connect the 2-20 hierarchy
         graph.connect(from: nodes[2]!, to: nodes[20]!,
                       attributes: ["label":"child", "index": 0])
-        
-        self.nodes = nodes
-
     }
 
     func testEmpty() {
-        let node = Node()
-        graph.add(node)
+        let node = graph.create()
         let outline = OutlineCell(node)
         
         XCTAssertEqual(outline.children.count, 0)

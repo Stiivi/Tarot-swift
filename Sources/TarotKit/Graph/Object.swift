@@ -55,7 +55,7 @@ open class Object: Identifiable {
     // TODO: Make this private. Use Graph.create() and Graph.connect()
     /// Create an empty object. The object needs to be associated with a graph.
     ///
-    public init(id: OID?=nil, attributes: [AttributeKey:AttributeValue]=[:]) {
+    init(id: OID?=nil, attributes: [AttributeKey:AttributeValue]=[:]) {
         self.id = id
         self.attributes = attributes
     }

@@ -117,12 +117,11 @@ public class TarotFileLoader: Loader {
         let node: Node
         
         if preserveIdentity {
-            node = Node(id: id, attributes: attributes)
+            node = graph.create(attributes: attributes, id: id)
         }
         else {
-            node = Node(attributes: attributes)
+            node = graph.create(attributes: attributes)
         }
-        graph.add(node)
         index[idString] = node
     }
 

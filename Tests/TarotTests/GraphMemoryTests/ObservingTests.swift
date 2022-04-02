@@ -17,6 +17,7 @@ final class GraphObservingTests: XCTestCase {
         graph = Graph()
     }
 
+    // TODO: Split it to different actions
     func testBasic() throws {
         let publisher = graph.observe()
         var lastChange: GraphChange? = nil
@@ -25,15 +26,13 @@ final class GraphObservingTests: XCTestCase {
             lastChange = $0
         }
         
-        let node = Node()
-        graph.add(node)
+        var node = graph.create()
         XCTAssertEqual(lastChange, .addNode(node))
         graph.remove(node)
         XCTAssertEqual(lastChange, .removeNode(node))
 
-        let other = Node()
-        graph.add(node)
-        graph.add(other)
+        let other = graph.create()
+        node = graph.create()
         let link = graph.connect(from: node, to: other)
         XCTAssertEqual(lastChange, .connect(link))
 
