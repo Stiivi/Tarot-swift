@@ -13,13 +13,15 @@ provide a more complex operations with the projected node.
 
 - ``NodeProjection``
 - ``BaseNodeProjection``
+- ``LinkSelector``
+- ``NeighbourhoodType``
 
 ### Neigbourhoods
 
-- ``LinkSelector``
 - ``LabelledNeighbourhood``
-- ``IndexedCollection``
-- ``KeyedCollection``
+- ``IndexedNeighbourhood``
+- ``KeyedNeighbourhood``
+- ``NeighbourhoodOfOne``
 
 ### Concrete Projections
 

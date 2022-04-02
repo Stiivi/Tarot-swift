@@ -7,6 +7,16 @@
 
 import Foundation
 
+// TODO: Use ValueProtocol and then Something.asValue
+
+/// Protocol for objects that can be represented as ``Value``.
+///
+public protocol ValueProtocol {
+    /// Representation of the receiver as a ``Value``
+    /// 
+    func asValue() -> Value
+}
+
 /// ValueType specifies a data type of a value that is used in interfaces.
 ///
 public enum ValueType: String, Equatable, Codable, CustomStringConvertible {
@@ -67,7 +77,7 @@ public enum ValueType: String, Equatable, Codable, CustomStringConvertible {
 /// - `float` – a floating point number
 /// - `string` – a string representing a valid identifier
 ///
-public enum Value: Equatable, Hashable, Codable {
+public enum Value: Equatable, Hashable, Codable, ValueProtocol {
     /// A string value representation
     case string(String)
     
@@ -216,6 +226,10 @@ public enum Value: Equatable, Hashable, Codable {
         default: return false
         }
     }
+    
+    public func asValue() -> Value {
+        return self
+    }
 }
 
 extension Value: CustomStringConvertible {
@@ -246,5 +260,29 @@ extension Value: ExpressibleByIntegerLiteral {
 extension Value: ExpressibleByFloatLiteral {
     public init(floatLiteral: Float) {
         self = .float(Float(floatLiteral))
+    }
+}
+
+extension String: ValueProtocol {
+    public func asValue() -> Value {
+        return .string(self)
+    }
+}
+
+extension Int: ValueProtocol {
+    public func asValue() -> Value {
+        return .int(self)
+    }
+}
+
+extension Bool: ValueProtocol {
+    public func asValue() -> Value {
+        return .bool(self)
+    }
+}
+
+extension Float: ValueProtocol {
+    public func asValue() -> Value {
+        return .float(self)
     }
 }

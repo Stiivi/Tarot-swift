@@ -54,7 +54,7 @@ public struct LinkSelector {
     ///       is `label`.
     ///
     public init(_ label: Value, direction: LinkDirection = .outgoing,
-                labelAttribute: String="label") {
+                labelAttribute: String=DefaultLinkLabelAttribute) {
         self.label = label
         self.direction = direction
         self.labelAttribute = labelAttribute
@@ -73,7 +73,8 @@ public struct LinkSelector {
     }
 
     /// Returns endpoind of the link based on the direction. Returns link's
-    /// origin if the direction 
+    /// origin if the direction is ``LinkDirection.incoming`` or returns link's target if the
+    /// direction is ``LinkDirection.outgoing``.
     ///
     public func endpoint(_ link: Link) -> Node {
         switch direction {

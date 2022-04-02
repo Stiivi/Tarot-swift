@@ -32,7 +32,7 @@ final class IndexedCollectionTests: XCTestCase {
         graph.add(collectionNode)
     }
     func testAppend() throws {
-        let collection = IndexedCollection(collectionNode,
+        let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),
                                            indexAttribute: "index")
 
@@ -60,7 +60,7 @@ final class IndexedCollectionTests: XCTestCase {
     }
     
     func testNodeAt() throws {
-        let collection = IndexedCollection(collectionNode,
+        let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),
                                            indexAttribute: "index")
         collection.append(nodes[0])

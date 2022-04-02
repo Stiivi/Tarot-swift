@@ -12,10 +12,10 @@ import Records
 /// - ToDo: This is a draft
 ///
 public class Model: BaseNodeProjection {
-    // TODO: Rething this container: indexed? keyed? keyed with order? why?
+    // TODO: Rethink this container: indexed? keyed? keyed with order? why?
     
-    public var _attributesHood: IndexedCollection {
-        IndexedCollection(representedNode, selector:LinkSelector("attribute"))
+    public var _attributesHood: IndexedNeighbourhood {
+        IndexedNeighbourhood(representedNode, selector:LinkSelector("attribute"))
     }
     
     /// Indexed neighbourhood with nodes representing attributes that are
@@ -27,18 +27,11 @@ public class Model: BaseNodeProjection {
     
     /// Returns a first attribute with given name
     public func firstAttribute(name: String) -> AttributeDescription? {
-        // TODO: Still wondering whether we should rather use keyed collecition
+        // TODO: Still wondering whether we should rather use keyed collection
         let attr = attributes.first { $0.name == name }
-        
-        if let attr = attr {
-            return attr
-        }
-        else {
-            return nil
-        }
-        
+
+        return attr
     }
-    
     /// Add an attribute to the model.
     ///
     /// - ToDo: This is a draft
@@ -46,4 +39,12 @@ public class Model: BaseNodeProjection {
     public func addAttribute(_ node: Node) {
         _attributesHood.append(node)
     }
+    
+
+    /// A dictionary of traits.
+    ///
+    public var traits: KeyedNeighbourhood {
+        KeyedNeighbourhood(representedNode, selector:LinkSelector("attribute"))
+    }
 }
+

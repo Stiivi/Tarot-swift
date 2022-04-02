@@ -24,8 +24,8 @@ public class TextDocumentSection: BaseNodeProjection {
     /// as `subsection` and using the attribute `order` to determine the
     /// subsection order within the section.
     ///
-    public var subsections: IndexedCollection {
-        return IndexedCollection(representedNode,
+    public var subsections: IndexedNeighbourhood {
+        return IndexedNeighbourhood(representedNode,
                                  selector:LinkSelector("subsection"),
                                  indexAttribute: "order")
     }
@@ -34,8 +34,8 @@ public class TextDocumentSection: BaseNodeProjection {
     /// as `block` and using the attribute `order` to determine the
     /// order of the blocks in the section.
     ///
-    public var blocks: IndexedCollection {
-        return IndexedCollection(representedNode,
+    public var blocks: IndexedNeighbourhood {
+        return IndexedNeighbourhood(representedNode,
                                  selector:LinkSelector("block"),
                                  indexAttribute: "order")
     }
@@ -69,8 +69,8 @@ public class TextDocument: BaseNodeProjection {
     /// subsection order within the section. See ``TextDocumentSection`` for
     /// more information.
     ///
-    public var sections: IndexedCollection {
-        return IndexedCollection(representedNode,
+    public var sections: IndexedNeighbourhood {
+        return IndexedNeighbourhood(representedNode,
                                  selector:LinkSelector("subsection"),
                                  indexAttribute: "order")
     }

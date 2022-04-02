@@ -23,6 +23,15 @@ are the core of TarotKit.
 - ``AttributeValue``
 - ``AttributeDictionary``
 
+###  Utility Objects
+
+- ``ObjectSelection``
+- ``LinkDirection``
+
+### Changes
+
+- ``GraphChange``
+
 ### Support Structures and Protocols
 
 - ``UniqueIDGenerator``

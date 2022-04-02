@@ -21,7 +21,7 @@ public class LabelledNeighbourhood: BaseNodeProjection {
         super.init(node)
     }
     
-    /// Links in the neighbourhood of the represented node. The neghborhood
+    /// Links in the neighbourhood of the represented node. The neighbourhood
     /// links are all links where the represented node is an origin or a target
     /// (depends on the link selector) and which match the link selector pattern.
     ///
@@ -49,13 +49,13 @@ public class LabelledNeighbourhood: BaseNodeProjection {
         return links
     }
    
-    /// Get count of links in the neigbourhood.
+    /// Get count of links in the neighbourhood.
     ///
     public var count: Int {
         return links.count
     }
 
-    /// Nodes in the neighbourhood of the represented node. The neghborhood
+    /// Nodes in the neighbourhood of the represented node. The neighbourhood
     /// nodes are all adjacent nodes where the link matches the link selector
     /// pattern.
     ///
@@ -91,7 +91,7 @@ public class LabelledNeighbourhood: BaseNodeProjection {
     ///   neighbourhood.
     ///
     @discardableResult
-    public func add(_ node: Node, attributes: [String:Value]=[:]) -> Link {
+    public func add(_ node: Node, attributes: AttributeDictionary=[:]) -> Link {
         var linkAttributes = attributes
         linkAttributes[selector.labelAttribute] = selector.label
         let link: Link

@@ -61,7 +61,7 @@ final class ChangeUndoRecorderTests: XCTestCase {
 
     func testIndexedCollectionAppend() {
         let collectionNode = Node()
-        let collection = IndexedCollection(collectionNode,
+        let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),
                                            indexAttribute: "index")
         let node = Node()
@@ -86,7 +86,7 @@ final class ChangeUndoRecorderTests: XCTestCase {
     
     func testIndexedCollectionRemoveCorrupted() {
         let collectionNode = Node()
-        let collection = IndexedCollection(collectionNode,
+        let collection = IndexedNeighbourhood(collectionNode,
                                            selector:LinkSelector("item"),
                                            indexAttribute: "index")
         let node = Node()

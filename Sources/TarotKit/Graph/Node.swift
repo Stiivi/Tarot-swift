@@ -6,6 +6,8 @@
 //
 
 
+// TODO: Node should be in World, not Graph, so we can benefit from the semantics
+
 /// Object representing a node of a graph.
 ///
 public final class Node: Object {

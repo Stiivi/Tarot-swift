@@ -75,6 +75,8 @@ import Records
 /// For more information about the file format see ``TarotFileWriter``
 ///
 public class GraphManager {
+    // TODO: Important: Rename to World
+    
     /// Graph that the manager manages.
     ///
     public let graph: Graph
@@ -84,7 +86,18 @@ public class GraphManager {
     ///
     /// Catalog is a collection node.
     ///
-    public var catalog: KeyedCollection? = nil
+    public var catalog: KeyedNeighbourhood? = nil
+    
+    /*
+     
+     World references:
+     - catalog
+     - model
+     - everything_proxy
+     - constraints
+     - rules
+
+     */
     
     /// Create a manager with an empty graph.
     ///
@@ -129,7 +142,8 @@ public class GraphManager {
         guard node.graph === graph else {
             fatalError("Trying to set a catalog with a node from a different graph")
         }
-        catalog = KeyedCollection(node, selector: LinkSelector("item"))
+        catalog = KeyedNeighbourhood(node, selector: LinkSelector("item"))
     }
     
 }
+

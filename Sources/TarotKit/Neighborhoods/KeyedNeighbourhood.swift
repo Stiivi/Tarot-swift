@@ -13,7 +13,7 @@ import Records
 /// node where items can be assigned a key. Key is a property of a link and is
 /// unique for the dictionary.
 ///
-public class KeyedCollection: LabelledNeighbourhood {
+public class KeyedNeighbourhood: LabelledNeighbourhood {
     /// Name of an attribute that belongs to a link refering to a dictionary
     /// node. The value of the attribute is a key that is used to lookup the
     /// node. Default is `key`.
@@ -75,22 +75,22 @@ public class KeyedCollection: LabelledNeighbourhood {
     /// creating a new link. See ``KeyedCollection/removeNode(forKey:)`` for more
     /// information.
     ///
-    public func setNode(_ node: Node, forKey key: Value,
+    public func setNode(_ node: NodeProjection, forKey key: Value,
                         attributes: [String:Value] = [:]) {
         var linkAttributes = attributes
         linkAttributes[linkKeyAttribute] = key
         removeNode(forKey: key)
-        self.add(node, attributes:linkAttributes)
+        self.add(node.representedNode, attributes:linkAttributes)
     }
     
-    public subscript(key: Value) -> Node? {
-        get { node(forKey: key) }
+    public subscript(key: ValueProtocol) -> Node? {
+        get { node(forKey: key.asValue()) }
         set(node) {
             if let node = node {
-                setNode(node, forKey: key)
+                setNode(node, forKey: key.asValue())
             }
             else {
-                removeNode(forKey: key)
+                removeNode(forKey: key.asValue())
             }
         }
     }

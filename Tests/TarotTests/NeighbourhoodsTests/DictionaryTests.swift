@@ -38,7 +38,7 @@ final class DictionaryTests: XCTestCase {
                       attributes: ["label":"item", "key":"k3", "name": "tri"])
     }
     func testDefaultLookup() throws {
-        let dict = KeyedCollection(collectionNode, selector: LinkSelector("item"))
+        let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
         
         XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
         XCTAssertEqual(dict.node(forKey: "k2"), nodes[1])
@@ -47,7 +47,7 @@ final class DictionaryTests: XCTestCase {
     }
 
     func testCustomKeyLookup() throws {
-        let dict = KeyedCollection(collectionNode,
+        let dict = KeyedNeighbourhood(collectionNode,
                                    selector: LinkSelector("item"),
                                    keyAttribute: "name")
         XCTAssertEqual(dict.node(forKey: "jedna"), nodes[0])
@@ -57,7 +57,7 @@ final class DictionaryTests: XCTestCase {
     }
     
     func testRemoveKey() throws {
-        let dict = KeyedCollection(collectionNode, selector: LinkSelector("item"))
+        let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
 
         XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
         dict.removeNode(forKey: "k1")
@@ -65,7 +65,7 @@ final class DictionaryTests: XCTestCase {
 
     }
     func testSetKey() throws {
-        let dict = KeyedCollection(collectionNode, selector: LinkSelector("item"))
+        let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
         let node = Node()
 
         graph.add(node)
@@ -74,7 +74,7 @@ final class DictionaryTests: XCTestCase {
         XCTAssertIdentical(dict.node(forKey:"new"), node)
     }
     func testLookupAfterObjectRemoval() throws {
-        let dict = KeyedCollection(collectionNode, selector: LinkSelector("item"))
+        let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
 
         XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
         graph.remove(nodes[0])

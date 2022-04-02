@@ -22,7 +22,7 @@ import Combine
 
 /// Protocol for a basic graph implementation. This protocol is
 /// a scaffolding for development - it helps to separate interface from the
-/// implementaiton.
+/// implementation.
 ///
 public protocol GraphProtocol {
     // TODO: Now unused, should be removed?
@@ -58,8 +58,10 @@ public protocol GraphProtocol {
 //    /// Remove a link attribute if exists. Returns previous value if it was set or
 //    /// nil when there was no value set for the attribute.
 //    func removeAttribute(link: Link, attribute: String) -> Value?
+    // func copy(link: Link, to: Node) -> Link
+    // func copy(link: Link, from: Node) -> Link
+    // func linearise(node, nodepredicate, linkpredicate) -> (Node,Link)
 }
-
 
 // NOTE: Status: Stable
 /// Graph is a mutable structure representing a directed labelled multi-graph.
@@ -147,6 +149,48 @@ public class Graph {
         return Set(linkIndex.values)
     }
     
+    
+    /// Create a new node in the graph. Attributes of a newly created node
+    /// can be provided as `attributes`.
+    ///
+    /// Optionally an explicit node ID can be provided when recreating
+    /// a graph, for example from an external representation. A node with
+    /// provided id must not exist.
+    ///
+    /// - Parameters:
+    ///
+    ///     - attributes: an attribute dictionary of the newly created node
+    ///     - id: an optional object ID of the newlo created node
+    ///
+    public func create(attributes:AttributeDictionary=[:], id: OID?=nil) -> Node {
+        let newID: OID
+        if let id = id {
+            guard nodeIndex[id] == nil else {
+                fatalError("Trying to create a node with id that already exists: \(id)")
+            }
+            idGenerator.markUsed(id)
+            newID = id
+        }
+        else {
+            newID = idGenerator.next()
+        }
+
+        let node = Node(id: newID, attributes: attributes)
+        
+        let change = GraphChange.addNode(node)
+        willChange(change)
+        
+        // Register the object
+        node.graph = self
+
+        nodeIndex[node.id!] = node
+        
+        didChange(change)
+        
+        return node
+    }
+    
+    // FIXME: Deprecated. Use: create()
     /// Adds a node to the graph.
     ///
     /// - Note: A node belongs to one graph only. It can not be shared once
@@ -156,6 +200,7 @@ public class Graph {
     ///
     ///     - node: Node to be added to the graph.
     ///
+    @available(*, deprecated, message: "Use create() instead")
     public func add(_ node: Node) {
         guard node.graph == nil else {
             fatalError("Trying to associate already associated node: \(node)")

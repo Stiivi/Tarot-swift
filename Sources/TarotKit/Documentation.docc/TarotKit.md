@@ -35,6 +35,13 @@ associated structures are the core of TarotKit.
 
 - <doc:Projections>
 
+### Model
+
+- ``Model``
+- ``Trait``
+- ``AttributeDescription``
+- ``NeighbourhoodTrait``
+
 ### Skeleton
 
 - <doc:Skeleton>

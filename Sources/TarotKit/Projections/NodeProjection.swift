@@ -34,10 +34,6 @@ public protocol NodeProjection {
     // TODO: Implement: neighbours(name: String) -> [Node]
     var representedNode: Node { get }
     
-    /// Return a labelled neighbourhood with given selector.
-    /// 
-    func neighbourhood(selector: LinkSelector) -> LabelledNeighbourhood
-    
     /// Connect the represented node with a node `node` in a way that the
     /// connection follows the selector specification. Optional attributes
     /// can be set on the connection.
@@ -49,7 +45,6 @@ public protocol NodeProjection {
     /// a key `label`.
     ///
     func connect(with node: Node, selector: LinkSelector, attributes: AttributeDictionary)
-
 }
 
 extension NodeProjection {
@@ -57,10 +52,6 @@ extension NodeProjection {
         return representedNode.graph
     }
 
-    public func neighbourhood(selector: LinkSelector) -> LabelledNeighbourhood {
-        return LabelledNeighbourhood(representedNode, selector: selector)
-    }
-    
     // TODO: This is the same as LabelledNeighbourhood.add(), probably remove this
     public func connect(with node: Node, selector: LinkSelector, attributes: AttributeDictionary = [:]) {
         var linkAttributes = attributes
@@ -73,11 +64,22 @@ extension NodeProjection {
     }
 }
 
-/// Convenience base class for concrete implementations of a node projection.
+/// Convenience base class for concrete implementations of a custom node
+/// projection.
+///
 open class BaseNodeProjection: NodeProjection {
     public var representedNode: Node
     
     public init(_ node: Node) {
         self.representedNode = node
     }
+    public init(_ projection: NodeProjection) {
+        self.representedNode = projection.representedNode
+    }
+}
+
+/// Node is a projection of itself.
+///
+extension Node: NodeProjection {
+    public var representedNode: Node { self }
 }

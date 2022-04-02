@@ -11,7 +11,7 @@ import Records
 /// Indexed collection is a neighbourhood where links are indexed by an index
 /// attribute.
 ///
-public class IndexedCollection: LabelledNeighbourhood {
+public class IndexedNeighbourhood: LabelledNeighbourhood {
     /// Attribute of the links in the neighbourhood that holds an index within
     /// the collection. Default is `index`.
     ///
@@ -142,12 +142,5 @@ public class IndexedCollection: LabelledNeighbourhood {
             return nil
         }
         return links[index].target
-    }
-}
-
-extension IndexedCollection: Sequence {
-    public typealias Iterator = Array<Node>.Iterator
-    public func makeIterator() -> Iterator {
-        return nodes.makeIterator()
     }
 }

@@ -52,6 +52,7 @@ open class Object: Identifiable {
     ///
     public internal(set) var id: OID?
     
+    // TODO: Make this private. Use Graph.create() and Graph.connect()
     /// Create an empty object. The object needs to be associated with a graph.
     ///
     public init(id: OID?=nil, attributes: [AttributeKey:AttributeValue]=[:]) {
