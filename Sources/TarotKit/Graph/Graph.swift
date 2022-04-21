@@ -162,7 +162,7 @@ public class Graph {
     ///     - attributes: an attribute dictionary of the newly created node
     ///     - id: an optional object ID of the newly created node
     ///
-    public func create(attributes:AttributeDictionary=[:], id: OID?=nil) -> Node {
+    public func create(labels: LabelSet=[], attributes:AttributeDictionary=[:], id: OID?=nil) -> Node {
         let newID: OID
         if let id = id {
             guard nodeIndex[id] == nil else {
@@ -175,7 +175,7 @@ public class Graph {
             newID = idGenerator.next()
         }
 
-        let node = Node(id: newID, attributes: attributes)
+        let node = Node(id: newID, labels: labels, attributes: attributes)
         add(node)
         return node
     }
@@ -286,7 +286,7 @@ public class Graph {
     /// - Returns: Newly created link
     ///
     @discardableResult
-    public func connect(from origin: Node, to target: Node, attributes: [AttributeKey:AttributeValue]=[:], id: OID?=nil) -> Link {
+    public func connect(from origin: Node, to target: Node, labels: LabelSet=[], attributes: [AttributeKey:AttributeValue]=[:], id: OID?=nil) -> Link {
         guard origin.graph === self else {
             if origin.graph == nil {
                 fatalError("Connecting to a non-associated origin")
@@ -320,7 +320,7 @@ public class Graph {
             linkID = idGenerator.next()
         }
         
-        let link = Link(id: linkID, origin: origin, target: target)
+        let link = Link(id: linkID, origin: origin, target: target, labels: labels)
         
         let change = GraphChange.connect(link)
         willChange(change)

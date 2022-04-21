@@ -9,7 +9,7 @@ import Foundation
 import XCTest
 @testable import TarotKit
 
-final class DictionaryTests: XCTestCase {
+final class KeyedNeighbourhoodTest: XCTestCase {
     var nodes: [Node]! = nil
     var graph: Graph! = nil
     var collectionNode: Node! = nil
@@ -32,11 +32,14 @@ final class DictionaryTests: XCTestCase {
         collectionNode = graph.create()
 
         graph.connect(from: collectionNode, to: nodes[0],
-                      attributes: ["label":"item", "key":"k1", "name": "jedna"])
+                      labels: ["item"],
+                      attributes: ["key":"k1", "name": "jedna"])
         graph.connect(from: collectionNode, to: nodes[1],
-                      attributes: ["label":"item", "key":"k2", "name": "dva"])
+                      labels: ["item"],
+                      attributes: ["key":"k2", "name": "dva"])
         graph.connect(from: collectionNode, to: nodes[2],
-                      attributes: ["label":"item", "key":"k3", "name": "tri"])
+                      labels: ["item"],
+                      attributes: ["key":"k3", "name": "tri"])
     }
     func testDefaultLookup() throws {
         let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
@@ -79,5 +82,10 @@ final class DictionaryTests: XCTestCase {
         XCTAssertEqual(dict.node(forKey: "k1"), nodes[0])
         graph.remove(nodes[0])
         XCTAssertNil(dict.node(forKey: "k1"))
+    }
+    func testKeys() throws {
+        let dict = KeyedNeighbourhood(collectionNode, selector: LinkSelector("item"))
+        let keys = dict.keys.compactMap { $0.stringValue() }
+        XCTAssertEqual(Set(keys), Set(["k1", "k2", "k3"]))
     }
 }

@@ -92,11 +92,13 @@ final class ChangeUndoRecorderTests: XCTestCase {
         let link = collection.append(node)
 
         // Create another item with the same index
-        graph.connect(from: collectionNode, to: node, attributes: [
-            "label": "item",
-            "comment": "corrupted link",
-            "index": link["index"]!
-        ])
+        graph.connect(from: collectionNode,
+                      to: node,
+                      labels: ["item"],
+                      attributes: [
+                        "comment": "corrupted link",
+                        "index": link["index"]!
+                    ])
 
         let changes = recorder.record {
             collection.remove(node)

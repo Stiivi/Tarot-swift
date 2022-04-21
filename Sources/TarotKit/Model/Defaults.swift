@@ -8,5 +8,4 @@
 import Foundation
 import Records
 
-public let DefaultLinkLabelAttribute: String = "label"
-public let DefaultNeighbourhoodItemLabel: Value = "item"
+public let DefaultNeighbourhoodItemLabel: String = "item"

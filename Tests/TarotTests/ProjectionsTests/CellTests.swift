@@ -25,7 +25,7 @@ final class CellTests: XCTestCase {
         
         graph.connect(from: cellNode,
                       to: contentNode,
-                      attributes: ["label":"content"])
+                      labels: ["content"])
 
         XCTAssertIdentical(cell.content(), contentNode)
         XCTAssertEqual(cellNode.outgoing.count, 1)
@@ -66,10 +66,10 @@ final class CellTests: XCTestCase {
 
         graph.connect(from: cellNode,
                       to: dummy,
-                      attributes: ["label":"content"])
+                      labels: ["content"])
         graph.connect(from: cellNode,
                       to: dummy,
-                      attributes: ["label":"content"])
+                      labels: ["content"])
 
         XCTAssertEqual(cellNode.outgoing.count, 2)
 

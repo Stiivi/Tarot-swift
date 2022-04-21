@@ -11,12 +11,10 @@ import XCTest
 
 
 final class RelationalPackageLoaderTests: XCTestCase {
-    var manager: GraphManager!
     var graph: Graph!
     
     override func setUp() {
-        self.manager = GraphManager()
-        self.graph = manager.graph
+        self.graph = Graph()
     }
     
     func testLoadRecordPrimaryKey() throws {

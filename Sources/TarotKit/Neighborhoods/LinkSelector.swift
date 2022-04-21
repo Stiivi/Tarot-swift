@@ -35,14 +35,10 @@ public enum LinkDirection {
 ///
 public struct LinkSelector {
     /// Label of a link. Links with this label are conforming to this link type.
-    public let label: Value
+    public let label: Label
     
     /// Direction of a link.
     public let direction: LinkDirection
-    
-    /// Attribute to be used to determine the label of a link. Default is
-    /// "label".
-    public let labelAttribute: String
     
     /// Create a labelled link type.
     ///
@@ -50,14 +46,9 @@ public struct LinkSelector {
     ///     - label: Label of links that conform to this type
     ///     - direction: Direction of links to be considered when relating
     ///       to a projected node.
-    ///     - labelAttribute: Link attribute that contains the label. Default
-    ///       is `label`.
-    ///
-    public init(_ label: Value, direction: LinkDirection = .outgoing,
-                labelAttribute: String=DefaultLinkLabelAttribute) {
+    public init(_ label: Label, direction: LinkDirection = .outgoing) {
         self.label = label
         self.direction = direction
-        self.labelAttribute = labelAttribute
     }
     
     /// Return a list of links associated with the node that match the selector.
@@ -69,10 +60,10 @@ public struct LinkSelector {
         case .outgoing: links = node.outgoing
         }
         
-        return links.filter { $0[labelAttribute] == label }
+        return links.filter { $0.contains(label: label) }
     }
 
-    /// Returns endpoind of the link based on the direction. Returns link's
+    /// Returns endpoint of the link based on the direction. Returns link's
     /// origin if the direction is ``LinkDirection.incoming`` or returns link's target if the
     /// direction is ``LinkDirection.outgoing``.
     ///

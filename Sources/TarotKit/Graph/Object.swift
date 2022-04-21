@@ -13,6 +13,14 @@ import Records
 ///
 public typealias OID = Int
 
+/// Type of a node or a link label.
+///
+public typealias Label = String
+
+/// Type for set of labels.
+///
+public typealias LabelSet = Set<Label>
+
 /// Type for object attribute key.
 public typealias AttributeKey = String
 
@@ -29,11 +37,15 @@ public typealias AttributeDictionary = [AttributeKey:AttributeValue]
 /// All object's attributes are optional. It is up to the user to add
 /// constraints or validations for the attributes of graph objects.
 ///
-open class Object: Identifiable {
+open class Object: Identifiable, CustomStringConvertible {
     /// Graph the object is associated with.
     ///
     public internal(set) var graph: Graph?
     
+    
+    /// A set of labels.
+    ///
+    public internal (set) var labels: LabelSet = []
     
     /// A dictionary of object's attributes.
     ///
@@ -44,7 +56,7 @@ open class Object: Identifiable {
     public var attributeKeys: [AttributeKey] {
         return Array(attributes.keys)
     }
-
+    
     /// Identifier of the object that is unique within the owning graph.
     /// The attribute is populated when the object is associated with a graph.
     /// When the object is disassociate from a graph, the identifier is set to
@@ -52,18 +64,35 @@ open class Object: Identifiable {
     ///
     public internal(set) var id: OID?
     
+
     // TODO: Make this private. Use Graph.create() and Graph.connect()
     /// Create an empty object. The object needs to be associated with a graph.
     ///
-    init(id: OID?=nil, attributes: [AttributeKey:AttributeValue]=[:]) {
+    init(id: OID?=nil, labels: LabelSet=[], attributes: [AttributeKey:AttributeValue]=[:]) {
         self.id = id
+        self.labels = labels
         self.attributes = attributes
     }
+
+    /// Returns `true` if the object contains the given label.
+    ///
+    public func contains(label: Label) -> Bool {
+        return labels.contains(label)
+    }
     
+    /// Sets object label.
+    public func set(label: Label) {
+        labels.insert(label)
+    }
+    
+    /// Unsets object label.
+    public func unset(label: Label) {
+        labels.remove(label)
+    }
     
     public subscript(_ key:AttributeKey) -> AttributeValue? {
         /// Gets attribute value for an attribute key `key`. If the attribute
-        /// is not set then it returns `nil`.
+        /// is not set it returns `nil`.
         get {
             return attributes[key]
         }
@@ -84,6 +113,14 @@ open class Object: Identifiable {
             self.graph?.didChange(change)
         }
     }
+
+    public var description: String {
+        let items = attributes.map { "\($0.key): \($0.value)" }
+        let joined = items.joined(separator: ", ")
+        let idString = id.map { String($0) } ?? "nil"
+        
+        return "Object(id: \(idString), labels: \(labels.sorted()), attributes: [\(joined)])"
+    }
 }
 
 extension Object: Hashable {
@@ -94,15 +131,5 @@ extension Object: Hashable {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-    }
-}
-
-extension Object: CustomStringConvertible {
-    public var description: String {
-        let items = attributes.map { "\($0.key): \($0.value)" }
-        let joined = items.joined(separator: ", ")
-        let idString = id.map { String($0) } ?? "nil"
-        
-        return "Object(id: \(idString), attributes: [\(joined)])"
     }
 }

@@ -38,11 +38,11 @@ public class LabelledNeighbourhood: BaseNodeProjection {
         switch selector.direction {
         case .incoming:
             links = graph.incoming(representedNode).filter {
-                $0[selector.labelAttribute] == selector.label
+                $0.contains(label: selector.label)
             }
         case .outgoing:
             links = graph.outgoing(representedNode).filter {
-                $0[selector.labelAttribute] == selector.label
+                $0.contains(label: selector.label)
             }
         }
         
@@ -91,13 +91,22 @@ public class LabelledNeighbourhood: BaseNodeProjection {
     ///   neighbourhood.
     ///
     @discardableResult
-    public func add(_ node: Node, attributes: AttributeDictionary=[:]) -> Link {
-        var linkAttributes = attributes
-        linkAttributes[selector.labelAttribute] = selector.label
+    public func add(_ node: Node, labels: LabelSet=[], attributes: AttributeDictionary=[:]) -> Link {
+        var linkLabels = labels
+        linkLabels.insert(selector.label)
+        
         let link: Link
         switch selector.direction {
-        case .incoming: link = node.connect(to: representedNode, attributes: linkAttributes)
-        case .outgoing: link = representedNode.connect(to: node, attributes: linkAttributes)
+        case .incoming:
+            link = graph!.connect(from: node,
+                                 to: representedNode,
+                                 labels: linkLabels,
+                                 attributes: attributes)
+        case .outgoing:
+            link = graph!.connect(from: representedNode,
+                                 to: node,
+                                 labels: linkLabels,
+                                 attributes: attributes)
         }
         return link
     }

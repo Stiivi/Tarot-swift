@@ -37,26 +37,33 @@ final class OutlineTests: XCTestCase {
         outlineNode = graph.create()
 
         graph.connect(from: outlineNode, to: nodes[1]!,
-                      attributes: ["label":"child", "index": 0])
+                      labels: ["child"],
+                      attributes: ["index": 0])
         graph.connect(from: outlineNode, to: nodes[2]!,
-                      attributes: ["label":"child", "index": 1])
+                      labels: ["child"],
+                      attributes: ["index": 1])
         graph.connect(from: outlineNode, to: nodes[3]!,
-                      attributes: ["label":"child", "index": 2])
+                      labels: ["child"],
+                      attributes: ["index": 2])
 
         // Connect the 1-10-100 hierarchy
         graph.connect(from: nodes[1]!, to: nodes[10]!,
-                      attributes: ["label":"child", "index": 0])
+                      labels: ["child"],
+                      attributes: ["index": 0])
         graph.connect(from: nodes[1]!, to: nodes[1]!,
-                      attributes: ["label":"child", "index": 1])
+                      labels: ["child"],
+                      attributes: ["index": 1])
 
         graph.connect(from: nodes[10]!, to: nodes[100]!,
-                      attributes: ["label":"child", "index": 0])
+                      labels: ["child"],
+                      attributes: ["index": 0])
         graph.connect(from: nodes[10]!, to: nodes[101]!,
-                      attributes: ["label":"child", "index": 1])
+                      labels: ["child"],
+                      attributes: ["index": 1])
 
         // Connect the 2-20 hierarchy
         graph.connect(from: nodes[2]!, to: nodes[20]!,
-                      attributes: ["label":"child", "index": 0])
+                      attributes: ["index": 0])
     }
 
     func testEmpty() {

@@ -20,10 +20,19 @@ public class Link: Object {
     ///
     public let target: Node
     
-    init(id: OID, origin: Node, target: Node, attributes: AttributeDictionary=[:]) {
+    init(id: OID, origin: Node, target: Node, labels: LabelSet=[], attributes: AttributeDictionary=[:]) {
         self.origin = origin
         self.target = target
-        super.init(id: id, attributes: attributes)
+        super.init(id: id, labels: labels, attributes: attributes)
+    }
+
+    public override var description: String {
+        let items = attributes.map { "\($0.key): \($0.value)" }
+        let joined = items.joined(separator: ", ")
+        let idString = id.map { String($0) } ?? "nil"
+        let originIdString = origin.id.map { String($0) } ?? "nil"
+        let targetIdString = target.id.map { String($0) } ?? "nil"
+
+        return "Object(id: \(idString), from: \(originIdString), to: \(targetIdString), labels: \(labels.sorted()), attributes: [\(joined)])"
     }
 }
-

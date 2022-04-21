@@ -10,7 +10,7 @@ import XCTest
 @testable import TarotKit
 
 
-final class IndexedCollectionTests: XCTestCase {
+final class IndexedNeighbourhoodTest: XCTestCase {
     var nodes: [Node]! = nil
     var graph: Graph! = nil
     var collectionNode: Node! = nil
